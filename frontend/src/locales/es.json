@@ -120,6 +120,11 @@
     },
     "message": {
       "sendFailed": "No se pudo enviar el mensaje."
+    },
+    "encryption": {
+      "locked": "Privé no puede desbloquear tus datos: su clave ya no está en el llavero de este equipo. Para empezar de cero, cierra Privé y borra su carpeta de datos; podrás vincular tus cuentas de nuevo.",
+      "keychainUnavailable": "Privé no pudo acceder al llavero del sistema, donde guarda la clave que protege tus datos. Asegúrate de que el llavero esté desbloqueado y vuelve a abrir Privé.",
+      "corrupt": "El archivo de claves de Privé está dañado, así que no se pueden desbloquear tus datos."
     }
   }
 }

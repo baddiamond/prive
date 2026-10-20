@@ -3,6 +3,7 @@
 import {
   GetAppInfo,
   GetSettings,
+  GetSystemLocale,
   SetLanguage,
   SetTheme,
 } from "../../wailsjs/go/main/App";
@@ -56,4 +57,9 @@ export interface AppInfo {
 /** Loads the app version and data folder. */
 export function getAppInfo(): Promise<AppInfo> {
   return GetAppInfo();
+}
+
+/** Returns the OS language; works even when local data could not be opened. */
+export function getSystemLocale(): Promise<string> {
+  return GetSystemLocale();
 }

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"regexp"
@@ -10,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/baddiamond/prive/internal/core"
+	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/platform"
 	"github.com/baddiamond/prive/internal/store"
 )
@@ -43,6 +46,9 @@ type App struct {
 	manager *core.Manager
 	dataDir string
 	logger  *slog.Logger
+	// failure is set when local data could not be opened; every data method returns it so
+	// the UI can explain the problem instead of the app quitting silently.
+	failure *core.CodedError
 }
 
 // AppInfo is static information shown in Settings.
@@ -63,8 +69,9 @@ type Settings struct {
 }
 
 // NewApp creates the bound API on top of an open store. The account manager is
-// created here and started once the window exists (see startup).
-func NewApp(st *store.Store, engines core.EngineSource, dataDir string, logger *slog.Logger) *App {
+// created here and started once the window exists (see startup). Engine databases are
+// encrypted with keys derived from k.
+func NewApp(st *store.Store, engines core.EngineSource, dataDir string, k *keys.Keys, logger *slog.Logger) *App {
 	a := &App{store: st, dataDir: dataDir, logger: logger}
 	a.manager = core.NewManager(core.ManagerConfig{
 		Engines: engines,
@@ -72,13 +79,24 @@ func NewApp(st *store.Store, engines core.EngineSource, dataDir string, logger *
 		DataDir: dataDir,
 		Logger:  logger,
 		Emit:    a.emit,
+		OpenDB: func(ctx context.Context, path, label string) (*sql.DB, error) {
+			return store.OpenDB(ctx, path, store.Options{Key: k.Derive(label)})
+		},
 	})
 	return a
+}
+
+// NewFailedApp creates an App that only reports why local data could not be opened.
+func NewFailedApp(err error, dataDir string, logger *slog.Logger) *App {
+	return &App{dataDir: dataDir, logger: logger, failure: core.AsCoded(err)}
 }
 
 // startup is called by Wails when the app starts. The context is needed by the runtime package.
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	if a.failure != nil {
+		return
+	}
 	// Sessions connect in the background; the UI renders from local data meanwhile.
 	if err := a.manager.Start(ctx); err != nil {
 		a.logger.Error("start accounts", "err", err)
@@ -87,6 +105,9 @@ func (a *App) startup(ctx context.Context) {
 
 // shutdown is called by Wails after the window has closed.
 func (a *App) shutdown(context.Context) {
+	if a.manager == nil {
+		return
+	}
 	if err := a.manager.Close(); err != nil {
 		a.logger.Warn("close accounts", "err", err)
 	}
@@ -107,19 +128,27 @@ type errorPayload struct {
 	Params map[string]string `json:"params,omitempty"`
 }
 
-// formatError turns errors returned by bound methods into {code, params} for the frontend.
-// Errors without a code are logged and reported as errors.unknown.
+// formatError turns errors returned by bound methods into the JSON text of {code, params}.
+// It must be a string: the Wails runtime wraps whatever it receives in a JavaScript Error,
+// which would turn an object into "[object Object]". Errors without a code are logged and
+// reported as errors.unknown.
 func formatError(logger *slog.Logger) func(error) any {
 	return func(err error) any {
+		payload := errorPayload{Code: core.CodeUnknown}
 		var ce *core.CodedError
-		if !errors.As(err, &ce) {
+		if errors.As(err, &ce) {
+			payload = errorPayload{Code: ce.Code, Params: ce.Params}
+			if ce.Err != nil {
+				logger.Warn("error returned to the UI", "code", ce.Code, "err", ce.Err)
+			}
+		} else {
 			logger.Error("uncoded error returned to the UI", "err", err)
-			return errorPayload{Code: core.CodeUnknown}
 		}
-		if ce.Err != nil {
-			logger.Warn("error returned to the UI", "code", ce.Code, "err", ce.Err)
+		text, mErr := json.Marshal(payload)
+		if mErr != nil {
+			return `{"code":"` + core.CodeUnknown + `"}`
 		}
-		return errorPayload{Code: ce.Code, Params: ce.Params}
+		return string(text)
 	}
 }
 
@@ -137,8 +166,17 @@ func (a *App) GetAppInfo() AppInfo {
 	return AppInfo{Version: version, DataDir: a.dataDir}
 }
 
+// GetSystemLocale returns the OS language as a BCP 47 tag. It works even when local data
+// could not be opened, so the error screen can still speak the user's language.
+func (a *App) GetSystemLocale() string {
+	return platform.SystemLocale()
+}
+
 // GetSettings returns the stored preferences plus the detected system language.
 func (a *App) GetSettings() (Settings, error) {
+	if a.failure != nil {
+		return Settings{}, a.failure
+	}
 	ctx := a.context()
 	lang, _, err := a.store.Setting(ctx, store.SettingLanguage)
 	if err != nil {
@@ -162,6 +200,9 @@ func (a *App) GetSettings() (Settings, error) {
 
 // SetLanguage saves the UI language (a BCP 47 tag). An empty string means "follow the system".
 func (a *App) SetLanguage(lang string) error {
+	if a.failure != nil {
+		return a.failure
+	}
 	ctx := a.context()
 	var err error
 	switch {
@@ -181,6 +222,9 @@ func (a *App) SetLanguage(lang string) error {
 
 // SetTheme saves the color theme: "system", "light" or "dark".
 func (a *App) SetTheme(theme string) error {
+	if a.failure != nil {
+		return a.failure
+	}
 	if !isTheme(theme) {
 		return errInvalidSetting
 	}

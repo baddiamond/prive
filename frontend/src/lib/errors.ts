@@ -10,15 +10,22 @@ export interface BackendError {
 const unknownError: BackendError = { code: "errors.unknown" };
 
 /**
- * Normalizes a rejected backend call. Bound Go methods reject with {code, params}
- * (see formatError in app.go); anything else becomes errors.unknown.
+ * Normalizes a rejected backend call. Bound Go methods reject with an Error whose message is
+ * the JSON text of {code, params} (see formatError in app.go); anything else becomes errors.unknown.
  */
 export function toBackendError(err: unknown): BackendError {
-  if (typeof err === "object" && err !== null && "code" in err && typeof err.code === "string") {
-    const params = "params" in err && typeof err.params === "object" && err.params !== null
-      ? (err.params as Record<string, string>)
-      : undefined;
-    return { code: err.code, params };
+  const text = err instanceof Error ? err.message : typeof err === "string" ? err : "";
+  try {
+    const parsed: unknown = JSON.parse(text);
+    if (typeof parsed === "object" && parsed !== null && "code" in parsed && typeof parsed.code === "string") {
+      const params =
+        "params" in parsed && typeof parsed.params === "object" && parsed.params !== null
+          ? (parsed.params as Record<string, string>)
+          : undefined;
+      return { code: parsed.code, params };
+    }
+  } catch {
+    // not JSON: fall through
   }
   return unknownError;
 }

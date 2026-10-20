@@ -15,8 +15,10 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 
+	"github.com/baddiamond/prive/internal/core"
 	"github.com/baddiamond/prive/internal/engines"
 	_ "github.com/baddiamond/prive/internal/engines/all" // registers bundled engines
+	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/platform"
 	"github.com/baddiamond/prive/internal/store"
 )
@@ -33,6 +35,24 @@ var version = "0.1.0-dev"
 // appID identifies Privé to the OS, e.g. for the single-instance lock.
 const appID = "io.github.baddiamond.prive"
 
+// openStorage resolves the data folder, unlocks the data key from the system keychain
+// (creating it on first run) and opens the encrypted database (ADR 0007).
+func openStorage(ctx context.Context) (string, *store.Store, *keys.Keys, error) {
+	dataDir, err := platform.EnsureDataDir()
+	if err != nil {
+		return "", nil, nil, err
+	}
+	k, _, err := keys.Unlock(dataDir, keys.OSKeychain())
+	if err != nil {
+		return dataDir, nil, nil, err
+	}
+	st, err := store.Open(ctx, filepath.Join(dataDir, store.FileName), store.Options{Key: k.Derive(store.FileName)})
+	if err != nil {
+		return dataDir, nil, nil, err
+	}
+	return dataDir, st, k, nil
+}
+
 func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	slog.SetDefault(logger)
@@ -43,19 +63,23 @@ func main() {
 	}
 }
 
-// run opens local storage and blocks until the window is closed.
+// run opens local storage and blocks until the window is closed. If storage cannot be
+// opened, the window still opens and explains why (see App.failure).
 func run(logger *slog.Logger) error {
-	dataDir, err := platform.EnsureDataDir()
-	if err != nil {
-		return err
+	if generatingBindings {
+		// Only the method signatures matter; never open the keychain or the database.
+		return wails.Run(&options.App{Bind: []any{NewFailedApp(core.ErrShuttingDown, "", logger)}})
 	}
-	st, err := store.Open(context.Background(), filepath.Join(dataDir, store.FileName))
-	if err != nil {
-		return err
-	}
-	defer func() { _ = st.Close() }()
 
-	app := NewApp(st, engines.Default(), dataDir, logger)
+	dataDir, st, k, err := openStorage(context.Background())
+	var app *App
+	if err != nil {
+		logger.Error("open local data", "err", err)
+		app = NewFailedApp(err, dataDir, logger)
+	} else {
+		defer func() { _ = st.Close() }()
+		app = NewApp(st, engines.Default(), dataDir, k, logger)
+	}
 
 	return wails.Run(&options.App{
 		Title:     "Privé",

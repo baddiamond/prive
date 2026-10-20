@@ -9,8 +9,8 @@ export default defineConfig({
     fs: { allow: [".."] },
   },
   build: {
-    // The app runs inside the OS webview (WebKit on macOS/Linux, WebView2 on Windows),
-    // so target engines that ship with still-supported OS versions.
-    target: ["es2022", "safari15", "chrome100"],
+    // The app runs inside the OS webview (WebKit on macOS/Linux, WebView2 on Windows).
+    // Safari 14 is the WebKit of macOS 11, the oldest macOS we support (docs/REQUIREMENTS.md).
+    target: ["es2020", "safari14", "chrome100"],
   },
 });

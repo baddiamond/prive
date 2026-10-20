@@ -2,6 +2,7 @@ import { create } from "zustand";
 import i18n, { isLanguageCode, resolveLanguage, type LanguageCode } from "../i18n";
 import {
   getSettings,
+  getSystemLocale,
   saveLanguage,
   saveTheme,
   type ThemePreference,
@@ -44,7 +45,10 @@ export const useSettings = create<SettingsState>()((set, get) => ({
       await applyLanguage(language, s.systemLocale);
       set({ status: "ready" });
     } catch (err) {
-      set({ status: "error", errorCode: errorCode(err) });
+      // Explain the problem in the user's language even without settings.
+      const systemLocale = await getSystemLocale().catch(() => "");
+      await applyLanguage("", systemLocale);
+      set({ status: "error", errorCode: errorCode(err), systemLocale });
     }
   },
 

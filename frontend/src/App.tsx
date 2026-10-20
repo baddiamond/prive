@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import AccountRail from "./components/AccountRail";
 import ChatList from "./components/ChatList";
+import LogoMark from "./components/LogoMark";
 import SettingsScreen from "./components/settings/SettingsScreen";
 import Welcome from "./components/Welcome";
 import { translateCode } from "./lib/errors";
@@ -50,8 +51,11 @@ export default function App() {
 
   if (status === "error") {
     return (
-      <div className="flex h-full items-center justify-center p-8 text-status-danger" role="alert">
-        {translateCode(t, errorCode ?? "errors.unknown")}
+      <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
+        <LogoMark width={56} height={56} />
+        <p role="alert" className="max-w-md leading-relaxed text-text">
+          {translateCode(t, errorCode ?? "errors.unknown")}
+        </p>
       </div>
     );
   }

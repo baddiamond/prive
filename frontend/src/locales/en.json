@@ -120,6 +120,11 @@
     },
     "message": {
       "sendFailed": "The message could not be sent."
+    },
+    "encryption": {
+      "locked": "Privé can't unlock your data: its key is no longer in this computer's keychain. To start fresh, quit Privé and delete its data folder; you can link your accounts again.",
+      "keychainUnavailable": "Privé couldn't reach your system keychain, where it keeps the key that protects your data. Make sure the keychain is unlocked and open Privé again.",
+      "corrupt": "Privé's key file is damaged, so your data can't be unlocked."
     }
   }
 }

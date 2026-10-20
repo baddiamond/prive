@@ -8,21 +8,39 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/baddiamond/prive/internal/core"
 	"github.com/baddiamond/prive/internal/engines"
+	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/store"
 )
 
 func newTestApp(t *testing.T) *App {
 	t.Helper()
-	st, err := store.Open(context.Background(), filepath.Join(t.TempDir(), store.FileName))
+	dir := t.TempDir()
+	k, _, err := keys.Unlock(dir, keys.NewMemoryKeychain())
+	if err != nil {
+		t.Fatal(err)
+	}
+	st, err := store.Open(context.Background(), filepath.Join(dir, store.FileName), store.Options{Key: k.Derive(store.FileName)})
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = st.Close() })
-	return NewApp(st, engines.NewRegistry(), t.TempDir(), slog.New(slog.NewTextHandler(io.Discard, nil)))
+	return NewApp(st, engines.NewRegistry(), dir, k, slog.New(slog.NewTextHandler(io.Discard, nil)))
+}
+
+func TestFailedAppReportsTheCause(t *testing.T) {
+	app := NewFailedApp(keys.ErrLocked, t.TempDir(), slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if _, err := app.GetSettings(); !errors.Is(err, keys.ErrLocked) {
+		t.Errorf("GetSettings = %v, want ErrLocked", err)
+	}
+	if err := app.SetTheme(ThemeDark); !errors.Is(err, keys.ErrLocked) {
+		t.Errorf("SetTheme = %v, want ErrLocked", err)
+	}
+	app.shutdown(context.Background()) // must not panic without a manager
 }
 
 func TestAppInfo(t *testing.T) {
@@ -85,14 +103,14 @@ func TestFormatError(t *testing.T) {
 	format := formatError(slog.New(slog.NewTextHandler(io.Discard, nil)))
 
 	got := format(core.ErrSendFailed.Wrap(errors.New("private detail")).With("reason", "timeout"))
-	want := errorPayload{Code: core.CodeSendFailed, Params: map[string]string{"reason": "timeout"}}
-	if gotJSON, wantJSON := mustJSON(t, got), mustJSON(t, want); gotJSON != wantJSON {
-		t.Errorf("coded error = %s, want %s", gotJSON, wantJSON)
+	want := mustJSON(t, errorPayload{Code: core.CodeSendFailed, Params: map[string]string{"reason": "timeout"}})
+	if got != want {
+		t.Errorf("coded error = %v, want %s", got, want)
 	}
 
 	// Errors without a code never leak their text to the UI.
-	if got := mustJSON(t, format(errors.New("private detail"))); got != `{"code":"errors.unknown"}` {
-		t.Errorf("plain error = %s", got)
+	if got := format(errors.New("private detail")); got != `{"code":"errors.unknown"}` {
+		t.Errorf("plain error = %v", got)
 	}
 }
 
@@ -101,20 +119,30 @@ func TestAppCodesHaveTranslations(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var locale struct {
-		Errors struct {
-			Settings map[string]string `json:"settings"`
-		} `json:"errors"`
-	}
+	var locale map[string]any
 	if err := json.Unmarshal(raw, &locale); err != nil {
 		t.Fatal(err)
 	}
-	for _, e := range appErrorCodes {
-		key := e.Code[len("errors.settings."):]
-		if locale.Errors.Settings[key] == "" {
+	codes := append(append([]*core.CodedError{}, appErrorCodes...), keys.Codes()...)
+	for _, e := range codes {
+		if !hasTranslation(locale, e.Code) {
 			t.Errorf("code %q has no translation in en.json", e.Code)
 		}
 	}
+}
+
+func hasTranslation(tree map[string]any, key string) bool {
+	head, rest, nested := strings.Cut(key, ".")
+	v, ok := tree[head]
+	if !ok {
+		return false
+	}
+	if !nested {
+		_, isString := v.(string)
+		return isString
+	}
+	sub, ok := v.(map[string]any)
+	return ok && hasTranslation(sub, rest)
 }
 
 func mustJSON(t *testing.T, v any) string {
