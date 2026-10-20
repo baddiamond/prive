@@ -155,8 +155,12 @@ type ListChatsOptions struct {
 type GetMessagesOptions struct {
 	// Limit caps the number of messages; 0 means the implementation's default.
 	Limit int
-	// Before, if set, returns only messages older than this time.
+	// Before, if set, returns only messages older than this time…
 	Before time.Time
+	// BeforeID, with Before, also returns messages at exactly Before whose ID sorts before
+	// this one. Passing the oldest message of the previous page as (Before, BeforeID) pages
+	// without skipping messages that share a timestamp.
+	BeforeID MessageID
 }
 
 // ChatPatch changes some fields of a stored chat. Nil fields are left as they are.

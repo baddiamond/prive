@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import AccountRail from "./components/AccountRail";
 import AddAccountDialog from "./components/accounts/AddAccountDialog";
 import ChatList from "./components/ChatList";
-import ConversationPlaceholder from "./components/chats/ConversationPlaceholder";
+import Conversation from "./components/conversation/Conversation";
 import LogoMark from "./components/LogoMark";
 import Onboarding from "./components/onboarding/Onboarding";
 import RecoveryDialog from "./components/recovery/RecoveryDialog";
@@ -93,7 +93,7 @@ function Shell() {
       {screen === "inbox" ? (
         <>
           <ChatList />
-          {hasSelection ? <ConversationPlaceholder /> : <Welcome />}
+          {hasSelection ? <Conversation /> : <Welcome />}
         </>
       ) : (
         <SettingsScreen />

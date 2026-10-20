@@ -38,6 +38,14 @@ module.exports = {
           success: "var(--prive-status-success)",
           warning: "var(--prive-status-warning)",
           danger: "var(--prive-status-danger)"
+        },
+        sender: {
+          green: "var(--prive-sender-green)",
+          amber: "var(--prive-sender-amber)",
+          rose: "var(--prive-sender-rose)",
+          sky: "var(--prive-sender-sky)",
+          violet: "var(--prive-sender-violet)",
+          coral: "var(--prive-sender-coral)"
         }
       },
       borderRadius: {

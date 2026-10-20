@@ -147,7 +147,7 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - [x] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
 - [x] **2. WhatsApp login** — QR pairing, persisted sessions, auto-reconnect, unlimited accounts
 - [x] **3. Chat list** — history import, unified inbox + per-account filter, unread counters, recovery phrase
-- [ ] **4. History** — paginated message history cached locally
+- [x] **4. History** — conversation view, paginated history cached locally, older messages from the phone
 - [ ] **5. Real time** — send and receive text messages live, mark as read
 - [ ] **6. Polish** — keyboard shortcuts, startup/memory profiling, macOS/Windows/Linux builds
 

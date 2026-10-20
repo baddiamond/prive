@@ -32,6 +32,8 @@ export interface Capabilities {
   edit: boolean;
   delete: boolean;
   replies: boolean;
+  /** Older messages than those stored can be asked from the network (e.g. the phone). */
+  historyOnDemand: boolean;
 }
 
 /** Describes one network. */

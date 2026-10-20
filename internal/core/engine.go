@@ -45,6 +45,16 @@ type Session interface {
 	Close() error
 }
 
+// HistoryRequester is implemented by sessions whose engine declares
+// Capabilities.HistoryOnDemand.
+type HistoryRequester interface {
+	// RequestOlderHistory asks the network for up to count messages older than oldest, the
+	// oldest message stored for the chat. It returns once the request is sent; the messages
+	// arrive as a HistoryBatchEvent (not authoritative), followed by a HistoryResultEvent for
+	// the chat, which also reports when the network does not answer.
+	RequestOlderHistory(ctx context.Context, chatID ChatID, oldest Message, count int) error
+}
+
 // LoginMethod is a way to link an account.
 type LoginMethod string
 
@@ -70,6 +80,9 @@ type Capabilities struct {
 	Edit         bool `json:"edit"`
 	Delete       bool `json:"delete"`
 	Replies      bool `json:"replies"`
+	// HistoryOnDemand means the session implements HistoryRequester: older messages than
+	// those stored can be asked from the network (e.g. from the phone, for WhatsApp).
+	HistoryOnDemand bool `json:"historyOnDemand"`
 }
 
 // Manifest describes an engine.

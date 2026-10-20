@@ -83,12 +83,16 @@ with a second number, then run `go run ./cmd/prive-dev accounts` again later: bo
 **Test:** your real chats appear in the right order with correct unread counts. Accounts linked before phase 3
 must be removed and linked again to import their history.
 
-### ⬜ 4. Message history
+### ✅ 4. Message history
 
-- Paginated history (infinite scroll upwards), cached locally
-- Older history on demand: when the user scrolls past what is stored, ask the phone for more
-  (whatsmeow `BuildHistorySyncRequest` + `SendPeerMessage`; the answer arrives as an `ON_DEMAND` history sync,
-  which phase 3 already stores without overwriting newer state)
+- Conversation view: day separators, incoming and outgoing bubbles, sender names in groups with their own
+  color, media shown by kind until media support arrives ✅
+- Paginated history (infinite scroll upwards, cursor by time and id), cached locally; reopening a chat is
+  instant (the last 20 chats stay in memory) ✅
+- Older history on demand (`Capabilities.HistoryOnDemand`): when the stored messages end, Privé asks the
+  phone for 50 more (whatsmeow `BuildHistorySyncRequest` + `SendPeerMessage`). The answer arrives as an
+  `ON_DEMAND` history sync and a `history:result` event; if the phone does not answer, the chat's other
+  address (phone number or LID) is tried, then the user sees why and can retry ✅
 
 **Test:** open a chat and scroll back through older messages; reopening is instant.
 

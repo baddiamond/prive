@@ -58,6 +58,12 @@
   --prive-status-success: #5ED3B5;
   --prive-status-warning: #F2A65A;
   --prive-status-danger: #F2A0A8;
+  --prive-sender-green: #3FB68B;
+  --prive-sender-amber: #E0A43A;
+  --prive-sender-rose: #D46A9A;
+  --prive-sender-sky: #4AA3DF;
+  --prive-sender-violet: #9C8CFF;
+  --prive-sender-coral: #E5765C;
 }
 
 /* Light theme: explicit choice, or the OS preference when no choice was made. */
@@ -90,6 +96,12 @@
   --prive-status-success: #1A7D5A;
   --prive-status-warning: #976209;
   --prive-status-danger: #B3261E;
+  --prive-sender-green: #197755;
+  --prive-sender-amber: #925F09;
+  --prive-sender-rose: #AD4475;
+  --prive-sender-sky: #1D6FA7;
+  --prive-sender-violet: #6554DF;
+  --prive-sender-coral: #AE4B34;
 }
 
 @media (prefers-color-scheme: light) {
@@ -122,6 +134,12 @@
     --prive-status-success: #1A7D5A;
     --prive-status-warning: #976209;
     --prive-status-danger: #B3261E;
+    --prive-sender-green: #197755;
+    --prive-sender-amber: #925F09;
+    --prive-sender-rose: #AD4475;
+    --prive-sender-sky: #1D6FA7;
+    --prive-sender-violet: #6554DF;
+    --prive-sender-coral: #AE4B34;
   }
 }
 

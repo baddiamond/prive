@@ -83,12 +83,14 @@ Previews of sent messages start with "You: ".
 |---|---|
 | Header | 64 px: avatar 38 px · name (15/600) · status line `{account dot} {account} · {network} · {state}` |
 | Header actions | Search (⌘K), Details (⌘I, `aria-pressed`) |
-| Message log | `role="log"`, newest at bottom, day separators ("Today", dates) as pills in `raised` |
-| Incoming bubble | `raised`, radius 16 16 16 4, max 62% width; group chats show sender name (700, sender color) on the first bubble of a run |
-| Outgoing bubble | `accentTint`, radius 16 16 4 16 |
+| Message log | `role="log"`, focusable (keyboard scrolling), newest at bottom, day separators ("Today", "Yesterday", weekday within a week, then the date) as pills in `raised` |
+| Older messages | Scrolling near the top loads the previous 50 stored messages, keeping the view still. When none are left and the engine has `HistoryOnDemand`, a row at the top shows "Load older messages"; reaching the top asks on its own (except after a failure). States of that row: "Loading older messages…", "Getting older messages…", the error (`errors.history.*`) with **Try again**, "No older messages." |
+| Incoming bubble | `raised`, radius 16 16 16 6 (`bubble`, `tag` on the author's corner of the last bubble of a run), max 62% width; group chats show sender name (700, `sender.*` color picked from the sender id) on the first bubble of a run. A run is consecutive messages from one author less than 5 minutes apart |
+| Media | Until media support, the kind ("Photo", "Voice message"…) in italic `textSecondary`, then the caption if any |
+| Outgoing bubble | `accentTint`, radius 16 16 6 16 (`tag` corner on the last bubble of a run) |
 | Meta | Time + status for outgoing: Sending · Sent · Delivered · Read · Not sent (11 px, `textSecondary`) |
 | Failed message | Bubble border 1.5 px `danger`; meta "Not sent" in `danger`; under it a `role="alert"` row: icon + "Couldn't send. Check your connection and try again." + **Retry** |
-| Composer note | `Sending as {account} · {network}` with account dot (always visible — prevents replying from the wrong account) |
+| Composer note | `Sending as {account} · {network}` with account dot (always visible — prevents replying from the wrong account). Until phase 5 the composer is a placeholder: "Sending messages arrives in the next version." |
 | Composer | Attach (disabled until the engine has `Media`), text field 42 px with 1.5 px `border`, Send (accent, 42×42). Enter sends, Shift+Enter new line |
 
 Capabilities drive the UI: no Attach without `Media`, no reactions without `Reactions`,

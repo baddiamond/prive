@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mau.fi/whatsmeow"
+	"go.mau.fi/whatsmeow/proto/waE2E"
 	"go.mau.fi/whatsmeow/proto/waHistorySync"
 	"go.mau.fi/whatsmeow/proto/waWeb"
 	"go.mau.fi/whatsmeow/types"
@@ -22,12 +23,24 @@ type syncer struct {
 	push   func(core.Event)
 	log    func(msg string, args ...any)
 
+	// sendPeer sends a message to the user's phone; replaced in tests.
+	sendPeer func(context.Context, *waE2E.Message) error
+
 	mu          sync.Mutex
 	knownGroups map[types.JID]bool // groups whose name was already looked up this session
+	pending     map[core.ChatID]*historyRequest
 }
 
 func newSyncer(client *whatsmeow.Client, push func(core.Event), log func(string, ...any)) *syncer {
-	return &syncer{client: client, push: push, log: log, knownGroups: map[types.JID]bool{}}
+	y := &syncer{
+		client:      client,
+		push:        push,
+		log:         log,
+		knownGroups: map[types.JID]bool{},
+		pending:     map[core.ChatID]*historyRequest{},
+	}
+	y.sendPeer = sendPeerMessage(y)
+	return y
 }
 
 // handle dispatches one whatsmeow event. It reports whether the event was handled.
@@ -85,8 +98,10 @@ func (y *syncer) history(ctx context.Context, data *waHistorySync.HistorySync) {
 	}
 
 	var (
-		chats []core.Chat
-		msgs  []core.Message
+		chats   []core.Chat
+		msgs    []core.Message
+		results []core.HistoryResultEvent
+		names   = map[types.JID]string{}
 	)
 	for _, conv := range data.GetConversations() {
 		chat, ok := y.conversation(ctx, conv)
@@ -94,15 +109,25 @@ func (y *syncer) history(ctx context.Context, data *waHistorySync.HistorySync) {
 			continue
 		}
 		jid, _ := types.ParseJID(conv.GetID())
+		n := 0
 		for _, hm := range conv.GetMessages() {
-			if m, ok := y.historyMessage(jid, chat.ID, hm.GetMessage()); ok {
+			if m, ok := y.historyMessage(ctx, jid, chat.ID, hm.GetMessage(), names); ok {
 				msgs = append(msgs, m)
+				n++
 			}
 		}
 		chats = append(chats, chat)
+		if !authoritative {
+			results = append(results, core.HistoryResultEvent{ChatID: chat.ID, Messages: n, Complete: historyComplete(conv)})
+		}
 	}
 	if len(chats) > 0 || len(msgs) > 0 {
 		y.push(core.HistoryBatchEvent{Chats: chats, Messages: msgs, Authoritative: authoritative})
+	}
+	// After the batch, so the UI reloads a chat once its older messages are stored.
+	for _, r := range results {
+		y.answered(r.ChatID)
+		y.push(r)
 	}
 	if authoritative && data.GetProgress() > 0 {
 		y.push(core.SyncProgressEvent{Done: int(data.GetProgress()), Total: 100})
@@ -139,7 +164,8 @@ func (y *syncer) conversation(ctx context.Context, conv *waHistorySync.Conversat
 	}, true
 }
 
-func (y *syncer) historyMessage(chatJID types.JID, chatID core.ChatID, web *waWeb.WebMessageInfo) (core.Message, bool) {
+func (y *syncer) historyMessage(ctx context.Context, chatJID types.JID, chatID core.ChatID,
+	web *waWeb.WebMessageInfo, names map[types.JID]string) (core.Message, bool) {
 	if web == nil {
 		return core.Message{}, false
 	}
@@ -148,10 +174,31 @@ func (y *syncer) historyMessage(chatJID types.JID, chatID core.ChatID, web *waWe
 		return core.Message{}, false
 	}
 	m, ok := toMessage(evt, chatID)
-	if ok && m.FromMe {
-		m.Status = webStatus(web.GetStatus())
+	if !ok {
+		return m, false
 	}
-	return m, ok
+	if m.FromMe {
+		m.Status = webStatus(web.GetStatus())
+	} else {
+		y.identifySender(ctx, &m, evt, names)
+	}
+	return m, true
+}
+
+// identifySender stores the author of an incoming message by phone number when known, with
+// their best name, so group messages show who wrote them. names caches lookups in a batch.
+func (y *syncer) identifySender(ctx context.Context, m *core.Message, evt *events.Message, names map[types.JID]string) {
+	sender := y.canonical(ctx, evt.Info.Sender)
+	if sender.IsEmpty() {
+		return
+	}
+	m.SenderID = sender.String()
+	name, ok := names[sender]
+	if !ok {
+		name = y.contactName(ctx, sender, evt.Info.PushName)
+		names[sender] = name
+	}
+	m.SenderName = name
 }
 
 // message handles a live message (incoming, or sent from another of the user's devices).
@@ -163,6 +210,9 @@ func (y *syncer) message(ctx context.Context, evt *events.Message) {
 	m, ok := toMessage(evt, core.ChatID(chat.String()))
 	if !ok {
 		return
+	}
+	if !m.FromMe {
+		y.identifySender(ctx, &m, evt, map[types.JID]string{})
 	}
 	kind, name := core.ChatDirect, ""
 	if evt.Info.IsGroup {

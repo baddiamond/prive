@@ -145,6 +145,11 @@ func (h *harness) testManifest(t *testing.T) {
 	if again := h.engine.Manifest(); again.ID != m.ID {
 		t.Errorf("Manifest ID is not stable: %q then %q", m.ID, again.ID)
 	}
+	if m.Capabilities.HistoryOnDemand {
+		if _, ok := h.open(t, h.newAccount(t)).(core.HistoryRequester); !ok {
+			t.Error("Capabilities.HistoryOnDemand is declared but the session does not implement core.HistoryRequester")
+		}
+	}
 }
 
 func (h *harness) testConnectWithoutLogin(t *testing.T) {

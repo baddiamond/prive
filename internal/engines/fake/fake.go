@@ -47,7 +47,7 @@ func (e *Engine) Manifest() core.Manifest {
 		Name:         "Fake",
 		ShortName:    "FK",
 		LoginMethods: []core.LoginMethod{core.LoginQR},
-		Capabilities: core.Capabilities{SendText: true, ReadReceipts: true},
+		Capabilities: core.Capabilities{SendText: true, ReadReceipts: true, HistoryOnDemand: true},
 	}
 }
 
@@ -63,6 +63,9 @@ func (e *Engine) NewSession(account core.Account, deps core.SessionDeps) (core.S
 		chats:    map[core.ChatID]*core.Chat{},
 		messages: map[core.ChatID][]core.Message{},
 		engine:   e,
+
+		historyPages: map[core.ChatID]int{},
+		groups:       map[core.ChatID]bool{},
 	}
 	e.sessions[account.ID] = s
 	return s, nil
@@ -96,6 +99,10 @@ type Session struct {
 	nextID    int
 	chats     map[core.ChatID]*core.Chat
 	messages  map[core.ChatID][]core.Message
+	// historyPages counts RequestOlderHistory calls per chat.
+	historyPages map[core.ChatID]int
+	// groups marks the demo's group chats, whose fictional senders vary.
+	groups map[core.ChatID]bool
 }
 
 // RemoteID is the network identity a fake account gets after login.

@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -400,6 +401,36 @@ func (a *App) ListChats(accountID string) ([]core.Chat, error) {
 		chats = []core.Chat{} // JSON [] rather than null
 	}
 	return chats, err
+}
+
+// maxMessagePage caps GetMessages pages.
+const maxMessagePage = 200
+
+// GetMessages returns a page of a chat's stored history, oldest first. With beforeMs = 0
+// it returns the newest messages; to page backwards, pass the oldest message of the
+// previous page as beforeMs (its Unix time in milliseconds) and beforeID.
+func (a *App) GetMessages(accountID, chatID string, beforeMs int64, beforeID string, limit int) ([]core.Message, error) {
+	if a.failure != nil {
+		return nil, a.failure
+	}
+	opts := core.GetMessagesOptions{Limit: min(max(limit, 1), maxMessagePage), BeforeID: core.MessageID(beforeID)}
+	if beforeMs > 0 {
+		opts.Before = time.UnixMilli(beforeMs)
+	}
+	msgs, err := a.manager.GetMessages(a.context(), core.AccountID(accountID), core.ChatID(chatID), opts)
+	if msgs == nil && err == nil {
+		msgs = []core.Message{}
+	}
+	return msgs, err
+}
+
+// RequestOlderHistory asks the network for messages older than those stored for a chat
+// (Capabilities.HistoryOnDemand). The answer arrives as a history:result event.
+func (a *App) RequestOlderHistory(accountID, chatID string) error {
+	if a.failure != nil {
+		return a.failure
+	}
+	return a.manager.RequestOlderHistory(a.context(), core.AccountID(accountID), core.ChatID(chatID))
 }
 
 // UnreadSummary counts unread messages per account (muted and archived chats excluded).

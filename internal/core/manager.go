@@ -338,6 +338,30 @@ func (m *Manager) GetMessages(ctx context.Context, id AccountID, chat ChatID, op
 	return msgs, nil
 }
 
+// historyPageSize is how many older messages RequestOlderHistory asks for at a time.
+const historyPageSize = 50
+
+// RequestOlderHistory asks the network for messages older than the oldest one stored for a
+// chat. It returns once the request is sent; the answer arrives as a HistoryResultEvent.
+func (m *Manager) RequestOlderHistory(ctx context.Context, id AccountID, chat ChatID) error {
+	ra, err := m.running(id)
+	if err != nil {
+		return err
+	}
+	requester, ok := ra.session.(HistoryRequester)
+	if !ok || !ra.manifest.Capabilities.HistoryOnDemand {
+		return ErrCapabilityUnsupported
+	}
+	oldest, found, err := m.repo.OldestMessage(ctx, id, chat)
+	if err != nil {
+		return ErrUnknown.Wrap(err)
+	}
+	if !found {
+		return ErrHistoryUnavailable
+	}
+	return requester.RequestOlderHistory(ctx, chat, oldest, historyPageSize)
+}
+
 // SendMessage sends a message through the account that owns the chat, stores it and
 // emits it as a MessageEvent so the UI shows it immediately.
 func (m *Manager) SendMessage(ctx context.Context, id AccountID, chat ChatID, out OutgoingMessage) (Message, error) {

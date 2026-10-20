@@ -83,14 +83,20 @@ func (s *Store) ListMessages(ctx context.Context, account core.AccountID, chat c
 	if !opts.Before.IsZero() {
 		before = toMillis(opts.Before)
 	}
+	// (timestamp, id) is the cursor: messages that share the boundary millisecond are
+	// split by id, in the same order as ORDER BY.
+	beforeID := string(opts.BeforeID)
+	if opts.Before.IsZero() {
+		beforeID = ""
+	}
 
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT account_id, chat_id, id, sender_id, sender_name, from_me, timestamp,
-		       kind, text, status, reply_to
+		SELECT `+messageColumns+`
 		FROM messages
-		WHERE account_id = ? AND chat_id = ? AND timestamp < ?
+		WHERE account_id = ? AND chat_id = ?
+		  AND (timestamp < ? OR (timestamp = ? AND id < ?))
 		ORDER BY timestamp DESC, id DESC
-		LIMIT ?`, account, chat, before, limit)
+		LIMIT ?`, account, chat, before, before, beforeID, limit)
 	if err != nil {
 		return nil, fmt.Errorf("list messages: %w", err)
 	}
@@ -98,21 +104,10 @@ func (s *Store) ListMessages(ctx context.Context, account core.AccountID, chat c
 
 	var out []core.Message
 	for rows.Next() {
-		var (
-			m                     core.Message
-			fromMe                int
-			ts                    int64
-			kind, status, replyTo string
-		)
-		if err := rows.Scan(&m.AccountID, &m.ChatID, &m.ID, &m.SenderID, &m.SenderName, &fromMe,
-			&ts, &kind, &m.Text, &status, &replyTo); err != nil {
+		m, err := scanMessage(rows)
+		if err != nil {
 			return nil, fmt.Errorf("list messages: %w", err)
 		}
-		m.FromMe = fromMe != 0
-		m.Timestamp = fromMillis(ts)
-		m.Kind = core.MessageKind(kind)
-		m.Status = core.MessageStatus(status)
-		m.ReplyTo = core.MessageID(replyTo)
 		out = append(out, m)
 	}
 	if err := rows.Err(); err != nil {
@@ -120,6 +115,47 @@ func (s *Store) ListMessages(ctx context.Context, account core.AccountID, chat c
 	}
 	slices.Reverse(out)
 	return out, nil
+}
+
+// OldestMessage implements core.Repository.
+func (s *Store) OldestMessage(ctx context.Context, account core.AccountID, chat core.ChatID) (core.Message, bool, error) {
+	row := s.db.QueryRowContext(ctx, `
+		SELECT `+messageColumns+`
+		FROM messages
+		WHERE account_id = ? AND chat_id = ?
+		ORDER BY timestamp ASC, id ASC
+		LIMIT 1`, account, chat)
+	m, err := scanMessage(row)
+	if errors.Is(err, sql.ErrNoRows) {
+		return core.Message{}, false, nil
+	}
+	if err != nil {
+		return core.Message{}, false, fmt.Errorf("oldest message: %w", err)
+	}
+	return m, true, nil
+}
+
+const messageColumns = `account_id, chat_id, id, sender_id, sender_name, from_me, timestamp,
+		       kind, text, status, reply_to`
+
+// scanMessage reads one row selected with messageColumns.
+func scanMessage(row interface{ Scan(...any) error }) (core.Message, error) {
+	var (
+		m                     core.Message
+		fromMe                int
+		ts                    int64
+		kind, status, replyTo string
+	)
+	if err := row.Scan(&m.AccountID, &m.ChatID, &m.ID, &m.SenderID, &m.SenderName, &fromMe,
+		&ts, &kind, &m.Text, &status, &replyTo); err != nil {
+		return core.Message{}, err
+	}
+	m.FromMe = fromMe != 0
+	m.Timestamp = fromMillis(ts)
+	m.Kind = core.MessageKind(kind)
+	m.Status = core.MessageStatus(status)
+	m.ReplyTo = core.MessageID(replyTo)
+	return m, nil
 }
 
 // messageStatus returns the stored status of a message, or "" if it does not exist.

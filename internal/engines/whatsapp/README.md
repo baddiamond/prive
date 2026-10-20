@@ -16,10 +16,10 @@ Links WhatsApp accounts to Privé as **companion devices** (like WhatsApp Web), 
 |---|---|
 | Link with QR, resume on startup, automatic reconnection, log out | 2 ✅ |
 | Chat list and initial history sync | 3 ✅ |
-| Message history | 4 |
+| Message history, older messages on demand from the phone | 4 ✅ |
 | Sending, delivery and read receipts | 5 |
 
-The manifest declares no capabilities yet; each one is added in the phase that implements it.
+The manifest declares `HistoryOnDemand`; every other capability is added in the phase that implements it.
 
 ## Behavior
 
@@ -36,6 +36,14 @@ The manifest declares no capabilities yet; each one is added in the phase that i
   archive, pin, mute); `ON_DEMAND` batches only add messages; `PUSH_NAME` batches update contact names.
   Chats are keyed by phone-number JID even when WhatsApp sends a LID. Names come from the contact store
   (full name, first name, business name, push name) and group info, falling back to the number.
+- **Older messages on demand:** `RequestOlderHistory` sends a history sync request to the phone
+  (`BuildHistorySyncRequest` + `SendPeerMessage`) anchored on the oldest stored message. The answer is an
+  `ON_DEMAND` history sync: its messages are stored without touching newer chat state, and a `history:result`
+  event says how many arrived and whether the phone has nothing older (`endOfHistoryTransferType`). If the phone
+  does not answer within 20 seconds, the request is sent again with the chat's LID (the phone may know a chat by
+  either address); after that the UI shows `errors.history.noAnswer`.
+- **Senders:** incoming messages store their author by phone number when known, with the best name from the
+  contact store, so group messages show who wrote them.
 - **Chat state from other devices:** archive, pin, mute and mark-as-read app-state events become `chat:patch`.
 - **Logs:** only warnings and errors from whatsmeow are kept, and long numbers (phone numbers, JIDs) are redacted.
 
@@ -43,8 +51,8 @@ The manifest declares no capabilities yet; each one is added in the phase that i
 
 - Accounts linked before phase 3 must be linked again to import their history: WhatsApp sends it only once,
   right after linking.
-- Only the recent history WhatsApp sends after linking is imported. Asking the phone for older messages on demand
-  comes in phase 4.
+- After linking, only the recent history WhatsApp sends is imported; older messages are asked from the phone as you
+  scroll, so the phone must be online for that.
 - Media is shown as its kind (photo, voice message, …); downloading media comes later.
 
 ## Tests

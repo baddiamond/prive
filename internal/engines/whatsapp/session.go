@@ -32,6 +32,7 @@ type Session struct {
 	mu        sync.Mutex
 	container *sqlstore.Container // nil until first use
 	client    *whatsmeow.Client   // nil while disconnected
+	syncer    *syncer             // the client's syncer; nil while disconnected
 	closed    bool
 }
 
@@ -238,6 +239,7 @@ func (s *Session) newClient(device *store.Device) *whatsmeow.Client {
 	// Archive, pin, mute, read and contact names from the phone's full sync arrive as events too.
 	client.EmitAppStateEventsOnFullSync = true
 	y := newSyncer(client, s.events.Push, func(msg string, args ...any) { s.log.Warn(msg, args...) })
+	s.syncer = y
 	client.AddEventHandler(func(evt any) {
 		if e, ok := stateEvent(evt); ok {
 			s.events.Push(e)

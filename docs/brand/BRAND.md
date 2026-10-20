@@ -162,6 +162,10 @@ we never use WhatsApp green or Telegram blue inside the interface.
 An account color is always paired with the account's initial and name, never used alone.
 Text on account colors is near-black in the dark theme and white in the light theme.
 
+**Sender colors** (`color.sender.*`) are the same six hues for people's names in group chats, always next
+to the name itself. In the light theme they are slightly darker than the account colors so bold caption
+text keeps 4.5:1 on incoming bubbles (`raised`); `generate.py --check` enforces it.
+
 ### Status
 
 | Status | Dark | Light |

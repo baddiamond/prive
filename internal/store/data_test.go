@@ -252,3 +252,46 @@ func TestConcurrentWritesFromManyAccounts(t *testing.T) {
 		}
 	}
 }
+
+func TestMessagePagesWithSharedTimestamps(t *testing.T) {
+	ctx := context.Background()
+	s := newStore(t)
+	addAccount(t, s, "a", 0)
+	if _, found, err := s.OldestMessage(ctx, "a", "c"); err != nil || found {
+		t.Fatalf("OldestMessage of an empty chat = %v, %v", found, err)
+	}
+
+	// Seven messages, several in the same millisecond (a history batch often has them).
+	stamps := []int{0, 1, 1, 1, 1, 2, 3}
+	for i, sec := range stamps {
+		m := core.Message{AccountID: "a", ChatID: "c", ID: core.MessageID(fmt.Sprintf("m%d", i)),
+			Timestamp: t0.Add(time.Duration(sec) * time.Second), Kind: core.MessageText}
+		if err := s.UpsertMessage(ctx, m); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	var seen []core.MessageID
+	opts := core.GetMessagesOptions{Limit: 2}
+	for range 10 {
+		page, err := s.ListMessages(ctx, "a", "c", opts)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(page) == 0 {
+			break
+		}
+		for i := len(page) - 1; i >= 0; i-- {
+			seen = append(seen, page[i].ID)
+		}
+		opts.Before, opts.BeforeID = page[0].Timestamp, page[0].ID
+	}
+	if got := fmt.Sprint(seen); got != "[m6 m5 m4 m3 m2 m1 m0]" {
+		t.Errorf("paging backwards saw %s", got)
+	}
+
+	oldest, found, err := s.OldestMessage(ctx, "a", "c")
+	if err != nil || !found || oldest.ID != "m0" {
+		t.Errorf("OldestMessage = %+v, %v, %v", oldest, found, err)
+	}
+}

@@ -137,6 +137,9 @@ type Capabilities struct {
     Edit         bool
     Delete       bool
     Replies      bool
+    // HistoryOnDemand: the session implements HistoryRequester (older messages can be
+    // asked from the network, e.g. from the phone for WhatsApp).
+    HistoryOnDemand bool
 }
 
 // SessionDeps is what the core gives each session.
@@ -177,6 +180,19 @@ type Session interface {
 }
 ```
 
+Optional interfaces add features an engine declares in its manifest. The conformance suite checks that a
+declared capability comes with its interface:
+
+```go
+// HistoryRequester: Capabilities.HistoryOnDemand.
+type HistoryRequester interface {
+    // Asks for up to count messages older than oldest (the oldest stored one). Returns once the
+    // request is sent; the messages arrive as a HistoryBatchEvent (not authoritative), then a
+    // HistoryResultEvent for the chat, which also reports when the network does not answer.
+    RequestOlderHistory(ctx context.Context, chatID ChatID, oldest Message, count int) error
+}
+```
+
 ### Events
 
 Sessions emit typed events; the manager persists what is needed, adds the `accountId` and forwards
@@ -194,6 +210,7 @@ to the UI as Wails events.
 | `message:new` | `{accountId, chatId, message}` | incoming or outgoing message |
 | `message:status` | `{accountId, chatId, messageId, status}` | sent / delivered / read / failed |
 | `chats:synced` | `{accountId, chats, messages}` | a history batch was stored; the UI reloads the chat list (emitted by the Manager only) |
+| `history:result` | `{accountId, chatId, messages, complete, code?}` | answer to `RequestOlderHistory`: how many older messages were stored, whether the network has nothing older, or why it failed (`errors.history.noAnswer`) |
 | `sync:progress` | `{accountId, done, total}` | initial history sync |
 
 Some session events are internal and never reach the UI as such: `history:batch` (chats and messages from a

@@ -60,6 +60,12 @@ const (
 	CodeNotImplemented         = "errors.engine.notImplemented"
 	CodeSendFailed             = "errors.message.sendFailed"
 	CodeShuttingDown           = "errors.app.shuttingDown"
+	// CodeHistoryUnavailable means older messages cannot be asked for this chat, e.g. it
+	// has no stored message to start from.
+	CodeHistoryUnavailable = "errors.history.unavailable"
+	// CodeHistoryNoAnswer means the network did not answer a history request in time,
+	// e.g. the phone is offline.
+	CodeHistoryNoAnswer = "errors.history.noAnswer"
 )
 
 // Sentinel errors for use with errors.Is.
@@ -74,6 +80,7 @@ var (
 	ErrNotImplemented         = NewError(CodeNotImplemented)
 	ErrSendFailed             = NewError(CodeSendFailed)
 	ErrShuttingDown           = NewError(CodeShuttingDown)
+	ErrHistoryUnavailable     = NewError(CodeHistoryUnavailable)
 )
 
 // KnownCodes lists every translation key the core may send to the UI,
@@ -82,7 +89,7 @@ func KnownCodes() []string {
 	codes := []string{
 		CodeUnknown, CodeAccountNotFound, CodeNotLoggedIn, CodeConnectFailed,
 		CodeEngineNotFound, CodeLoginMethodUnsupported, CodeCapabilityUnsupported,
-		CodeNotImplemented, CodeSendFailed, CodeShuttingDown,
+		CodeNotImplemented, CodeSendFailed, CodeShuttingDown, CodeHistoryUnavailable, CodeHistoryNoAnswer,
 	}
 	for _, s := range accountStates {
 		codes = append(codes, s.Key())

@@ -193,6 +193,10 @@
       "wrongWord": "La palabra {{position}} no coincide. Revisa tu papel.",
       "tooFewAnswers": "Escribe todas las palabras que se piden.",
       "notLocked": "Tus chats ya están desbloqueados."
+    },
+    "history": {
+      "unavailable": "No se pueden cargar mensajes anteriores de este chat.",
+      "noAnswer": "No llegaron los mensajes anteriores. Comprueba que tu teléfono esté encendido y conectado, y vuelve a intentarlo."
     }
   },
   "legal": {
@@ -299,7 +303,18 @@
     }
   },
   "conversation": {
-    "comingSoon": "Los mensajes de este chat aparecerán aquí en la próxima versión."
+    "messages": "Mensajes",
+    "loading": "Cargando mensajes…",
+    "loadingOlder": "Cargando mensajes anteriores…",
+    "asking": "Trayendo mensajes anteriores…",
+    "loadOlder": "Cargar mensajes anteriores",
+    "retry": "Reintentar",
+    "start": "No hay mensajes anteriores.",
+    "empty": "Aún no hay mensajes en este equipo.",
+    "you": "Tú",
+    "unknownSender": "Alguien",
+    "sendingAs": "Envías como {{account}} · {{network}}",
+    "sendingSoon": "El envío de mensajes llega en la próxima versión."
   },
   "message": {
     "kind": {
@@ -317,7 +332,8 @@
     }
   },
   "time": {
-    "yesterday": "Ayer"
+    "yesterday": "Ayer",
+    "today": "Hoy"
   },
   "recovery": {
     "banner": {

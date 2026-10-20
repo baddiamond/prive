@@ -568,3 +568,38 @@ func TestHistoryBatchAndPatches(t *testing.T) {
 		return sum.Total == 1 && sum.PerAccount[a.ID] == 1
 	})
 }
+
+func TestRequestOlderHistory(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("A")
+
+	if err := e.manager.RequestOlderHistory(ctx, a.ID, "chat-1"); !errors.Is(err, core.ErrHistoryUnavailable) {
+		t.Fatalf("request for a chat without messages = %v, want ErrHistoryUnavailable", err)
+	}
+	e.fake.Session(a.ID).Receive("chat-1", "Alice", "latest")
+	waitFor(t, "message stored", func() bool {
+		msgs, _ := e.manager.GetMessages(ctx, a.ID, "chat-1", core.GetMessagesOptions{})
+		return len(msgs) == 1
+	})
+
+	if err := e.manager.RequestOlderHistory(ctx, a.ID, "chat-1"); err != nil {
+		t.Fatal(err)
+	}
+	waitFor(t, "history:result event", func() bool {
+		for _, ev := range e.events.snapshot() {
+			if r, ok := ev.(core.HistoryResultEvent); ok && r.AccountID == a.ID && r.ChatID == "chat-1" && r.Messages > 0 {
+				return true
+			}
+		}
+		return false
+	})
+	msgs, _ := e.manager.GetMessages(ctx, a.ID, "chat-1", core.GetMessagesOptions{Limit: 500})
+	if len(msgs) < 2 || msgs[len(msgs)-1].Text != "latest" {
+		t.Fatalf("older messages not stored before the newest: %d messages", len(msgs))
+	}
+	chat, _, _ := e.store.GetChat(ctx, a.ID, "chat-1")
+	if chat.LastMessagePreview != "latest" {
+		t.Errorf("older history must not replace the last message preview: %q", chat.LastMessagePreview)
+	}
+}

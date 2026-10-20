@@ -37,6 +37,14 @@ var demoChats = []struct {
 	{"c8", "Billing", false, core.MessageText, "Payment received", 12 * 24 * time.Hour, 0, false, false},
 }
 
+// demoLength is how many messages lead to chat i's last one: long for the first chats.
+func demoLength(i int) int {
+	if i < 2 {
+		return 60
+	}
+	return 8
+}
+
 // importDemo pushes a fictional history in two batches with progress, then a live message.
 func (s *Session) importDemo() {
 	now := time.Now().UTC()
@@ -52,10 +60,23 @@ func (s *Session) importDemo() {
 			ID: core.ChatID(d.id), Name: d.name, Kind: kind, UnreadCount: d.unread,
 			LastMessageAt: at, Pinned: d.pinned, Muted: d.muted,
 		})
-		msgs = append(msgs, core.Message{
+		// A conversation leading to the last message, long enough to scroll.
+		msgs = append(msgs, fictionalMessages(core.ChatID(d.id), d.group, d.name, at, demoLength(i), "demo")...)
+		last := core.Message{
 			ChatID: core.ChatID(d.id), ID: core.MessageID(fmt.Sprintf("demo-%d", i)), Kind: d.kind, Text: d.text,
-			Timestamp: at, FromMe: i == 3, Status: core.StatusRead, SenderName: d.name,
-		})
+			Timestamp: at, FromMe: i == 3, SenderName: d.name, SenderID: "contact:" + d.id,
+		}
+		if last.FromMe {
+			last.Status = core.StatusRead
+		} else if d.group {
+			last.SenderName = fictionalSenders[0]
+		}
+		msgs = append(msgs, last)
+		if d.group {
+			s.mu.Lock()
+			s.groups[core.ChatID(d.id)] = true
+			s.mu.Unlock()
+		}
 	}
 	half := len(chats) / 2
 	s.events.Push(core.SyncProgressEvent{Done: 10, Total: 100})

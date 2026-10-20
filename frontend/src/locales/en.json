@@ -193,6 +193,10 @@
       "wrongWord": "Word {{position}} doesn't match. Check your paper.",
       "tooFewAnswers": "Type every word that's asked.",
       "notLocked": "Your chats are already unlocked."
+    },
+    "history": {
+      "unavailable": "Older messages can't be loaded for this chat.",
+      "noAnswer": "Older messages didn't arrive. Make sure your phone is on and connected, then try again."
     }
   },
   "legal": {
@@ -299,7 +303,18 @@
     }
   },
   "conversation": {
-    "comingSoon": "Messages of this chat appear here in the next version."
+    "messages": "Messages",
+    "loading": "Loading messages…",
+    "loadingOlder": "Loading older messages…",
+    "asking": "Getting older messages…",
+    "loadOlder": "Load older messages",
+    "retry": "Try again",
+    "start": "No older messages.",
+    "empty": "No messages on this computer yet.",
+    "you": "You",
+    "unknownSender": "Someone",
+    "sendingAs": "Sending as {{account}} · {{network}}",
+    "sendingSoon": "Sending messages arrives in the next version."
   },
   "message": {
     "kind": {
@@ -317,7 +332,8 @@
     }
   },
   "time": {
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "today": "Today"
   },
   "recovery": {
     "banner": {

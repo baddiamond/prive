@@ -41,4 +41,7 @@ type Repository interface {
 	UpdateMessageStatus(ctx context.Context, account AccountID, chat ChatID, id MessageID, status MessageStatus) error
 	// ListMessages returns a page of a chat's stored history in chronological order.
 	ListMessages(ctx context.Context, account AccountID, chat ChatID, opts GetMessagesOptions) ([]Message, error)
+	// OldestMessage returns the oldest stored message of a chat; found is false when the
+	// chat has none.
+	OldestMessage(ctx context.Context, account AccountID, chat ChatID) (msg Message, found bool, err error)
 }

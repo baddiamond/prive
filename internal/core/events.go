@@ -123,6 +123,19 @@ type SyncProgressEvent struct {
 	Total     int       `json:"total"`
 }
 
+// HistoryResultEvent ends a HistoryRequester.RequestOlderHistory call for one chat. The
+// messages themselves were stored from the HistoryBatchEvent that came before it.
+type HistoryResultEvent struct {
+	AccountID AccountID `json:"accountId"`
+	ChatID    ChatID    `json:"chatId"`
+	// Messages is how many older messages arrived.
+	Messages int `json:"messages"`
+	// Complete means the network has nothing older for this chat.
+	Complete bool `json:"complete"`
+	// Code is set when the request failed, e.g. errors.history.noAnswer.
+	Code string `json:"code,omitempty"`
+}
+
 // AccountUpdatedEvent is emitted by the Manager (never by sessions) when an account's label,
 // color or remote identity changes.
 type AccountUpdatedEvent struct {
@@ -174,6 +187,9 @@ func (ChatsSyncedEvent) EventName() string { return "chats:synced" }
 // EventName implements Event.
 func (AccountUpdatedEvent) EventName() string { return "account:updated" }
 
+// EventName implements Event.
+func (HistoryResultEvent) EventName() string { return "history:result" }
+
 func (e AccountStateEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
 func (e LoginQREvent) stamped(id AccountID) Event      { e.AccountID = id; return e }
 func (e LoginSuccessEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
@@ -205,6 +221,7 @@ func (e MessageEvent) stamped(id AccountID) Event {
 func (e MessageStatusEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
 func (e ChatPatchEvent) stamped(id AccountID) Event     { e.AccountID = id; return e }
 func (e ChatsSyncedEvent) stamped(id AccountID) Event   { e.AccountID = id; return e }
+func (e HistoryResultEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
 
 func (e HistoryBatchEvent) stamped(id AccountID) Event {
 	e.AccountID = id

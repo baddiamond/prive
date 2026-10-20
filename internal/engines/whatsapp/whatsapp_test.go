@@ -91,10 +91,12 @@ func TestManifest(t *testing.T) {
 	if m.ID != ID || !m.SupportsLogin(core.LoginQR) {
 		t.Errorf("manifest = %+v", m)
 	}
-	// Declared capabilities must be implemented: none yet (chats in phase 3, sending in phase 5).
-	if m.Capabilities != (core.Capabilities{}) {
-		t.Errorf("capabilities declared before they are implemented: %+v", m.Capabilities)
+	// Declared capabilities must be implemented: only on-demand history so far (sending
+	// arrives in phase 5).
+	if m.Capabilities != (core.Capabilities{HistoryOnDemand: true}) {
+		t.Errorf("capabilities = %+v", m.Capabilities)
 	}
+	var _ core.HistoryRequester = (*Session)(nil)
 }
 
 func TestCodesHaveTranslations(t *testing.T) {
