@@ -438,8 +438,9 @@ def social_svg(face_bold: Typeface, face_text: Typeface, theme: dict) -> str:
     return svg(w, h, body, "Privé — Your conversations, at home.")
 
 
-# Theme tokens left out of the palette illustration: aliases and the translucent overlay scrim.
-NOT_IN_PALETTE = ("onAccountColor", "focus", "scrim")
+# Theme tokens left out of the palette illustration: aliases, the translucent overlay scrim
+# and the fixed QR code colors (the same in both themes).
+NOT_IN_PALETTE = ("onAccountColor", "focus", "scrim", "qrPaper", "qrInk", "qrAccent")
 
 
 def palette_svg(face: Typeface, tokens: dict) -> str:

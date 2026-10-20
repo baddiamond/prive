@@ -23,6 +23,9 @@ module.exports = {
         "focus": "var(--prive-focus)",
         "on-account-color": "var(--prive-on-account-color)",
         "scrim": "var(--prive-scrim)",
+        "qr-paper": "var(--prive-qr-paper)",
+        "qr-ink": "var(--prive-qr-ink)",
+        "qr-accent": "var(--prive-qr-accent)",
         account: {
           green: "var(--prive-account-green)",
           amber: "var(--prive-account-amber)",
