@@ -117,6 +117,27 @@ func (a *App) startup(ctx context.Context) {
 	if err := a.manager.Start(ctx); err != nil {
 		a.logger.Error("start accounts", "err", err)
 	}
+	a.removeUnlinkedAccounts()
+}
+
+// removeUnlinkedAccounts deletes accounts that were added but never linked, e.g. when the
+// window was closed on the QR step. They hold nothing, and the flow creates a new one.
+func (a *App) removeUnlinkedAccounts() {
+	for _, s := range a.manager.Accounts() {
+		if s.Account.RemoteID == "" {
+			if err := a.manager.RemoveAccount(a.context(), s.Account.ID); err != nil {
+				a.logger.Warn("remove unlinked account", "err", err)
+			}
+		}
+	}
+}
+
+// ReconnectAccount retries an account in the error state.
+func (a *App) ReconnectAccount(accountID string) error {
+	if a.failure != nil {
+		return a.failure
+	}
+	return a.manager.Reconnect(core.AccountID(accountID))
 }
 
 // shutdown is called by Wails after the window has closed.

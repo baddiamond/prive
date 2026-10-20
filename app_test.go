@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/baddiamond/prive/internal/bootstrap"
 	"github.com/baddiamond/prive/internal/core"
@@ -201,4 +202,64 @@ func mustJSON(t *testing.T, v any) string {
 		t.Fatal(err)
 	}
 	return string(b)
+}
+
+func TestOnboarding(t *testing.T) {
+	app := newTestApp(t)
+	o, err := app.GetOnboarding()
+	if err != nil || o.Completed || o.Step != 1 || o.LegalAccepted {
+		t.Fatalf("fresh onboarding = %+v, %v", o, err)
+	}
+	if err := app.SetOnboardingStep(4); err != nil {
+		t.Fatal(err)
+	}
+	if err := app.SetOnboardingStep(9); !errors.Is(err, errInvalidSetting) {
+		t.Errorf("SetOnboardingStep(9) = %v", err)
+	}
+	if err := app.AcceptLegal(); err != nil {
+		t.Fatal(err)
+	}
+	if err := app.CompleteOnboarding(); err != nil {
+		t.Fatal(err)
+	}
+	o, _ = app.GetOnboarding()
+	if !o.Completed || o.Step != 4 || !o.LegalAccepted || o.LegalVersion != legalVersion {
+		t.Errorf("after onboarding = %+v", o)
+	}
+}
+
+func TestRemoveUnlinkedAccounts(t *testing.T) {
+	app := newTestApp(t)
+	linked, _ := app.AddAccount(fake.EngineID, "Linked", "green")
+	if err := app.Login(string(linked.ID), "qr"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := app.AddAccount(fake.EngineID, "Abandoned", "amber"); err != nil {
+		t.Fatal(err)
+	}
+	// Wait until the login is recorded (the fake engine reports it asynchronously).
+	deadline := time.Now().Add(5 * time.Second)
+	for time.Now().Before(deadline) {
+		list, _ := app.ListAccounts()
+		if list[0].Account.RemoteID != "" {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	app.removeUnlinkedAccounts()
+	list, _ := app.ListAccounts()
+	if len(list) != 1 || list[0].Account.ID != linked.ID {
+		t.Errorf("accounts = %+v, want only the linked one", list)
+	}
+}
+
+func TestRenderQR(t *testing.T) {
+	app := newTestApp(t)
+	q, err := app.RenderQR("2@payload,for,a,test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if q.Size < 21 || !strings.HasPrefix(q.Path, "M0 0h7") {
+		t.Errorf("unexpected QR: size %d, path starts %q", q.Size, q.Path[:min(len(q.Path), 10)])
+	}
 }

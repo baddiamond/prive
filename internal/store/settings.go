@@ -14,6 +14,16 @@ const (
 	SettingLanguage = "language"
 	// SettingTheme holds "light" or "dark". Absent means "follow the OS".
 	SettingTheme = "theme"
+	// SettingLegalAcceptedVersion holds the version of the Disclaimer and Acceptable Use Policy
+	// the user agreed to during onboarding.
+	SettingLegalAcceptedVersion = "legal.acceptedVersion"
+	// SettingLegalAcceptedAt holds when they agreed (RFC 3339).
+	SettingLegalAcceptedAt = "legal.acceptedAt"
+	// SettingOnboardingStep holds the last onboarding step reached, so closing the window
+	// mid-flow resumes there.
+	SettingOnboardingStep = "onboarding.step"
+	// SettingOnboardingCompletedAt holds when onboarding finished (RFC 3339).
+	SettingOnboardingCompletedAt = "onboarding.completedAt"
 )
 
 // Setting returns the value stored under key and whether it exists.
