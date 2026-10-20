@@ -9,8 +9,10 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 )
 
 // ManagerConfig holds the Manager's dependencies.
@@ -338,6 +340,56 @@ func (m *Manager) GetMessages(ctx context.Context, id AccountID, chat ChatID, op
 	return msgs, nil
 }
 
+// MaxMessageLength caps outgoing text, in characters. Networks have their own limits
+// (WhatsApp's is about 65,000); this keeps every engine well inside them.
+const MaxMessageLength = 4096
+
+// maxReadBatch caps how many messages one MarkChatRead reports to the network.
+const maxReadBatch = 100
+
+// MarkChatRead clears a chat's unread count and, when the engine supports it, tells the
+// network that its unread messages were read. The local count is cleared even if the
+// network cannot be reached (the user has seen the messages); that failure is only logged.
+func (m *Manager) MarkChatRead(ctx context.Context, id AccountID, chat ChatID) error {
+	ra, err := m.lookup(id)
+	if err != nil {
+		return err
+	}
+	current, found, err := m.repo.GetChat(ctx, id, chat)
+	if err != nil {
+		return ErrUnknown.Wrap(err)
+	}
+	if !found || current.UnreadCount == 0 {
+		return nil
+	}
+
+	if marker, ok := ra.session.(ReadMarker); ok && ra.manifest.Capabilities.ReadReceipts {
+		recent, err := m.repo.ListMessages(ctx, id, chat, GetMessagesOptions{Limit: min(current.UnreadCount, maxReadBatch)})
+		if err != nil {
+			return ErrUnknown.Wrap(err)
+		}
+		var unread []Message
+		for _, msg := range recent {
+			if !msg.FromMe {
+				unread = append(unread, msg)
+			}
+		}
+		if len(unread) > 0 {
+			if err := marker.MarkRead(ctx, chat, unread); err != nil {
+				m.logger.Warn("mark read on the network", "account", id, "err", err)
+			}
+		}
+	}
+
+	read := true
+	updated, _, err := m.repo.PatchChat(ctx, id, ChatPatch{ChatID: chat, Read: &read})
+	if err != nil {
+		return ErrUnknown.Wrap(err)
+	}
+	m.emit(ChatUpdatedEvent{AccountID: id, Chat: updated})
+	return nil
+}
+
 // historyPageSize is how many older messages RequestOlderHistory asks for at a time.
 const historyPageSize = 50
 
@@ -371,6 +423,12 @@ func (m *Manager) SendMessage(ctx context.Context, id AccountID, chat ChatID, ou
 	}
 	if !ra.manifest.Capabilities.SendText {
 		return Message{}, ErrCapabilityUnsupported
+	}
+	if strings.TrimSpace(out.Text) == "" {
+		return Message{}, ErrMessageEmpty
+	}
+	if utf8.RuneCountInString(out.Text) > MaxMessageLength {
+		return Message{}, ErrMessageTooLong
 	}
 	msg, err := ra.session.SendMessage(ctx, chat, out)
 	if err != nil {

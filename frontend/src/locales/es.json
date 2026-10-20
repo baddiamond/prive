@@ -166,7 +166,9 @@
       "notImplemented": "Esta función todavía no está disponible para esta red."
     },
     "message": {
-      "sendFailed": "No se pudo enviar el mensaje."
+      "sendFailed": "No se pudo enviar el mensaje.",
+      "empty": "Escribe un mensaje primero.",
+      "tooLong": "Este mensaje es demasiado largo. Divídelo en mensajes más cortos."
     },
     "encryption": {
       "locked": "Privé no puede desbloquear tus datos: su llave ya no está en el llavero de este equipo. Escribe tu frase de recuperación para desbloquearlos.",
@@ -314,7 +316,19 @@
     "you": "Tú",
     "unknownSender": "Alguien",
     "sendingAs": "Envías como {{account}} · {{network}}",
-    "sendingSoon": "El envío de mensajes llega en la próxima versión."
+    "composer": "Mensaje",
+    "send": "Enviar",
+    "sendHint": "Enter envía, Mayús+Enter añade una línea",
+    "status": {
+      "pending": "Enviando",
+      "sent": "Enviado",
+      "delivered": "Entregado",
+      "read": "Leído",
+      "failed": "No enviado"
+    },
+    "sendFailed": "No se pudo enviar. Revisa tu conexión y vuelve a intentarlo.",
+    "offline": "{{account}} no está conectada. Podrás enviar mensajes cuando se reconecte.",
+    "attach": "Adjuntar"
   },
   "message": {
     "kind": {

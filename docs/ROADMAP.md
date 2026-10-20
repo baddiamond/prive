@@ -96,10 +96,15 @@ must be removed and linked again to import their history.
 
 **Test:** open a chat and scroll back through older messages; reopening is instant.
 
-### ⬜ 5. Real-time messaging
+### ✅ 5. Real-time messaging
 
-- Send and receive text messages live
-- Message status (sent / delivered / read), mark chat as read
+- Send and receive text messages live; the message shows at once as "Sending", and a failure stays as
+  "Not sent" with the reason and **Retry** ✅
+- Message status (sent / delivered / read) from the network's receipts ✅
+- Mark chat as read when it is open and the window has focus; read receipts follow the user's own setting on
+  the network (WhatsApp sends "read-self" when read receipts are off). Reading a chat on the phone clears it
+  in Privé too ✅
+- Drafts are kept per chat while the app runs ✅
 
 **Test:** message yourself from your phone and see it instantly; reply from Privé and see it on the phone.
 

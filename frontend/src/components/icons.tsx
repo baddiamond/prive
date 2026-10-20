@@ -137,3 +137,31 @@ export function RefreshIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** Arrow: send a message (design/prototypes/ui/Main.dc.html). */
+export function SendIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2.25} {...props}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </Icon>
+  );
+}
+
+/** Paperclip: attach a file. */
+export function AttachIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7" />
+    </Icon>
+  );
+}
+
+/** Circle with an exclamation mark: a message that was not sent. */
+export function AlertIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2.25} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v6M12 16.5h.01" />
+    </Icon>
+  );
+}

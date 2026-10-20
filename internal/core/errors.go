@@ -66,6 +66,10 @@ const (
 	// CodeHistoryNoAnswer means the network did not answer a history request in time,
 	// e.g. the phone is offline.
 	CodeHistoryNoAnswer = "errors.history.noAnswer"
+	// CodeMessageEmpty means the user tried to send a message without text.
+	CodeMessageEmpty = "errors.message.empty"
+	// CodeMessageTooLong means the text is longer than MaxMessageLength.
+	CodeMessageTooLong = "errors.message.tooLong"
 )
 
 // Sentinel errors for use with errors.Is.
@@ -81,6 +85,8 @@ var (
 	ErrSendFailed             = NewError(CodeSendFailed)
 	ErrShuttingDown           = NewError(CodeShuttingDown)
 	ErrHistoryUnavailable     = NewError(CodeHistoryUnavailable)
+	ErrMessageEmpty           = NewError(CodeMessageEmpty)
+	ErrMessageTooLong         = NewError(CodeMessageTooLong)
 )
 
 // KnownCodes lists every translation key the core may send to the UI,
@@ -90,6 +96,7 @@ func KnownCodes() []string {
 		CodeUnknown, CodeAccountNotFound, CodeNotLoggedIn, CodeConnectFailed,
 		CodeEngineNotFound, CodeLoginMethodUnsupported, CodeCapabilityUnsupported,
 		CodeNotImplemented, CodeSendFailed, CodeShuttingDown, CodeHistoryUnavailable, CodeHistoryNoAnswer,
+		CodeMessageEmpty, CodeMessageTooLong,
 	}
 	for _, s := range accountStates {
 		codes = append(codes, s.Key())

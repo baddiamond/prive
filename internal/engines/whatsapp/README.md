@@ -17,9 +17,10 @@ Links WhatsApp accounts to Privé as **companion devices** (like WhatsApp Web), 
 | Link with QR, resume on startup, automatic reconnection, log out | 2 ✅ |
 | Chat list and initial history sync | 3 ✅ |
 | Message history, older messages on demand from the phone | 4 ✅ |
-| Sending, delivery and read receipts | 5 |
+| Sending, delivery and read receipts, mark as read | 5 ✅ |
 
-The manifest declares `HistoryOnDemand`; every other capability is added in the phase that implements it.
+The manifest declares `SendText`, `ReadReceipts` and `HistoryOnDemand`; every other capability is added in the
+phase that implements it.
 
 ## Behavior
 
@@ -42,6 +43,13 @@ The manifest declares `HistoryOnDemand`; every other capability is added in the 
   event says how many arrived and whether the phone has nothing older (`endOfHistoryTransferType`). If the phone
   does not answer within 20 seconds, the request is sent again with the chat's LID (the phone may know a chat by
   either address); after that the UI shows `errors.history.noAnswer`.
+- **Sending:** text messages go out with `SendMessage` to the chat as stored (phone number or group); whatsmeow
+  handles LID addressing. Offline, sending fails at once with `errors.account.connectFailed`.
+- **Receipts:** delivery and read receipts from recipients become `message:status` (delivery only moves forward).
+  In groups the first receipt sets the status, like the single grey ticks WhatsApp shows before everyone has read.
+  A `read-self` receipt (the user read the chat on the phone) marks the chat read in Privé.
+- **Mark as read:** `MarkRead` sends read receipts for the chat's unread messages, per sender in groups. If the
+  user turned read receipts off in WhatsApp, whatsmeow sends `read-self`, so contacts are not told.
 - **Senders:** incoming messages store their author by phone number when known, with the best name from the
   contact store, so group messages show who wrote them.
 - **Chat state from other devices:** archive, pin, mute and mark-as-read app-state events become `chat:patch`.

@@ -38,7 +38,7 @@ func (e *Engine) Manifest() core.Manifest {
 		Name:         "WhatsApp",
 		ShortName:    "WA",
 		LoginMethods: []core.LoginMethod{core.LoginQR},
-		Capabilities: core.Capabilities{HistoryOnDemand: true},
+		Capabilities: core.Capabilities{SendText: true, ReadReceipts: true, HistoryOnDemand: true},
 	}
 }
 

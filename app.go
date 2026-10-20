@@ -424,6 +424,24 @@ func (a *App) GetMessages(accountID, chatID string, beforeMs int64, beforeID str
 	return msgs, err
 }
 
+// SendMessage sends a text message from the account that owns the chat. The returned
+// message is also announced as message:new; delivery updates arrive as message:status.
+func (a *App) SendMessage(accountID, chatID, text string) (core.Message, error) {
+	if a.failure != nil {
+		return core.Message{}, a.failure
+	}
+	return a.manager.SendMessage(a.context(), core.AccountID(accountID), core.ChatID(chatID), core.OutgoingMessage{Text: text})
+}
+
+// MarkChatRead clears a chat's unread count and sends read receipts when the network
+// supports them (the user's own privacy settings on that network still apply).
+func (a *App) MarkChatRead(accountID, chatID string) error {
+	if a.failure != nil {
+		return a.failure
+	}
+	return a.manager.MarkChatRead(a.context(), core.AccountID(accountID), core.ChatID(chatID))
+}
+
 // RequestOlderHistory asks the network for messages older than those stored for a chat
 // (Capabilities.HistoryOnDemand). The answer arrives as a history:result event.
 func (a *App) RequestOlderHistory(accountID, chatID string) error {

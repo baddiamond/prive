@@ -19,6 +19,7 @@ export interface BackendEvents {
   "chats:synced": { accountId: string; chats: number; messages: number };
   "sync:progress": { accountId: string; done: number; total: number };
   "message:new": { accountId: string; message: MessagePayload };
+  "message:status": { accountId: string; chatId: string; messageId: string; status: string };
   "history:result": { accountId: string; chatId: string; messages: number; complete: boolean; code?: string };
 }
 

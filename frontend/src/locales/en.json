@@ -166,7 +166,9 @@
       "notImplemented": "This feature is not available yet for this network."
     },
     "message": {
-      "sendFailed": "The message could not be sent."
+      "sendFailed": "The message could not be sent.",
+      "empty": "Write a message first.",
+      "tooLong": "This message is too long. Split it into shorter ones."
     },
     "encryption": {
       "locked": "Privé can't unlock your data: its key is no longer in this computer's keychain. Type your recovery phrase to unlock it.",
@@ -314,7 +316,19 @@
     "you": "You",
     "unknownSender": "Someone",
     "sendingAs": "Sending as {{account}} · {{network}}",
-    "sendingSoon": "Sending messages arrives in the next version."
+    "composer": "Message",
+    "send": "Send",
+    "sendHint": "Enter sends, Shift+Enter adds a line",
+    "status": {
+      "pending": "Sending",
+      "sent": "Sent",
+      "delivered": "Delivered",
+      "read": "Read",
+      "failed": "Not sent"
+    },
+    "sendFailed": "Couldn't send. Check your connection and try again.",
+    "offline": "{{account}} is not connected. Messages can be sent once it reconnects.",
+    "attach": "Attach"
   },
   "message": {
     "kind": {

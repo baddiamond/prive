@@ -178,12 +178,6 @@ func (s *Session) GetMessages(context.Context, core.ChatID, core.GetMessagesOpti
 	return nil, core.ErrNotImplemented
 }
 
-// SendMessage implements core.Session. Sending arrives in phase 5; the manifest does not
-// declare SendText yet.
-func (s *Session) SendMessage(context.Context, core.ChatID, core.OutgoingMessage) (core.Message, error) {
-	return core.Message{}, core.ErrCapabilityUnsupported
-}
-
 // SubscribeEvents implements core.Session.
 func (s *Session) SubscribeEvents() <-chan core.Event { return s.events.Events() }
 

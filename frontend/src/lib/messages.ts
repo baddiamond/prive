@@ -1,5 +1,5 @@
 // Messages of one chat: backend wrappers and the grouping the conversation view needs.
-import { GetMessages, RequestOlderHistory } from "../../wailsjs/go/main/App";
+import { GetMessages, MarkChatRead, RequestOlderHistory, SendMessage } from "../../wailsjs/go/main/App";
 import type { MessageKind } from "./chats";
 
 /** Page size when opening a chat and when scrolling back. */
@@ -21,6 +21,10 @@ export interface Message {
   kind: MessageKind;
   text: string;
   status: MessageStatus;
+  /** Set on a message typed here that the network has not accepted yet ("local:<n>" id). */
+  local?: boolean;
+  /** Translation key of why a local message was not sent. */
+  errorCode?: string;
 }
 
 /** A message as the backend sends it (bindings and events). */
@@ -68,6 +72,28 @@ export async function getMessages(accountId: string, chatId: string, before?: Me
 /** Asks the network (e.g. the phone) for older messages; the answer is a history:result event. */
 export function requestOlderHistory(accountId: string, chatId: string): Promise<void> {
   return RequestOlderHistory(accountId, chatId);
+}
+
+/** Sends a text message; resolves with the message as the network accepted it. */
+export async function sendMessage(accountId: string, chatId: string, text: string): Promise<Message> {
+  const m = await SendMessage(accountId, chatId, text);
+  return messageFromBackend(m as unknown as MessagePayload);
+}
+
+/** Clears a chat's unread count and sends read receipts where the network supports them. */
+export function markChatRead(accountId: string, chatId: string): Promise<void> {
+  return MarkChatRead(accountId, chatId);
+}
+
+const statusOrder: Record<MessageStatus, number> = { "": 0, failed: 0, pending: 1, sent: 2, delivered: 3, read: 4 };
+
+/**
+ * The status to keep when a message in state current receives next: delivery only moves
+ * forward, and "failed" only replaces a message that never left (like core.MergeStatus).
+ */
+export function mergeStatus(current: MessageStatus, next: MessageStatus): MessageStatus {
+  if (next === "failed") return current === "" || current === "pending" ? "failed" : current;
+  return statusOrder[next] > statusOrder[current] ? next : current;
 }
 
 /** Orders messages like the store does: by time, then id. */

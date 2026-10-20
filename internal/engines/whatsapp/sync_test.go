@@ -189,3 +189,36 @@ func TestLiveMessageAndAppState(t *testing.T) {
 		t.Errorf("read patch = %+v", p)
 	}
 }
+
+func TestReceipts(t *testing.T) {
+	y, r := newTestSyncer(t)
+	chat, _ := types.ParseJID(alice)
+	src := types.MessageSource{Chat: chat, Sender: chat}
+
+	y.handle(&events.Receipt{MessageSource: src, MessageIDs: []types.MessageID{"s1", "s2"}, Type: types.ReceiptTypeDelivered})
+	y.handle(&events.Receipt{MessageSource: src, MessageIDs: []types.MessageID{"s1"}, Type: types.ReceiptTypeRead})
+	own := src
+	own.IsFromMe = true
+	y.handle(&events.Receipt{MessageSource: own, MessageIDs: []types.MessageID{"s3"}, Type: types.ReceiptTypeDelivered})
+	y.handle(&events.Receipt{MessageSource: own, MessageIDs: []types.MessageID{"in1"}, Type: types.ReceiptTypeReadSelf})
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.events) != 4 {
+		t.Fatalf("events = %+v, want 3 statuses and a read patch", r.events)
+	}
+	want := []core.MessageStatusEvent{
+		{ChatID: alice, MessageID: "s1", Status: core.StatusDelivered},
+		{ChatID: alice, MessageID: "s2", Status: core.StatusDelivered},
+		{ChatID: alice, MessageID: "s1", Status: core.StatusRead},
+	}
+	for i, w := range want {
+		if got := r.events[i].(core.MessageStatusEvent); got != w {
+			t.Errorf("event %d = %+v, want %+v", i, got, w)
+		}
+	}
+	p := r.events[3].(core.ChatPatchEvent).Patch
+	if p.ChatID != alice || p.Read == nil || !*p.Read {
+		t.Errorf("reading on the phone must mark the chat read: %+v", p)
+	}
+}

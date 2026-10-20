@@ -191,6 +191,12 @@ type HistoryRequester interface {
     // HistoryResultEvent for the chat, which also reports when the network does not answer.
     RequestOlderHistory(ctx context.Context, chatID ChatID, oldest Message, count int) error
 }
+
+// ReadMarker: Capabilities.ReadReceipts (which also means the engine reports message statuses).
+type ReadMarker interface {
+    // Marks these incoming messages of a chat as read on the network (read receipts).
+    MarkRead(ctx context.Context, chatID ChatID, messages []Message) error
+}
 ```
 
 ### Events
@@ -305,6 +311,10 @@ the busy timeout instead of failing with `SQLITE_BUSY`.
   count); history batches go through `Repository.ImportHistory`. Authoritative batches (the initial sync) may set
   unread counts and chat state; non-authoritative ones (e.g. history fetched on demand) only add messages and never
   overwrite newer state.
+- **SendMessage** rejects empty text and text over `MaxMessageLength`, sends through the session, stores the
+  message and emits it; statuses then arrive as `message:status`. **MarkChatRead** reports the chat's unread
+  incoming messages to the network (`ReadMarker`) and clears the local unread count even when the network
+  cannot be reached.
 - **AddAccount / UpdateAccount / Login / Reconnect / RemoveAccount / SendMessage / ListChats / GetMessages** are what
   `app.go` exposes to the UI. Accounts that were added but never linked (e.g. the window closed on the QR step) are
   removed at startup.

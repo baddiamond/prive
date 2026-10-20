@@ -55,6 +55,15 @@ type HistoryRequester interface {
 	RequestOlderHistory(ctx context.Context, chatID ChatID, oldest Message, count int) error
 }
 
+// ReadMarker is implemented by sessions whose engine declares Capabilities.ReadReceipts:
+// besides reporting the delivery status of sent messages, they can tell the network that
+// the user read incoming ones.
+type ReadMarker interface {
+	// MarkRead marks these incoming messages of a chat as read on the network (read
+	// receipts, or the network's equivalent).
+	MarkRead(ctx context.Context, chatID ChatID, messages []Message) error
+}
+
 // LoginMethod is a way to link an account.
 type LoginMethod string
 

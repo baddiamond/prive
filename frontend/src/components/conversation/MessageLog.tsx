@@ -16,6 +16,8 @@ interface MessageLogProps {
   chatName: string;
   /** The engine can fetch older history on demand (Capabilities.historyOnDemand). */
   canAsk: boolean;
+  /** The engine reports delivery and read status (Capabilities.readReceipts). */
+  showStatus: boolean;
 }
 
 /**
@@ -23,7 +25,7 @@ interface MessageLogProps {
  * page from this computer, then asks the network (e.g. the phone) once nothing older is
  * stored and the engine can be asked.
  */
-export default function MessageLog({ chat, chatName, canAsk }: MessageLogProps) {
+export default function MessageLog({ chat, chatName, canAsk, showStatus }: MessageLogProps) {
   const { t, i18n } = useTranslation();
   const key = `${chat.accountId}\u0000${chat.id}`;
   const state = useMessages((s) => s.chats[key]);
@@ -49,8 +51,10 @@ export default function MessageLog({ chat, chatName, canAsk }: MessageLogProps) 
       el.scrollTop = el.scrollHeight; // first render: start at the newest message
     } else if (prev.first !== first && prev.last === last) {
       el.scrollTop = prev.top + (el.scrollHeight - prev.height); // older page added above
-    } else if (prev.last !== last && prev.atBottom) {
-      el.scrollTop = el.scrollHeight; // a new message while reading the latest ones
+    } else if (prev.atBottom || (prev.last !== last && messages[messages.length - 1]?.fromMe)) {
+      // Reading the latest messages: follow new ones and status changes (e.g. "Not sent").
+      // A message the user just sent is always brought into view.
+      el.scrollTop = el.scrollHeight;
     }
     before.current = { height: el.scrollHeight, top: el.scrollTop, atBottom: isAtBottom(el), first, last };
     // Short histories that do not fill the view cannot be scrolled: load more right away.
@@ -93,6 +97,7 @@ export default function MessageLog({ chat, chatName, canAsk }: MessageLogProps) 
             chatName={chatName}
             firstOfRun={item.firstOfRun}
             lastOfRun={item.lastOfRun}
+            showStatus={showStatus}
           />
         ),
       )}

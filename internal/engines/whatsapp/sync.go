@@ -51,6 +51,8 @@ func (y *syncer) handle(evt any) bool {
 		y.history(ctx, e.Data)
 	case *events.Message:
 		y.message(ctx, e)
+	case *events.Receipt:
+		y.receipt(ctx, e)
 	case *events.Archive:
 		y.patch(ctx, e.JID, func(p *core.ChatPatch) { v := e.Action.GetArchived(); p.Archived = &v })
 	case *events.Pin:

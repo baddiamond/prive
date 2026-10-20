@@ -65,6 +65,8 @@ func (e *Engine) NewSession(account core.Account, deps core.SessionDeps) (core.S
 		engine:   e,
 
 		historyPages: map[core.ChatID]int{},
+		read:         map[core.ChatID][]core.MessageID{},
+		started:      time.Now().UnixNano(),
 		groups:       map[core.ChatID]bool{},
 	}
 	e.sessions[account.ID] = s
@@ -103,6 +105,10 @@ type Session struct {
 	historyPages map[core.ChatID]int
 	// groups marks the demo's group chats, whose fictional senders vary.
 	groups map[core.ChatID]bool
+	// read records MarkRead calls per chat.
+	read map[core.ChatID][]core.MessageID
+	// started is when the session was created; it makes message IDs unique.
+	started int64
 }
 
 // RemoteID is the network identity a fake account gets after login.
@@ -221,6 +227,9 @@ func (s *Session) SendMessage(_ context.Context, chatID core.ChatID, out core.Ou
 		ReplyTo:  out.ReplyTo,
 	})
 	s.events.Push(core.MessageStatusEvent{ChatID: chatID, MessageID: msg.ID, Status: core.StatusDelivered})
+	if s.engine.demo {
+		s.demoReply(chatID, msg)
+	}
 	return msg, nil
 }
 
@@ -265,7 +274,8 @@ func (s *Session) Closed() bool {
 func (s *Session) addMessage(chatID core.ChatID, m core.Message, name ...string) core.Message {
 	s.mu.Lock()
 	s.nextID++
-	m.ID = core.MessageID("m" + strconv.Itoa(s.nextID))
+	// The session's start time keeps IDs unique across restarts of the same account.
+	m.ID = core.MessageID("m" + strconv.FormatInt(s.started, 36) + "-" + strconv.Itoa(s.nextID))
 	m.ChatID = chatID
 	// Strictly increasing timestamps keep ordering deterministic in tests.
 	m.Timestamp = time.Now().UTC().Truncate(time.Millisecond).Add(time.Duration(s.nextID) * time.Millisecond)

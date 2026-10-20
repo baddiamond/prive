@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -601,5 +602,46 @@ func TestRequestOlderHistory(t *testing.T) {
 	chat, _, _ := e.store.GetChat(ctx, a.ID, "chat-1")
 	if chat.LastMessagePreview != "latest" {
 		t.Errorf("older history must not replace the last message preview: %q", chat.LastMessagePreview)
+	}
+}
+
+func TestMarkChatRead(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("A")
+	s := e.fake.Session(a.ID)
+	for _, text := range []string{"one", "two", "three"} {
+		s.Receive("chat-1", "Alice", text)
+	}
+	waitFor(t, "three unread messages", func() bool {
+		c, _, _ := e.store.GetChat(ctx, a.ID, "chat-1")
+		return c.UnreadCount == 3
+	})
+
+	if err := e.manager.MarkChatRead(ctx, a.ID, "chat-1"); err != nil {
+		t.Fatal(err)
+	}
+	if c, _, _ := e.store.GetChat(ctx, a.ID, "chat-1"); c.UnreadCount != 0 {
+		t.Errorf("unread after MarkChatRead = %d", c.UnreadCount)
+	}
+	if read := s.ReadMessages("chat-1"); len(read) != 3 {
+		t.Errorf("reported %d messages as read to the network, want the 3 incoming ones", len(read))
+	}
+	// Nothing left to read: no second report.
+	if err := e.manager.MarkChatRead(ctx, a.ID, "chat-1"); err != nil || len(s.ReadMessages("chat-1")) != 3 {
+		t.Errorf("second MarkChatRead = %v, reported %d", err, len(s.ReadMessages("chat-1")))
+	}
+}
+
+func TestSendMessageValidation(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("A")
+	if _, err := e.manager.SendMessage(ctx, a.ID, "chat-1", core.OutgoingMessage{Text: "  \n "}); !errors.Is(err, core.ErrMessageEmpty) {
+		t.Errorf("blank message = %v, want ErrMessageEmpty", err)
+	}
+	long := strings.Repeat("é", core.MaxMessageLength+1)
+	if _, err := e.manager.SendMessage(ctx, a.ID, "chat-1", core.OutgoingMessage{Text: long}); !errors.Is(err, core.ErrMessageTooLong) {
+		t.Errorf("long message = %v, want ErrMessageTooLong", err)
 	}
 }

@@ -145,9 +145,13 @@ func (h *harness) testManifest(t *testing.T) {
 	if again := h.engine.Manifest(); again.ID != m.ID {
 		t.Errorf("Manifest ID is not stable: %q then %q", m.ID, again.ID)
 	}
-	if m.Capabilities.HistoryOnDemand {
-		if _, ok := h.open(t, h.newAccount(t)).(core.HistoryRequester); !ok {
+	if m.Capabilities.HistoryOnDemand || m.Capabilities.ReadReceipts {
+		s := h.open(t, h.newAccount(t))
+		if _, ok := s.(core.HistoryRequester); m.Capabilities.HistoryOnDemand && !ok {
 			t.Error("Capabilities.HistoryOnDemand is declared but the session does not implement core.HistoryRequester")
+		}
+		if _, ok := s.(core.ReadMarker); m.Capabilities.ReadReceipts && !ok {
+			t.Error("Capabilities.ReadReceipts is declared but the session does not implement core.ReadMarker")
 		}
 	}
 }

@@ -91,7 +91,9 @@ Previews of sent messages start with "You: ".
 | Meta | Time + status for outgoing: Sending · Sent · Delivered · Read · Not sent (11 px, `textSecondary`) |
 | Failed message | Bubble border 1.5 px `danger`; meta "Not sent" in `danger`; under it a `role="alert"` row: icon + "Couldn't send. Check your connection and try again." + **Retry** |
 | Composer note | `Sending as {account} · {network}` with account dot (always visible — prevents replying from the wrong account). Until phase 5 the composer is a placeholder: "Sending messages arrives in the next version." |
-| Composer | Attach (disabled until the engine has `Media`), text field 42 px with 1.5 px `border`, Send (accent, 42×42). Enter sends, Shift+Enter new line |
+| Composer | Attach (disabled until the engine has `Media`), text field 42 px with 1.5 px `border` growing to 6 lines, Send (accent, 42×42, disabled while empty or offline). Enter sends, Shift+Enter new line. Drafts are kept per chat while the app runs. Offline, the note reads "{account} is not connected…" |
+| Sending | The message appears at once with "Sending"; it becomes Sent → Delivered → Read from receipts (only where the engine has `ReadReceipts`). A failure keeps the bubble as "Not sent" (see Failed message) |
+| Read state | The open chat is marked read while the window has focus (on open, on new messages, on returning to the window) |
 
 Capabilities drive the UI: no Attach without `Media`, no reactions without `Reactions`,
 no read ticks without `ReadReceipts`. Never check the engine id.

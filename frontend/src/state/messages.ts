@@ -4,10 +4,13 @@ import { onBackendEvent } from "../lib/events";
 import {
   getMessages,
   mergeMessages,
+  mergeStatus,
   messageFromBackend,
   messagePageSize,
   requestOlderHistory,
+  sendMessage,
   type Message,
+  type MessageStatus,
 } from "../lib/messages";
 
 /** Where older messages of a chat stand once the stored ones are all shown. */
@@ -45,6 +48,13 @@ interface MessagesState {
   open: (accountId: string, chatId: string, canAsk: boolean) => Promise<void>;
   /** Loads the page before the oldest shown message, or asks the network when none is left. */
   loadOlder: (accountId: string, chatId: string, canAsk: boolean) => Promise<void>;
+  /**
+   * Sends text. The message shows at once as "Sending" and is replaced by the network's copy,
+   * or stays as "Not sent" with the reason so the user can retry.
+   */
+  send: (accountId: string, chatId: string, text: string) => Promise<void>;
+  /** Sends a "Not sent" message again. */
+  retry: (accountId: string, chatId: string, localId: string) => Promise<void>;
 }
 
 /** Chats kept in memory; the least recently opened are dropped beyond this. */
@@ -52,6 +62,7 @@ const maxCachedChats = 20;
 
 let listening = false;
 const recent: string[] = [];
+let localCounter = 0;
 
 const chatKey = (accountId: string, chatId: string) => `${accountId}\u0000${chatId}`;
 
@@ -125,15 +136,74 @@ export const useMessages = create<MessagesState>()((set, get) => {
         update(key, { loadingOlder: false, errorCode: errorCode(err) });
       }
     },
+
+    send: async (accountId, chatId, text) => {
+      const key = chatKey(accountId, chatId);
+      const local: Message = {
+        accountId,
+        chatId,
+        id: `local:${++localCounter}`,
+        senderId: "",
+        senderName: "",
+        fromMe: true,
+        at: Date.now(),
+        kind: "text",
+        text,
+        status: "pending",
+        local: true,
+      };
+      setMessages(key, (list) => [...list, local]);
+      await deliver(key, local);
+    },
+
+    retry: async (accountId, chatId, localId) => {
+      const key = chatKey(accountId, chatId);
+      const local = get().chats[key]?.messages.find((m) => m.id === localId);
+      if (!local?.local || local.status !== "failed") return;
+      const again = { ...local, status: "pending" as MessageStatus, errorCode: undefined };
+      setMessages(key, (list) => list.map((m) => (m.id === localId ? again : m)));
+      await deliver(key, again);
+    },
   };
 
+  /** Sends a local message and swaps it for the network's copy, or marks it "Not sent". */
+  async function deliver(key: string, local: Message) {
+    try {
+      const sent = await sendMessage(local.accountId, local.chatId, local.text);
+      setMessages(key, (list) => mergeMessages(list.filter((m) => m.id !== local.id), [sent]));
+    } catch (err) {
+      setMessages(key, (list) =>
+        list.map((m) => (m.id === local.id ? { ...m, status: "failed", errorCode: errorCode(err) } : m)),
+      );
+    }
+  }
+
+  /** Changes a loaded chat's messages; chats that are not loaded are left alone. */
+  function setMessages(key: string, change: (list: Message[]) => Message[]) {
+    const chat = get().chats[key];
+    if (chat) update(key, { messages: change(chat.messages) });
+  }
+
   function subscribe() {
-    // A live message lands in its chat if that chat is loaded.
+    // A live message lands in its chat if that chat is loaded. The copy of a message sent
+    // here may arrive before SendMessage returns: it replaces the "Sending" placeholder.
     onBackendEvent("message:new", (e) => {
       const m = messageFromBackend(e.message);
       const key = chatKey(e.accountId, m.chatId);
       const chat = get().chats[key];
-      if (chat && !chat.loading) update(key, { messages: mergeMessages(chat.messages, [m]) });
+      if (!chat || chat.loading) return;
+      let list = chat.messages;
+      if (m.fromMe && !list.some((x) => x.id === m.id)) {
+        const placeholder = list.find((x) => x.local && x.status === "pending" && x.text === m.text);
+        if (placeholder) list = list.filter((x) => x !== placeholder);
+      }
+      update(key, { messages: mergeMessages(list, [m]) });
+    });
+
+    onBackendEvent("message:status", (e) => {
+      setMessages(chatKey(e.accountId, e.chatId), (list) =>
+        list.map((m) => (m.id === e.messageId ? { ...m, status: mergeStatus(m.status, e.status as MessageStatus) } : m)),
+      );
     });
 
     // The phone answered: show what it sent (now stored) and whether more remain.

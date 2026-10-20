@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { markChatRead } from "../../lib/messages";
 import { useTranslation } from "react-i18next";
 import { useAccounts } from "../../state/accounts";
 import { useChats } from "../../state/chats";
@@ -7,6 +8,7 @@ import { useUI } from "../../state/ui";
 import { accountLabel } from "../accounts/accountLabel";
 import { accountBg } from "../accounts/colors";
 import ChatAvatar from "../chats/ChatAvatar";
+import Composer from "./Composer";
 import MessageLog from "./MessageLog";
 
 /** The open chat (docs/UI.md §2.3): header, message history and the composer area. */
@@ -21,6 +23,8 @@ export default function Conversation() {
   useEffect(() => {
     if (chat) void open(chat.accountId, chat.id, canAsk);
   }, [chat?.accountId, chat?.id, canAsk, open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useMarkRead(chat?.accountId, chat?.id, chat?.unreadCount ?? 0);
 
   if (!chat) return null;
   const name = chat.name || t("chatList.unknownChat");
@@ -41,19 +45,31 @@ export default function Conversation() {
         </div>
       </header>
 
-      <MessageLog key={selected} chat={chat} chatName={name} canAsk={canAsk} />
+      <MessageLog
+        key={selected}
+        chat={chat}
+        chatName={name}
+        canAsk={canAsk}
+        showStatus={account?.manifest.capabilities.readReceipts ?? false}
+      />
 
-      <footer className="flex flex-col gap-2 border-t border-divider px-5 pb-4 pt-2.5">
-        {account && (
-          <span className="flex items-center gap-1.5 text-caption text-text-secondary">
-            <span aria-hidden className={`h-2 w-2 rounded-full ${dot}`} />
-            {t("conversation.sendingAs", { account: accountLabel(account), network: account.manifest.name })}
-          </span>
-        )}
-        <p className="flex h-[42px] items-center rounded-control border-[1.5px] border-border bg-raised px-3.5 text-text-faint">
-          {t("conversation.sendingSoon")}
-        </p>
-      </footer>
+      {account && <Composer key={selected} account={account} chatId={chat.id} />}
     </main>
   );
+}
+
+/**
+ * Marks the open chat as read while the window has focus: when it opens, when messages
+ * arrive, and when the user comes back to the window.
+ */
+function useMarkRead(accountId: string | undefined, chatId: string | undefined, unread: number) {
+  useEffect(() => {
+    if (!accountId || !chatId || unread === 0) return;
+    const mark = () => {
+      if (document.hasFocus()) void markChatRead(accountId, chatId).catch(() => undefined);
+    };
+    mark();
+    window.addEventListener("focus", mark);
+    return () => window.removeEventListener("focus", mark);
+  }, [accountId, chatId, unread]);
 }

@@ -37,6 +37,9 @@ accounts can be linked again.
 Privé connects **only** to the messaging networks you add (for example, WhatsApp's servers) to send and
 receive your messages. It does not contact any Privé server, because there is none.
 
+When you open a chat, Privé tells the network you read its messages, as the network's own apps do. Your
+settings on that network still apply: with read receipts turned off in WhatsApp, your contacts are not told.
+
 - No analytics, telemetry, crash reporting or usage statistics.
 - No advertising or tracking identifiers.
 - No automatic update checks. When updates are added they will be **opt-in**.
