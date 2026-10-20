@@ -493,3 +493,20 @@ func TestUpdateAccount(t *testing.T) {
 		t.Errorf("unknown account = %v", err)
 	}
 }
+
+func TestReconnect(t *testing.T) {
+	e := newEnv(t)
+	a := e.addLoggedIn("A")
+	e.fake.FailConnect(errors.New("offline"))
+	e.restart()
+	waitFor(t, "error state", func() bool { return stateOf(e.manager, a.ID) == core.StateError })
+
+	e.fake.FailConnect(nil) // the network is back
+	if err := e.manager.Reconnect(a.ID); err != nil {
+		t.Fatal(err)
+	}
+	e.waitState(a.ID, core.StateConnected)
+	if err := e.manager.Reconnect("nope"); !errors.Is(err, core.ErrAccountNotFound) {
+		t.Errorf("Reconnect(unknown) = %v", err)
+	}
+}

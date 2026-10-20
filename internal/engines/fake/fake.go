@@ -29,7 +29,7 @@ const sessionFile = "session"
 type Engine struct {
 	mu       sync.Mutex
 	sessions map[core.AccountID]*Session
-	// connectErr, if set, is returned by Connect of sessions created afterwards.
+	// connectErr, if set, is returned by every Connect call.
 	connectErr error
 }
 
@@ -54,19 +54,19 @@ func (e *Engine) NewSession(account core.Account, deps core.SessionDeps) (core.S
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	s := &Session{
-		account:    account,
-		deps:       deps,
-		dataDir:    deps.DataDir,
-		events:     core.NewEventQueue(),
-		chats:      map[core.ChatID]*core.Chat{},
-		messages:   map[core.ChatID][]core.Message{},
-		connectErr: e.connectErr,
+		account:  account,
+		deps:     deps,
+		dataDir:  deps.DataDir,
+		events:   core.NewEventQueue(),
+		chats:    map[core.ChatID]*core.Chat{},
+		messages: map[core.ChatID][]core.Message{},
+		engine:   e,
 	}
 	e.sessions[account.ID] = s
 	return s, nil
 }
 
-// FailConnect makes sessions created from now on fail Connect with err (nil restores success).
+// FailConnect makes every Connect fail with err from now on (nil restores success).
 func (e *Engine) FailConnect(err error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -82,11 +82,11 @@ func (e *Engine) Session(id core.AccountID) *Session {
 
 // Session is one fake account. It implements core.Session.
 type Session struct {
-	account    core.Account
-	deps       core.SessionDeps
-	dataDir    string
-	events     *core.EventQueue
-	connectErr error
+	account core.Account
+	deps    core.SessionDeps
+	dataDir string
+	events  *core.EventQueue
+	engine  *Engine
 
 	mu        sync.Mutex
 	connected bool
@@ -104,8 +104,11 @@ func (s *Session) Connect(ctx context.Context) error {
 	if err := ctx.Err(); err != nil {
 		return err
 	}
-	if s.connectErr != nil {
-		return s.connectErr
+	s.engine.mu.Lock()
+	connectErr := s.engine.connectErr
+	s.engine.mu.Unlock()
+	if connectErr != nil {
+		return connectErr
 	}
 	if _, err := os.Stat(filepath.Join(s.dataDir, sessionFile)); errors.Is(err, os.ErrNotExist) {
 		return core.ErrNotLoggedIn

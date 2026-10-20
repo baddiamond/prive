@@ -210,6 +210,16 @@ func (m *Manager) AddAccount(ctx context.Context, req NewAccount) (Account, erro
 	return acc, nil
 }
 
+// Reconnect retries the connection of an account in the error state ("Retry" in the UI).
+func (m *Manager) Reconnect(id AccountID) error {
+	ra, err := m.running(id)
+	if err != nil {
+		return err
+	}
+	m.connect(ra)
+	return nil
+}
+
 // UpdateAccount changes the label and color the user chose for an account.
 func (m *Manager) UpdateAccount(ctx context.Context, id AccountID, displayName, color string) (Account, error) {
 	ra, err := m.lookup(id)
@@ -248,7 +258,9 @@ func (m *Manager) Login(_ context.Context, id AccountID, method LoginMethod) err
 }
 
 // RemoveAccount logs the account out on the network (best effort), closes its session
-// and deletes its chats, messages and engine data.
+// and deletes its chats, messages and engine data. Removal works offline too: if only the
+// network logout failed with a coded error (e.g. "remove the device on your phone"), the
+// account is still removed and that error is returned so the UI can tell the user.
 func (m *Manager) RemoveAccount(ctx context.Context, id AccountID) error {
 	m.lifecycle.Lock()
 	defer m.lifecycle.Unlock()
@@ -265,10 +277,15 @@ func (m *Manager) RemoveAccount(ctx context.Context, id AccountID) error {
 	}
 	ra.cancel() // stops a pending connection or login
 
+	var logoutNotice error
 	if ra.session != nil {
-		// Removing must work offline too, so a failed network logout is only logged.
+		// Removing must work offline too, so a failed network logout does not stop it.
 		if err := ra.session.Logout(ctx); err != nil && !errors.Is(err, ErrNotLoggedIn) {
 			m.logger.Warn("logout failed while removing account", "account", id, "err", err)
+			var ce *CodedError
+			if errors.As(err, &ce) {
+				logoutNotice = ce
+			}
 		}
 		if err := ra.session.Close(); err != nil {
 			m.logger.Warn("close session", "account", id, "err", err)
@@ -283,7 +300,7 @@ func (m *Manager) RemoveAccount(ctx context.Context, id AccountID) error {
 		m.logger.Warn("remove account data", "account", id, "err", err)
 	}
 	m.emit(AccountRemovedEvent{AccountID: id})
-	return nil
+	return logoutNotice
 }
 
 // ListChats returns stored chats for the inbox, most recent first.
