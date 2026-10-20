@@ -10,7 +10,8 @@ These rules apply to every session. Read them before changing anything.
 - The maintainer may talk to you in Spanish. **Everything you write into the repository must be in English**:
   code, identifiers, comments, docstrings, commit messages, PR titles/bodies, docs, log messages and error codes.
 - The only Spanish text allowed in the repo lives in `frontend/src/locales/es.json`
-  (and in future `locales/<lang>.json` files for other languages).
+  (and in future `locales/<lang>.json` files for other languages). Exceptions, as reference material only:
+  translated sample copy inside `design/prototypes/` and the voice examples in `docs/brand/BRAND.md`.
 
 ## 2. Internationalization (strict)
 
