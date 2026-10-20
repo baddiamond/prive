@@ -14,7 +14,7 @@ func (s stubEngine) NewSession(core.Account, core.SessionDeps) (core.Session, er
 }
 
 func manifest(id string) core.Manifest {
-	return core.Manifest{ID: id, Name: id, LoginMethods: []core.LoginMethod{core.LoginQR}}
+	return core.Manifest{ID: id, Name: id, ShortName: "XX", LoginMethods: []core.LoginMethod{core.LoginQR}}
 }
 
 func TestRegistry(t *testing.T) {

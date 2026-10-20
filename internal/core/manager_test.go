@@ -239,7 +239,7 @@ func TestAccountsReconnectAfterRestart(t *testing.T) {
 type blockingEngine struct{}
 
 func (blockingEngine) Manifest() core.Manifest {
-	return core.Manifest{ID: "blocking", Name: "Blocking", LoginMethods: []core.LoginMethod{core.LoginQR}}
+	return core.Manifest{ID: "blocking", Name: "Blocking", ShortName: "BL", LoginMethods: []core.LoginMethod{core.LoginQR}}
 }
 
 func (blockingEngine) NewSession(core.Account, core.SessionDeps) (core.Session, error) {
@@ -458,5 +458,38 @@ func TestEngineDatabasesAreEncryptedAndConfined(t *testing.T) {
 			_ = db.Close()
 			t.Errorf("OpenDB(%q) accepted", bad)
 		}
+	}
+}
+
+func TestUpdateAccount(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("Old name")
+
+	updated, err := e.manager.UpdateAccount(ctx, a.ID, "Work", "amber")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if updated.DisplayName != "Work" || updated.Color != "amber" || updated.RemoteID != fake.RemoteID(a.ID) {
+		t.Errorf("updated = %+v", updated)
+	}
+	stored, _ := e.store.ListAccounts(ctx)
+	if stored[0].DisplayName != "Work" || stored[0].Color != "amber" {
+		t.Errorf("not persisted: %+v", stored[0])
+	}
+	if got := e.manager.Accounts()[0].Account; got.DisplayName != "Work" {
+		t.Errorf("not updated in memory: %+v", got)
+	}
+	found := false
+	for _, ev := range e.events.snapshot() {
+		if u, ok := ev.(core.AccountUpdatedEvent); ok && u.Account.DisplayName == "Work" {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("no account:updated event")
+	}
+	if _, err := e.manager.UpdateAccount(ctx, "nope", "x", "green"); !errors.Is(err, core.ErrAccountNotFound) {
+		t.Errorf("unknown account = %v", err)
 	}
 }

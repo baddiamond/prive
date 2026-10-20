@@ -90,6 +90,13 @@ type SyncProgressEvent struct {
 	Total     int       `json:"total"`
 }
 
+// AccountUpdatedEvent is emitted by the Manager (never by sessions) when an account's label,
+// color or remote identity changes.
+type AccountUpdatedEvent struct {
+	AccountID AccountID `json:"accountId"`
+	Account   Account   `json:"account"`
+}
+
 // AccountRemovedEvent is emitted by the Manager (never by sessions) after an account is deleted.
 type AccountRemovedEvent struct {
 	AccountID AccountID `json:"accountId"`
@@ -122,11 +129,20 @@ func (SyncProgressEvent) EventName() string { return "sync:progress" }
 // EventName implements Event.
 func (AccountRemovedEvent) EventName() string { return "account:removed" }
 
+// EventName implements Event.
+func (AccountUpdatedEvent) EventName() string { return "account:updated" }
+
 func (e AccountStateEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
 func (e LoginQREvent) stamped(id AccountID) Event      { e.AccountID = id; return e }
 func (e LoginSuccessEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
 func (e LoginFailedEvent) stamped(id AccountID) Event  { e.AccountID = id; return e }
 func (e SyncProgressEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
+func (e AccountUpdatedEvent) stamped(id AccountID) Event {
+	e.AccountID = id
+	e.Account.ID = id
+	return e
+}
+
 func (e AccountRemovedEvent) stamped(id AccountID) Event {
 	e.AccountID = id
 	return e

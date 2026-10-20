@@ -59,17 +59,18 @@ func TestCodedError(t *testing.T) {
 }
 
 func TestManifestValidate(t *testing.T) {
-	ok := Manifest{ID: "whatsapp", Name: "WhatsApp", LoginMethods: []LoginMethod{LoginQR}}
+	ok := Manifest{ID: "whatsapp", Name: "WhatsApp", ShortName: "WA", LoginMethods: []LoginMethod{LoginQR}}
 	if err := ok.Validate(); err != nil {
 		t.Fatal(err)
 	}
 	bad := []Manifest{
-		{ID: "WhatsApp", Name: "x", LoginMethods: []LoginMethod{LoginQR}},
-		{ID: "w", Name: "x", LoginMethods: []LoginMethod{LoginQR}},
-		{ID: "what-sapp", Name: "x", LoginMethods: []LoginMethod{LoginQR}},
+		{ID: "WhatsApp", Name: "x", ShortName: "XX", LoginMethods: []LoginMethod{LoginQR}},
+		{ID: "w", Name: "x", ShortName: "XX", LoginMethods: []LoginMethod{LoginQR}},
+		{ID: "what-sapp", Name: "x", ShortName: "XX", LoginMethods: []LoginMethod{LoginQR}},
 		{ID: "whatsapp", LoginMethods: []LoginMethod{LoginQR}},
 		{ID: "whatsapp", Name: "x"},
-		{ID: "whatsapp", Name: "x", LoginMethods: []LoginMethod{"carrier-pigeon"}},
+		{ID: "whatsapp", Name: "x", ShortName: "XX", LoginMethods: []LoginMethod{"carrier-pigeon"}},
+		{ID: "whatsapp", Name: "x", ShortName: "wa", LoginMethods: []LoginMethod{LoginQR}},
 	}
 	for _, m := range bad {
 		if m.Validate() == nil {

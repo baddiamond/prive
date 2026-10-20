@@ -43,6 +43,7 @@ func (e *Engine) Manifest() core.Manifest {
 	return core.Manifest{
 		ID:           EngineID,
 		Name:         "Fake",
+		ShortName:    "FK",
 		LoginMethods: []core.LoginMethod{core.LoginQR},
 		Capabilities: core.Capabilities{SendText: true, ReadReceipts: true},
 	}

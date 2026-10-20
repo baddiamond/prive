@@ -77,12 +77,17 @@ type Manifest struct {
 	// ID is stable forever (it is stored in the database): lowercase, e.g. "whatsapp".
 	ID string `json:"id"`
 	// Name is the brand name, not translated: "WhatsApp".
-	Name         string        `json:"name"`
+	Name string `json:"name"`
+	// ShortName is the 2–3 letter tag shown on account items in the rail: "WA".
+	ShortName    string        `json:"shortName"`
 	LoginMethods []LoginMethod `json:"loginMethods"`
 	Capabilities Capabilities  `json:"capabilities"`
 }
 
-var engineIDPattern = regexp.MustCompile(`^[a-z][a-z0-9]{1,31}$`)
+var (
+	engineIDPattern  = regexp.MustCompile(`^[a-z][a-z0-9]{1,31}$`)
+	shortNamePattern = regexp.MustCompile(`^[A-Z0-9]{2,3}$`)
+)
 
 // Validate reports whether the manifest is well formed.
 func (m Manifest) Validate() error {
@@ -91,6 +96,9 @@ func (m Manifest) Validate() error {
 	}
 	if m.Name == "" {
 		return fmt.Errorf("manifest %s: name is empty", m.ID)
+	}
+	if !shortNamePattern.MatchString(m.ShortName) {
+		return fmt.Errorf("manifest %s: short name %q must be 2-3 uppercase letters or digits", m.ID, m.ShortName)
 	}
 	if len(m.LoginMethods) == 0 {
 		return fmt.Errorf("manifest %s: no login methods", m.ID)

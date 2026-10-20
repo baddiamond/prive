@@ -210,6 +210,27 @@ func (m *Manager) AddAccount(ctx context.Context, req NewAccount) (Account, erro
 	return acc, nil
 }
 
+// UpdateAccount changes the label and color the user chose for an account.
+func (m *Manager) UpdateAccount(ctx context.Context, id AccountID, displayName, color string) (Account, error) {
+	ra, err := m.lookup(id)
+	if err != nil {
+		return Account{}, err
+	}
+	ra.mu.Lock()
+	acc := ra.account
+	acc.DisplayName, acc.Color = displayName, color
+	ra.mu.Unlock()
+
+	if err := m.repo.UpdateAccount(ctx, acc); err != nil {
+		return Account{}, ErrUnknown.Wrap(fmt.Errorf("update account: %w", err))
+	}
+	ra.mu.Lock()
+	ra.account.DisplayName, ra.account.Color = displayName, color
+	ra.mu.Unlock()
+	m.emit(AccountUpdatedEvent{AccountID: id, Account: acc})
+	return acc, nil
+}
+
 // Login starts an interactive login on an account. Progress arrives as events.
 func (m *Manager) Login(_ context.Context, id AccountID, method LoginMethod) error {
 	ra, err := m.running(id)
@@ -485,6 +506,7 @@ func (m *Manager) handle(ra *runningAccount, ev Event) {
 		if err := m.repo.UpdateAccount(ctx, acc); err != nil {
 			m.logger.Error("store login", "account", id, "err", err)
 		}
+		m.emit(AccountUpdatedEvent{AccountID: id, Account: acc})
 	case ChatUpdatedEvent:
 		if e.Chat.ID == "" {
 			m.logger.Warn("dropping chat without id", "account", id)

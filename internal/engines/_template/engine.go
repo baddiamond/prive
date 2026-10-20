@@ -30,6 +30,7 @@ func (e *Engine) Manifest() core.Manifest {
 	return core.Manifest{
 		ID:           "example",                        // TODO: lowercase, stable forever
 		Name:         "Example",                        // TODO: brand name, not translated
+		ShortName:    "EX",                             // TODO: 2-3 letter tag for the rail
 		LoginMethods: []core.LoginMethod{core.LoginQR}, // TODO
 		Capabilities: core.Capabilities{},              // TODO
 	}
