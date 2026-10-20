@@ -128,6 +128,9 @@ go run ./cmd/prive-dev accounts              # lists accounts and their connecti
 go run ./cmd/prive-dev remove <id-prefix>    # logs out and deletes an account
 ```
 
+To work on the account screens without a phone, build with the `devfake` tag: the in-memory test engine
+appears as a network called "Fake" and links instantly (`wails dev -tags devfake`). Release builds never include it.
+
 ## Adding a network (engine)
 
 Each network lives in `internal/engines/<id>/` and implements two interfaces (`Engine` and `Session`).

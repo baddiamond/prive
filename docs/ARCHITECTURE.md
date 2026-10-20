@@ -253,6 +253,15 @@ Messages reference their account (cascade delete) but not their chat, because a 
 Transactions start with `BEGIN IMMEDIATE` (`_txlock=immediate`) so concurrent writers from different accounts wait on
 the busy timeout instead of failing with `SQLITE_BUSY`.
 
+## Frontend
+
+- `src/state/` holds Zustand stores: `settings` (language, theme), `accounts` (accounts, engines, live state from
+  `account:*` events), `onboarding` (first-run step, legal acceptance) and `ui` (screen, scope, dialogs).
+- `src/lib/` wraps bound methods with typed functions (`api.ts`, `accounts.ts`) and subscribes to Wails events
+  (`events.ts`). Bound methods reject with JSON `{code, params}` text, decoded by `lib/errors.ts`.
+- QR codes are rendered in Go (`App.RenderQR`, `rsc.io/qr`) and drawn as one SVG path, always dark on white.
+- The window shows onboarding until `onboarding.completedAt` is set and the current legal version is accepted.
+
 ## Manager
 
 `core.Manager` is the only component that runs sessions:
@@ -263,7 +272,9 @@ the busy timeout instead of failing with `SQLITE_BUSY`.
 - **Event pump**: one goroutine per session reads its events in order, persists what changes (chats, messages,
   statuses, the remote ID after login), then forwards the event to the UI. Message statuses only move forward
   (`core.MergeStatus`): a late "delivered" never overwrites "read".
-- **AddAccount / Login / RemoveAccount / SendMessage / ListChats / GetMessages** are what `app.go` exposes to the UI.
+- **AddAccount / UpdateAccount / Login / Reconnect / RemoveAccount / SendMessage / ListChats / GetMessages** are what
+  `app.go` exposes to the UI. Accounts that were added but never linked (e.g. the window closed on the QR step) are
+  removed at startup.
   Removing an account logs out (best effort, so it works offline), closes the session, deletes its rows and its
   data folder.
 - **Close** cancels pending connections and logins, closes every session and waits for their goroutines.

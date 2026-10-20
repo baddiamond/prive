@@ -57,9 +57,12 @@ with a second number, then run `go run ./cmd/prive-dev accounts` again later: bo
 
 **2b — interface**
 
-- First-run onboarding ([`docs/ONBOARDING.md`](ONBOARDING.md)): welcome, responsible-use agreement, connect, link, ready
-- Add-account flow with QR code in the app
-- Accounts in the rail; Settings → Accounts (rename, log out)
+- First-run onboarding ([`docs/ONBOARDING.md`](ONBOARDING.md)): welcome, responsible-use agreement, connect, link, ready;
+  resumes after a restart; asks to agree again when the legal version changes ✅
+- Add-account flow with QR code in the app (also "Link again" for logged-out accounts) ✅
+- Accounts in the rail (color, initial, network tag, issue badge, ⌘0–9); status banners in the chat list ✅
+- Settings → Accounts (rename and recolor, log out with confirmation, link again, retry) ✅
+- `devfake` build tag offers the in-memory engine to develop the account UI without a phone ✅
 
 **Test on macOS:** link two WhatsApp numbers, quit the app, reopen it — both reconnect without scanning again.
 

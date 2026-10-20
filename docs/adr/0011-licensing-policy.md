@@ -48,7 +48,7 @@ restrictions such as the Gemma terms) needs a new ADR before it is added.
 | whatsmeow | MPL-2.0 | Allowed (unmodified) |
 | go.mau.fi/libsignal (required by whatsmeow) | **GPL-3.0** | Allowed by [ADR 0012](0012-gpl-binaries-with-whatsapp.md): binaries that include the WhatsApp engine are distributed under GPL-3.0 |
 | Inter (`@fontsource/inter`) | OFL-1.1 | Allowed (font) |
-| rsc.io/qr (only in the `cmd/prive-dev` tool) | BSD-3-Clause | Allowed |
+| rsc.io/qr (QR codes for linking, in the app and `cmd/prive-dev`) | BSD-3-Clause | Allowed |
 | Wails, React, Tailwind, Zustand, react-i18next | MIT | Allowed |
 | Lucide icons | ISC | Allowed |
 | EmbeddingGemma | Gemma terms | **Rejected** (use restrictions) |
