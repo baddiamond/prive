@@ -55,10 +55,13 @@ func run(logger *slog.Logger) error {
 
 	return wails.Run(&options.App{
 		Title:     "Privé",
-		Width:     1100,
-		Height:    720,
-		MinWidth:  720,
-		MinHeight: 480,
+		Width:     1180,
+		Height:    760,
+		MinWidth:  960, // docs/UI.md §1
+		MinHeight: 640,
+		// The brand's default (dark) background, so the window does not flash white
+		// before the UI paints. Keep in sync with --prive-bg in assets/brand/tokens.
+		BackgroundColour: &options.RGBA{R: 0x0F, G: 0x10, B: 0x13, A: 255},
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},

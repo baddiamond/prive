@@ -24,7 +24,7 @@ export default function App() {
 
   if (status === "loading") {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-neutral-500" role="status">
+      <div className="flex h-full items-center justify-center text-text-secondary" role="status">
         {t("app.loading")}
       </div>
     );
@@ -32,7 +32,7 @@ export default function App() {
 
   if (status === "error") {
     return (
-      <div className="flex h-full items-center justify-center p-8 text-sm text-red-600" role="alert">
+      <div className="flex h-full items-center justify-center p-8 text-status-danger" role="alert">
         {translateCode(t, errorCode ?? "errors.unknown")}
       </div>
     );

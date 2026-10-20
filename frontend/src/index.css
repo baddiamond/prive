@@ -10,9 +10,15 @@
   }
 
   body {
-    @apply bg-white font-sans text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+    @apply bg-bg font-sans text-body text-text antialiased;
     /* Desktop app: no rubber-band scrolling or accidental text selection in chrome. */
     overscroll-behavior: none;
     user-select: none;
+  }
+
+  /* Focus ring from the brand guide: 2px solid focus color, 2px offset, never removed. */
+  :focus-visible {
+    outline: 2px solid var(--prive-focus);
+    outline-offset: 2px;
   }
 }

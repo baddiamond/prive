@@ -16,11 +16,11 @@ export default function Settings() {
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="mx-auto flex max-w-xl flex-col gap-8 px-8 py-10">
-        <h1 className="text-2xl font-semibold">{t("settings.title")}</h1>
+        <h1 className="text-title font-semibold">{t("settings.title")}</h1>
         {errorCode && (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+            className="rounded-control border border-status-danger px-3 py-2 text-status-danger"
           >
             {translateCode(t, errorCode)}
           </p>
@@ -54,7 +54,7 @@ function LanguageSection() {
           const value = e.target.value;
           void setLanguage(isLanguageCode(value) ? value : "");
         }}
-        className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm dark:border-neutral-700 dark:bg-neutral-900"
+        className="w-full rounded-control border border-border bg-raised px-3 py-2 text-text"
       >
         <option value="">
           {t("settings.language.system", {
@@ -86,7 +86,7 @@ function ThemeSection() {
       <div
         role="radiogroup"
         aria-labelledby={titleId}
-        className="inline-flex self-start rounded-lg border border-neutral-300 p-1 dark:border-neutral-700"
+        className="inline-flex self-start rounded-control border border-border p-1"
       >
         {themeOptions.map((option) => (
           <button
@@ -95,10 +95,8 @@ function ThemeSection() {
             role="radio"
             aria-checked={theme === option}
             onClick={() => void setTheme(option)}
-            className={`rounded-md px-4 py-1.5 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-500 ${
-              theme === option
-                ? "bg-indigo-600 text-white"
-                : "text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+            className={`rounded-tag px-4 py-1.5 transition-colors duration-fast ease-prive ${
+              theme === option ? "bg-accent text-on-accent" : "text-text-secondary hover:bg-raised hover:text-text"
             }`}
           >
             {t(`settings.theme.options.${option}`)}
@@ -124,15 +122,15 @@ function Section({ title, description, labelFor, titleId, children }: SectionPro
     <section className="flex flex-col gap-3">
       <div>
         {labelFor ? (
-          <label htmlFor={labelFor} className="text-base font-medium">
+          <label htmlFor={labelFor} className="text-body-strong font-semibold">
             {title}
           </label>
         ) : (
-          <h2 id={titleId} className="text-base font-medium">
+          <h2 id={titleId} className="text-body-strong font-semibold">
             {title}
           </h2>
         )}
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">{description}</p>
+        <p className="text-text-secondary">{description}</p>
       </div>
       {children}
     </section>

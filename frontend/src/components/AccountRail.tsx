@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { InboxIcon, SettingsIcon } from "./icons";
+import LogoMark from "./LogoMark";
 
 /** The main areas of the window. */
 export type View = "inbox" | "settings";
@@ -20,8 +21,11 @@ export default function AccountRail({ view, onSelect }: AccountRailProps) {
   return (
     <nav
       aria-label={t("nav.label")}
-      className="flex w-16 shrink-0 flex-col items-center gap-2 border-r border-neutral-200 bg-neutral-50 py-3 dark:border-neutral-800 dark:bg-neutral-900"
+      className="flex w-[76px] shrink-0 flex-col items-center gap-2 border-r border-divider bg-rail py-3"
     >
+      <div className="mb-2 flex h-11 w-11 items-center justify-center">
+        <LogoMark height={30} />
+      </div>
       <RailButton label={t("nav.inbox")} active={view === "inbox"} onClick={() => onSelect("inbox")}>
         <InboxIcon />
       </RailButton>
@@ -52,10 +56,8 @@ function RailButton({ label, active, onClick, children }: RailButtonProps) {
       title={label}
       aria-current={active ? "page" : undefined}
       onClick={onClick}
-      className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 ${
-        active
-          ? "bg-indigo-600 text-white"
-          : "text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100"
+      className={`flex h-11 w-11 items-center justify-center rounded-card transition-colors duration-fast ease-prive ${
+        active ? "bg-accent text-on-accent" : "text-text-secondary hover:bg-raised hover:text-text"
       }`}
     >
       {children}
