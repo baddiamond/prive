@@ -41,7 +41,15 @@ type App struct {
 	ctx     context.Context
 	store   *store.Store
 	manager *core.Manager
+	dataDir string
 	logger  *slog.Logger
+}
+
+// AppInfo is static information shown in Settings.
+type AppInfo struct {
+	Version string `json:"version"`
+	// DataDir is the folder that holds every local file Privé writes.
+	DataDir string `json:"dataDir"`
 }
 
 // Settings is the user's preferences as seen by the frontend.
@@ -57,7 +65,7 @@ type Settings struct {
 // NewApp creates the bound API on top of an open store. The account manager is
 // created here and started once the window exists (see startup).
 func NewApp(st *store.Store, engines core.EngineSource, dataDir string, logger *slog.Logger) *App {
-	a := &App{store: st, logger: logger}
+	a := &App{store: st, dataDir: dataDir, logger: logger}
 	a.manager = core.NewManager(core.ManagerConfig{
 		Engines: engines,
 		Repo:    st,
@@ -122,6 +130,11 @@ func (a *App) onSecondInstance(options.SecondInstanceData) {
 	}
 	runtime.WindowUnminimise(a.ctx)
 	runtime.Show(a.ctx)
+}
+
+// GetAppInfo returns the app version and the local data folder.
+func (a *App) GetAppInfo() AppInfo {
+	return AppInfo{Version: version, DataDir: a.dataDir}
 }
 
 // GetSettings returns the stored preferences plus the detected system language.

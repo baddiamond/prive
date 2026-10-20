@@ -26,6 +26,10 @@ import (
 //go:embed all:frontend/dist
 var assets embed.FS
 
+// version is the app version, set at build time with
+// -ldflags "-X main.version=1.2.3".
+var version = "0.1.0-dev"
+
 // appID identifies Privé to the OS, e.g. for the single-instance lock.
 const appID = "io.github.baddiamond.prive"
 

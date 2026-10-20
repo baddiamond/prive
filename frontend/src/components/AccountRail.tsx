@@ -1,66 +1,64 @@
-import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { InboxIcon, SettingsIcon } from "./icons";
+import { shortcutLabel } from "../lib/platform";
+import { useUI } from "../state/ui";
+import { InboxIcon, PlusIcon, SettingsIcon } from "./icons";
 import LogoMark from "./LogoMark";
 
-/** The main areas of the window. */
-export type View = "inbox" | "settings";
-
-interface AccountRailProps {
-  view: View;
-  onSelect: (view: View) => void;
-}
-
 /**
- * Narrow left column. It holds the unified inbox and settings today;
- * one entry per connected account joins it in later phases.
+ * Left column (docs/UI.md §2.1): logo, "All inboxes", one item per account (from phase 2),
+ * add account and settings.
  */
-export default function AccountRail({ view, onSelect }: AccountRailProps) {
+export default function AccountRail() {
   const { t } = useTranslation();
+  const screen = useUI((s) => s.screen);
+  const closeSettings = useUI((s) => s.closeSettings);
+  const openSettings = useUI((s) => s.openSettings);
 
   return (
     <nav
-      aria-label={t("nav.label")}
-      className="flex w-[76px] shrink-0 flex-col items-center gap-2 border-r border-divider bg-rail py-3"
+      aria-label={t("rail.label")}
+      className="flex w-[76px] shrink-0 flex-col items-center gap-3 border-r border-divider bg-rail py-4"
     >
-      <div className="mb-2 flex h-11 w-11 items-center justify-center">
-        <LogoMark height={30} />
-      </div>
-      <RailButton label={t("nav.inbox")} active={view === "inbox"} onClick={() => onSelect("inbox")}>
-        <InboxIcon />
-      </RailButton>
+      <LogoMark width={30} height={30} className="mb-1" />
+      <div className="h-px w-9 bg-divider" />
+
+      <button
+        type="button"
+        aria-label={t("rail.allInboxes")}
+        title={t("rail.allInboxes")}
+        aria-pressed={screen === "inbox"}
+        onClick={closeSettings}
+        className={`flex h-12 w-12 items-center justify-center rounded-card text-text transition-colors duration-fast ease-prive ${
+          screen === "inbox" ? "bg-raised shadow-[0_0_0_2px_var(--prive-rail),0_0_0_4px_var(--prive-accent)]" : "hover:bg-raised"
+        }`}
+      >
+        <InboxIcon size={22} />
+      </button>
+
+      <button
+        type="button"
+        aria-label={t("rail.addAccount")}
+        title={`${t("rail.addAccount")} · ${t("common.nextVersion")}`}
+        disabled
+        className="flex h-12 w-12 items-center justify-center rounded-card border-[1.5px] border-dashed border-border text-text-secondary disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <PlusIcon />
+      </button>
+
       <div className="flex-1" />
-      <RailButton
-        label={t("nav.settings")}
-        active={view === "settings"}
-        onClick={() => onSelect("settings")}
+
+      <button
+        type="button"
+        aria-label={t("rail.settings")}
+        title={`${t("rail.settings")} (${shortcutLabel(",")})`}
+        aria-pressed={screen === "settings"}
+        onClick={() => openSettings()}
+        className={`flex h-11 w-11 items-center justify-center rounded-control transition-colors duration-fast ease-prive ${
+          screen === "settings" ? "bg-raised text-text" : "text-text-secondary hover:bg-raised hover:text-text"
+        }`}
       >
         <SettingsIcon />
-      </RailButton>
+      </button>
     </nav>
-  );
-}
-
-interface RailButtonProps {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  children: ReactNode;
-}
-
-function RailButton({ label, active, onClick, children }: RailButtonProps) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      aria-current={active ? "page" : undefined}
-      onClick={onClick}
-      className={`flex h-11 w-11 items-center justify-center rounded-card transition-colors duration-fast ease-prive ${
-        active ? "bg-accent text-on-accent" : "text-text-secondary hover:bg-raised hover:text-text"
-      }`}
-    >
-      {children}
-    </button>
   );
 }

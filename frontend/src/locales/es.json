@@ -3,36 +3,88 @@
     "name": "Privé",
     "loading": "Cargando…"
   },
-  "nav": {
-    "label": "Navegación principal",
-    "inbox": "Todos los chats",
-    "settings": "Ajustes"
+  "common": {
+    "comingSoon": "Próximamente",
+    "nextVersion": "Llega en la próxima versión."
+  },
+  "rail": {
+    "label": "Cuentas",
+    "allInboxes": "Todas las bandejas",
+    "addAccount": "Añadir cuenta",
+    "settings": "Configuración"
+  },
+  "chatList": {
+    "label": "Chats",
+    "allInboxes": "Todas las bandejas",
+    "noAccounts": "Aún no hay cuentas",
+    "search": "Buscar en todas las cuentas",
+    "filters": {
+      "label": "Filtrar chats",
+      "all": "Todos",
+      "unread": "No leídos",
+      "groups": "Grupos"
+    },
+    "empty": {
+      "title": "Aún no hay chats",
+      "body": "Añade una cuenta para ver aquí tus conversaciones.",
+      "action": "Añadir cuenta"
+    }
   },
   "inbox": {
-    "empty": {
-      "title": "Te damos la bienvenida a Privé",
-      "body": "Aquí aparecerán las conversaciones de todas tus cuentas, guardadas solo en este ordenador. La conexión de cuentas llegará en una próxima versión."
+    "welcome": {
+      "title": "Tus conversaciones, en casa.",
+      "body": "Conecta WhatsApp para empezar. Vienen más redes en camino y puedes añadir todas las cuentas que quieras.",
+      "tips": {
+        "addAccount": "Añadir cuenta",
+        "search": "Buscar",
+        "settings": "Configuración"
+      }
     }
   },
   "settings": {
-    "title": "Ajustes",
+    "title": "Configuración",
+    "sections": "Secciones de configuración",
+    "back": "Volver a la bandeja",
+    "nav": {
+      "general": "General",
+      "accounts": "Cuentas",
+      "privacy": "Privacidad",
+      "about": "Acerca de"
+    },
     "language": {
       "title": "Idioma",
-      "description": "Elige el idioma de Privé.",
-      "system": "Predeterminado del sistema ({{language}})",
+      "description": "Por defecto usa el idioma del sistema. Se guarda solo en este equipo.",
+      "system": "Predeterminado del sistema",
       "options": {
         "en": "English",
         "es": "Español"
       }
     },
     "theme": {
-      "title": "Apariencia",
-      "description": "Sigue al sistema o elige un tema fijo.",
+      "title": "Tema",
       "options": {
         "system": "Sistema",
         "light": "Claro",
         "dark": "Oscuro"
       }
+    },
+    "accounts": {
+      "title": "Cuentas",
+      "add": "Añadir cuenta",
+      "empty": "Aún no hay cuentas. La vinculación de WhatsApp llega en la próxima versión."
+    },
+    "privacy": {
+      "title": "Privacidad",
+      "local": "Todo se guarda localmente en una base de datos SQLite en este equipo.",
+      "noServers": "Sin cuenta de Privé, sin servidores de Privé, sin telemetría.",
+      "networkOnly": "El tráfico de red va solo a las redes de mensajería que conectes.",
+      "dataPath": "Tus datos están en"
+    },
+    "about": {
+      "title": "Acerca de",
+      "tagline": "Una app privada y local para todas tus cuentas de mensajería.",
+      "version": "Versión {{version}}",
+      "license": "Software libre con licencia MIT."
     }
   },
   "account": {

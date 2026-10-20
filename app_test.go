@@ -25,6 +25,13 @@ func newTestApp(t *testing.T) *App {
 	return NewApp(st, engines.NewRegistry(), t.TempDir(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 }
 
+func TestAppInfo(t *testing.T) {
+	info := newTestApp(t).GetAppInfo()
+	if info.Version == "" || info.DataDir == "" {
+		t.Errorf("incomplete app info: %+v", info)
+	}
+}
+
 func TestSettingsDefaults(t *testing.T) {
 	app := newTestApp(t)
 	s, err := app.GetSettings()

@@ -20,6 +20,8 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - GitHub issue/PR templates; CI running `go vet`, `go test`, frontend lint and typecheck ✅
 - Brought forward from phase 1: `internal/store` with embedded migrations and the `settings` table only,
   so preferences live in SQLite from day one ✅
+- App shell from the UI spec in its empty state: account rail, chat list header and filters, welcome screen,
+  and Settings (General, Accounts, Privacy, About) ✅
 
 **Test on macOS:** `wails dev` opens an empty window; switching language and theme works and survives a restart.
 

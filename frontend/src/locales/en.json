@@ -3,36 +3,88 @@
     "name": "Privé",
     "loading": "Loading…"
   },
-  "nav": {
-    "label": "Main navigation",
-    "inbox": "All chats",
+  "common": {
+    "comingSoon": "Coming soon",
+    "nextVersion": "Arrives in the next version."
+  },
+  "rail": {
+    "label": "Accounts",
+    "allInboxes": "All inboxes",
+    "addAccount": "Add account",
     "settings": "Settings"
   },
-  "inbox": {
+  "chatList": {
+    "label": "Chats",
+    "allInboxes": "All inboxes",
+    "noAccounts": "No accounts yet",
+    "search": "Search all accounts",
+    "filters": {
+      "label": "Filter chats",
+      "all": "All",
+      "unread": "Unread",
+      "groups": "Groups"
+    },
     "empty": {
-      "title": "Welcome to Privé",
-      "body": "Your conversations from every account will appear here, stored only on this computer. Connecting accounts arrives in an upcoming version."
+      "title": "No chats yet",
+      "body": "Add an account to see your conversations here.",
+      "action": "Add account"
+    }
+  },
+  "inbox": {
+    "welcome": {
+      "title": "Your conversations, at home.",
+      "body": "Connect WhatsApp to start. More networks are on the way, and you can add as many accounts as you like.",
+      "tips": {
+        "addAccount": "Add account",
+        "search": "Search",
+        "settings": "Settings"
+      }
     }
   },
   "settings": {
     "title": "Settings",
+    "sections": "Settings sections",
+    "back": "Back to inbox",
+    "nav": {
+      "general": "General",
+      "accounts": "Accounts",
+      "privacy": "Privacy",
+      "about": "About"
+    },
     "language": {
       "title": "Language",
-      "description": "Choose the language Privé uses.",
-      "system": "System default ({{language}})",
+      "description": "Defaults to your system language. Saved only on this computer.",
+      "system": "System default",
       "options": {
         "en": "English",
         "es": "Español"
       }
     },
     "theme": {
-      "title": "Appearance",
-      "description": "Follow your system or pick a fixed theme.",
+      "title": "Theme",
       "options": {
         "system": "System",
         "light": "Light",
         "dark": "Dark"
       }
+    },
+    "accounts": {
+      "title": "Accounts",
+      "add": "Add account",
+      "empty": "No accounts yet. Linking WhatsApp arrives in the next version."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "local": "Everything is stored locally in an SQLite database on this computer.",
+      "noServers": "No Privé account, no Privé servers, no telemetry.",
+      "networkOnly": "Network traffic goes only to the messaging networks you connect.",
+      "dataPath": "Your data lives in"
+    },
+    "about": {
+      "title": "About",
+      "tagline": "One private, local-first app for all your messaging accounts.",
+      "version": "Version {{version}}",
+      "license": "Free software under the MIT license."
     }
   },
   "account": {

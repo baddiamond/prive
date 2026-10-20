@@ -1,35 +1,91 @@
 import type { SVGProps } from "react";
 
-// Small inline icons (no icon library dependency). Decorative: always aria-hidden.
+// Inline stroke icons from the design prototypes (design/prototypes/ui). Decorative:
+// always aria-hidden; label the surrounding control instead.
 
-const base: SVGProps<SVGSVGElement> = {
-  width: 20,
-  height: 20,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 1.8,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-  "aria-hidden": true,
-  focusable: false,
-};
+type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
-/** Chat bubbles, used for the unified inbox. */
-export function InboxIcon(props: SVGProps<SVGSVGElement>) {
+function Icon({ size = 20, strokeWidth = 1.75, children, ...props }: IconProps) {
   return (
-    <svg {...base} {...props}>
-      <path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12Z" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      focusable={false}
+      {...props}
+    >
+      {children}
     </svg>
   );
 }
 
-/** Gear, used for settings. */
-export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
+/** Inbox tray: the unified "All inboxes" item. */
+export function InboxIcon(props: IconProps) {
   return (
-    <svg {...base} {...props}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
-    </svg>
+    <Icon {...props}>
+      <path d="M3 12h4l2 3h6l2-3h4" />
+      <path d="M5 5h14l2 7v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z" />
+    </Icon>
+  );
+}
+
+/** Sliders: Settings. */
+export function SettingsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+    </Icon>
+  );
+}
+
+/** Plus: add account. */
+export function PlusIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2} {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </Icon>
+  );
+}
+
+/** Magnifier: search. */
+export function SearchIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2} {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </Icon>
+  );
+}
+
+/** Speech bubble: chats. */
+export function ChatIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </Icon>
+  );
+}
+
+/** Left arrow: back. */
+export function BackIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2} {...props}>
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </Icon>
+  );
+}
+
+/** Check mark: privacy statements. */
+export function CheckIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={2.2} {...props}>
+      <path d="m5 12 5 5 9-10" />
+    </Icon>
   );
 }

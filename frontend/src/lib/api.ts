@@ -1,6 +1,7 @@
 // Typed wrappers around the Go methods bound by Wails (see app.go).
 // The generated bindings in ../../wailsjs are created by `wails dev` or `wails generate module`.
 import {
+  GetAppInfo,
   GetSettings,
   SetLanguage,
   SetTheme,
@@ -43,4 +44,16 @@ export function saveLanguage(language: string): Promise<void> {
 /** Saves the color theme. */
 export function saveTheme(theme: ThemePreference): Promise<void> {
   return SetTheme(theme);
+}
+
+/** Static information shown in Settings. */
+export interface AppInfo {
+  version: string;
+  /** Folder that holds every local file Privé writes. */
+  dataDir: string;
+}
+
+/** Loads the app version and data folder. */
+export function getAppInfo(): Promise<AppInfo> {
+  return GetAppInfo();
 }

@@ -1,26 +1,44 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import AccountRail, { type View } from "./components/AccountRail";
-import EmptyInbox from "./components/EmptyInbox";
-import Settings from "./components/Settings";
+import AccountRail from "./components/AccountRail";
+import ChatList from "./components/ChatList";
+import SettingsScreen from "./components/settings/SettingsScreen";
+import Welcome from "./components/Welcome";
 import { translateCode } from "./lib/errors";
+import { hasCommandKey } from "./lib/platform";
 import { applyTheme } from "./lib/theme";
 import { useSettings } from "./state/settings";
+import { useUI } from "./state/ui";
 
-/** Root component: loads preferences, applies the theme and lays out the window. */
+/** Root component: loads preferences, applies the theme and lays out the window (docs/UI.md §1). */
 export default function App() {
   const { t } = useTranslation();
   const status = useSettings((s) => s.status);
   const theme = useSettings((s) => s.theme);
   const errorCode = useSettings((s) => s.errorCode);
   const load = useSettings((s) => s.load);
-  const [view, setView] = useState<View>("inbox");
+  const screen = useUI((s) => s.screen);
 
   useEffect(() => {
     void load();
   }, [load]);
 
   useEffect(() => applyTheme(theme), [theme]);
+
+  useEffect(() => {
+    // ⌘, (Ctrl+, elsewhere) opens Settings; Esc goes back to the inbox.
+    const onKey = (e: KeyboardEvent) => {
+      const ui = useUI.getState();
+      if (hasCommandKey(e) && e.key === ",") {
+        e.preventDefault();
+        ui.openSettings();
+      } else if (e.key === "Escape" && ui.screen === "settings") {
+        ui.closeSettings();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   if (status === "loading") {
     return (
@@ -40,10 +58,15 @@ export default function App() {
 
   return (
     <div className="flex h-full">
-      <AccountRail view={view} onSelect={setView} />
-      <main className="flex min-w-0 flex-1 flex-col">
-        {view === "inbox" ? <EmptyInbox /> : <Settings />}
-      </main>
+      <AccountRail />
+      {screen === "inbox" ? (
+        <>
+          <ChatList />
+          <Welcome />
+        </>
+      ) : (
+        <SettingsScreen />
+      )}
     </div>
   );
 }
