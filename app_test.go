@@ -7,29 +7,78 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/baddiamond/prive/internal/bootstrap"
 	"github.com/baddiamond/prive/internal/core"
 	"github.com/baddiamond/prive/internal/engines"
+	"github.com/baddiamond/prive/internal/engines/fake"
 	"github.com/baddiamond/prive/internal/keys"
-	"github.com/baddiamond/prive/internal/store"
 )
 
 func newTestApp(t *testing.T) *App {
 	t.Helper()
-	dir := t.TempDir()
-	k, _, err := keys.Unlock(dir, keys.NewMemoryKeychain())
+	local, err := bootstrap.OpenAt(context.Background(), t.TempDir(), keys.NewMemoryKeychain())
 	if err != nil {
 		t.Fatal(err)
 	}
-	st, err := store.Open(context.Background(), filepath.Join(dir, store.FileName), store.Options{Key: k.Derive(store.FileName)})
+	t.Cleanup(func() { _ = local.Close() })
+	reg := engines.NewRegistry()
+	if err := reg.Register(fake.New()); err != nil {
+		t.Fatal(err)
+	}
+	return NewApp(local, reg, slog.New(slog.NewTextHandler(io.Discard, nil)))
+}
+
+func TestAccountsAPI(t *testing.T) {
+	app := newTestApp(t)
+	engs, err := app.ListEngines()
+	if err != nil || len(engs) != 1 || engs[0].ID != fake.EngineID {
+		t.Fatalf("ListEngines = %+v, %v", engs, err)
+	}
+
+	acc, err := app.AddAccount(fake.EngineID, "  Work  ", "amber")
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() { _ = st.Close() })
-	return NewApp(st, engines.NewRegistry(), dir, k, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	if acc.DisplayName != "Work" {
+		t.Errorf("name not trimmed: %q", acc.DisplayName)
+	}
+	if err := app.Login(string(acc.ID), "qr"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := app.UpdateAccount(string(acc.ID), "Personal", "green"); err != nil {
+		t.Fatal(err)
+	}
+	list, _ := app.ListAccounts()
+	if len(list) != 1 || list[0].Account.DisplayName != "Personal" || list[0].Manifest.ShortName != "FK" {
+		t.Errorf("ListAccounts = %+v", list)
+	}
+	if err := app.CancelLogin(string(acc.ID)); err != nil {
+		t.Fatal(err)
+	}
+	if list, _ := app.ListAccounts(); len(list) != 0 {
+		t.Errorf("account not removed: %+v", list)
+	}
+
+	bad := []struct {
+		name, color string
+		want        error
+	}{
+		{strings.Repeat("x", 41), "green", errInvalidAccountName},
+		{"tab\there", "green", errInvalidAccountName},
+		{"ok", "magenta", errInvalidAccountColor},
+		{"ok", "#ff0000", errInvalidAccountColor},
+	}
+	for _, b := range bad {
+		if _, err := app.AddAccount(fake.EngineID, b.name, b.color); !errors.Is(err, b.want) {
+			t.Errorf("AddAccount(%q, %q) = %v, want %v", b.name, b.color, err, b.want)
+		}
+	}
+	if _, err := app.AddAccount("nope", "x", "green"); !errors.Is(err, core.ErrEngineNotFound) {
+		t.Errorf("unknown engine = %v", err)
+	}
 }
 
 func TestFailedAppReportsTheCause(t *testing.T) {

@@ -2,17 +2,19 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"log/slog"
 	"regexp"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"github.com/baddiamond/prive/internal/bootstrap"
 	"github.com/baddiamond/prive/internal/core"
-	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/platform"
 	"github.com/baddiamond/prive/internal/store"
 )
@@ -25,8 +27,31 @@ var (
 	errSettingsLoad   = core.NewError("errors.settings.loadFailed")
 )
 
+// Account input error codes.
+var (
+	errInvalidAccountName  = core.NewError("errors.account.invalidName")
+	errInvalidAccountColor = core.NewError("errors.account.invalidColor")
+)
+
 // appErrorCodes lists the codes defined in this file, for the translation check in tests.
-var appErrorCodes = []*core.CodedError{errInvalidSetting, errSettingsSave, errSettingsLoad}
+var appErrorCodes = []*core.CodedError{
+	errInvalidSetting, errSettingsSave, errSettingsLoad, errInvalidAccountName, errInvalidAccountColor,
+}
+
+// accountColors are the account accent tokens of the brand (assets/brand/tokens, "account.*").
+var accountColors = map[string]bool{
+	"green": true, "amber": true, "rose": true, "sky": true, "violet": true, "coral": true,
+}
+
+// maxAccountNameLength caps account labels, counted in characters.
+const maxAccountNameLength = 40
+
+// engineCatalog is what the App needs from the engine registry.
+type engineCatalog interface {
+	core.EngineSource
+	// Manifests lists every bundled engine.
+	Manifests() []core.Manifest
+}
 
 // Theme values accepted by SetTheme.
 const (
@@ -43,6 +68,7 @@ var languageTag = regexp.MustCompile(`^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$`)
 type App struct {
 	ctx     context.Context
 	store   *store.Store
+	engines engineCatalog
 	manager *core.Manager
 	dataDir string
 	logger  *slog.Logger
@@ -68,21 +94,11 @@ type Settings struct {
 	Theme string `json:"theme"`
 }
 
-// NewApp creates the bound API on top of an open store. The account manager is
-// created here and started once the window exists (see startup). Engine databases are
-// encrypted with keys derived from k.
-func NewApp(st *store.Store, engines core.EngineSource, dataDir string, k *keys.Keys, logger *slog.Logger) *App {
-	a := &App{store: st, dataDir: dataDir, logger: logger}
-	a.manager = core.NewManager(core.ManagerConfig{
-		Engines: engines,
-		Repo:    st,
-		DataDir: dataDir,
-		Logger:  logger,
-		Emit:    a.emit,
-		OpenDB: func(ctx context.Context, path, label string) (*sql.DB, error) {
-			return store.OpenDB(ctx, path, store.Options{Key: k.Derive(label)})
-		},
-	})
+// NewApp creates the bound API on top of opened local data. The account manager is
+// created here and started once the window exists (see startup).
+func NewApp(local *bootstrap.Local, engines engineCatalog, logger *slog.Logger) *App {
+	a := &App{store: local.Store, engines: engines, dataDir: local.DataDir, logger: logger}
+	a.manager = core.NewManager(local.ManagerConfig(engines, logger, a.emit))
 	return a
 }
 
@@ -252,4 +268,79 @@ func (a *App) context() context.Context {
 
 func isTheme(s string) bool {
 	return s == ThemeSystem || s == ThemeLight || s == ThemeDark
+}
+
+// ListEngines returns the manifests of every bundled network, for the "Add account" grid.
+func (a *App) ListEngines() ([]core.Manifest, error) {
+	if a.failure != nil {
+		return nil, a.failure
+	}
+	return a.engines.Manifests(), nil
+}
+
+// ListAccounts returns every account with its live connection state, in rail order.
+func (a *App) ListAccounts() ([]core.AccountStatus, error) {
+	if a.failure != nil {
+		return nil, a.failure
+	}
+	return a.manager.Accounts(), nil
+}
+
+// AddAccount creates an account for a network. It starts logged out: call Login next.
+func (a *App) AddAccount(engineID, displayName, color string) (core.Account, error) {
+	if a.failure != nil {
+		return core.Account{}, a.failure
+	}
+	name, err := validateAccountInput(displayName, color)
+	if err != nil {
+		return core.Account{}, err
+	}
+	return a.manager.AddAccount(a.context(), core.NewAccount{EngineID: engineID, DisplayName: name, Color: color})
+}
+
+// UpdateAccount changes an account's label and color.
+func (a *App) UpdateAccount(accountID, displayName, color string) (core.Account, error) {
+	if a.failure != nil {
+		return core.Account{}, a.failure
+	}
+	name, err := validateAccountInput(displayName, color)
+	if err != nil {
+		return core.Account{}, err
+	}
+	return a.manager.UpdateAccount(a.context(), core.AccountID(accountID), name, color)
+}
+
+// Login starts linking an account ("qr" for WhatsApp). QR codes, success and failure
+// arrive as login:* events.
+func (a *App) Login(accountID, method string) error {
+	if a.failure != nil {
+		return a.failure
+	}
+	return a.manager.Login(a.context(), core.AccountID(accountID), core.LoginMethod(method))
+}
+
+// CancelLogin abandons linking a new account (Back from the link step) and removes it.
+func (a *App) CancelLogin(accountID string) error {
+	return a.RemoveAccount(accountID)
+}
+
+// RemoveAccount logs the account out and deletes all of its local data.
+func (a *App) RemoveAccount(accountID string) error {
+	if a.failure != nil {
+		return a.failure
+	}
+	return a.manager.RemoveAccount(a.context(), core.AccountID(accountID))
+}
+
+// validateAccountInput trims the label and checks it and the color. An empty label is
+// allowed: the network's own name fills it in after linking.
+func validateAccountInput(displayName, color string) (string, error) {
+	name := strings.TrimSpace(displayName)
+	if utf8.RuneCountInString(name) > maxAccountNameLength || strings.ContainsFunc(name, unicode.IsControl) {
+		return "", errInvalidAccountName
+	}
+	if !accountColors[color] {
+		return "", errInvalidAccountColor
+	}
+	return name, nil
 }
