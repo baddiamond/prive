@@ -45,6 +45,7 @@
   --prive-accent-tint: #262C52;
   --prive-focus: #8B9CFF;
   --prive-on-account-color: #0A0B0D;
+  --prive-scrim: rgba(5, 6, 8, 0.6);
   --prive-account-green: #3FB68B;
   --prive-account-amber: #E0A43A;
   --prive-account-rose: #D46A9A;
@@ -73,6 +74,7 @@
   --prive-accent-tint: #E4E8FF;
   --prive-focus: #4453D6;
   --prive-on-account-color: #FFFFFF;
+  --prive-scrim: rgba(15, 16, 19, 0.35);
   --prive-account-green: #1A7D5A;
   --prive-account-amber: #976209;
   --prive-account-rose: #B4477A;
@@ -101,6 +103,7 @@
     --prive-accent-tint: #E4E8FF;
     --prive-focus: #4453D6;
     --prive-on-account-color: #FFFFFF;
+    --prive-scrim: rgba(15, 16, 19, 0.35);
     --prive-account-green: #1A7D5A;
     --prive-account-amber: #976209;
     --prive-account-rose: #B4477A;

@@ -22,6 +22,7 @@ module.exports = {
         "accent-tint": "var(--prive-accent-tint)",
         "focus": "var(--prive-focus)",
         "on-account-color": "var(--prive-on-account-color)",
+        "scrim": "var(--prive-scrim)",
         account: {
           green: "var(--prive-account-green)",
           amber: "var(--prive-account-amber)",

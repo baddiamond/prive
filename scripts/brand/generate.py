@@ -438,12 +438,16 @@ def social_svg(face_bold: Typeface, face_text: Typeface, theme: dict) -> str:
     return svg(w, h, body, "Privé — Your conversations, at home.")
 
 
+# Theme tokens left out of the palette illustration: aliases and the translucent overlay scrim.
+NOT_IN_PALETTE = ("onAccountColor", "focus", "scrim")
+
+
 def palette_svg(face: Typeface, tokens: dict) -> str:
     """Color guide illustration for BRAND.md."""
     dark, light = tokens["theme"]["dark"], tokens["theme"]["light"]
     rows = [
-        ("Dark theme", [(k, v) for k, v in dark.items() if k not in ("onAccountColor", "focus")], dark),
-        ("Light theme", [(k, v) for k, v in light.items() if k not in ("onAccountColor", "focus")], light),
+        ("Dark theme", [(k, v) for k, v in dark.items() if k not in NOT_IN_PALETTE], dark),
+        ("Light theme", [(k, v) for k, v in light.items() if k not in NOT_IN_PALETTE], light),
     ]
     w, sw, gap = 1600, 112, 10
     y = 40
