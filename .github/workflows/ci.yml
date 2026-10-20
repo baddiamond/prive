@@ -60,6 +60,13 @@ jobs:
       - name: go test
         run: go test -race -tags "$GO_TAGS" ./...
 
+      - name: Engine template passes the conformance suite
+        run: |
+          cp -r internal/engines/_template internal/engines/templatecheck
+          go vet ./internal/engines/templatecheck
+          go test ./internal/engines/templatecheck
+          rm -rf internal/engines/templatecheck
+
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm ci
