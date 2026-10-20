@@ -14,9 +14,15 @@ import (
 
 var t0 = time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
 
+// newStore opens an encrypted store, like the app does.
 func newStore(t *testing.T) *Store {
 	t.Helper()
-	return openTestStore(t, filepath.Join(t.TempDir(), FileName))
+	s, err := Open(context.Background(), filepath.Join(t.TempDir(), FileName), Options{Key: testKey(9)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = s.Close() })
+	return s
 }
 
 func addAccount(t *testing.T, s *Store, id core.AccountID, position int) core.Account {

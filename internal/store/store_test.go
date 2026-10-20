@@ -9,7 +9,7 @@ import (
 
 func openTestStore(t *testing.T, path string) *Store {
 	t.Helper()
-	s, err := Open(context.Background(), path)
+	s, err := Open(context.Background(), path, Options{})
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestSettingsSurviveReopen(t *testing.T) {
 	ctx := context.Background()
 	path := filepath.Join(t.TempDir(), FileName)
 
-	s, err := Open(ctx, path)
+	s, err := Open(ctx, path, Options{})
 	if err != nil {
 		t.Fatal(err)
 	}
