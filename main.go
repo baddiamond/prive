@@ -15,6 +15,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 
+	"github.com/baddiamond/prive/internal/engines"
+	_ "github.com/baddiamond/prive/internal/engines/all" // registers bundled engines
 	"github.com/baddiamond/prive/internal/platform"
 	"github.com/baddiamond/prive/internal/store"
 )
@@ -49,7 +51,7 @@ func run(logger *slog.Logger) error {
 	}
 	defer func() { _ = st.Close() }()
 
-	app := NewApp(st, logger)
+	app := NewApp(st, engines.Default(), dataDir, logger)
 
 	return wails.Run(&options.App{
 		Title:     "Privé",
@@ -63,6 +65,8 @@ func run(logger *slog.Logger) error {
 		OnStartup:  app.startup,
 		OnShutdown: app.shutdown,
 		Bind:       []any{app},
+		// Bound methods reject with {code, params}, never with text.
+		ErrorFormatter: formatError(logger),
 		// Two instances would fight over the same database and network sessions.
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId:               appID,

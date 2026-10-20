@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
+	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/baddiamond/prive/internal/core"
+	"github.com/baddiamond/prive/internal/engines"
 	"github.com/baddiamond/prive/internal/store"
 )
 
@@ -18,7 +22,7 @@ func newTestApp(t *testing.T) *App {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { _ = st.Close() })
-	return NewApp(st, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	return NewApp(st, engines.NewRegistry(), t.TempDir(), slog.New(slog.NewTextHandler(io.Discard, nil)))
 }
 
 func TestSettingsDefaults(t *testing.T) {
@@ -68,4 +72,49 @@ func TestSetTheme(t *testing.T) {
 	if err := app.SetTheme("blue"); !errors.Is(err, errInvalidSetting) {
 		t.Fatalf("got %v, want errInvalidSetting", err)
 	}
+}
+
+func TestFormatError(t *testing.T) {
+	format := formatError(slog.New(slog.NewTextHandler(io.Discard, nil)))
+
+	got := format(core.ErrSendFailed.Wrap(errors.New("private detail")).With("reason", "timeout"))
+	want := errorPayload{Code: core.CodeSendFailed, Params: map[string]string{"reason": "timeout"}}
+	if gotJSON, wantJSON := mustJSON(t, got), mustJSON(t, want); gotJSON != wantJSON {
+		t.Errorf("coded error = %s, want %s", gotJSON, wantJSON)
+	}
+
+	// Errors without a code never leak their text to the UI.
+	if got := mustJSON(t, format(errors.New("private detail"))); got != `{"code":"errors.unknown"}` {
+		t.Errorf("plain error = %s", got)
+	}
+}
+
+func TestAppCodesHaveTranslations(t *testing.T) {
+	raw, err := os.ReadFile("frontend/src/locales/en.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var locale struct {
+		Errors struct {
+			Settings map[string]string `json:"settings"`
+		} `json:"errors"`
+	}
+	if err := json.Unmarshal(raw, &locale); err != nil {
+		t.Fatal(err)
+	}
+	for _, e := range appErrorCodes {
+		key := e.Code[len("errors.settings."):]
+		if locale.Errors.Settings[key] == "" {
+			t.Errorf("code %q has no translation in en.json", e.Code)
+		}
+	}
+}
+
+func mustJSON(t *testing.T, v any) string {
+	t.Helper()
+	b, err := json.Marshal(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
 }

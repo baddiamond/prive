@@ -35,12 +35,39 @@
       }
     }
   },
+  "account": {
+    "state": {
+      "disconnected": "Desconectada",
+      "connecting": "Conectando…",
+      "connected": "Conectada",
+      "reconnecting": "Reconectando…",
+      "loggedOut": "Sin vincular",
+      "error": "Problema de conexión"
+    }
+  },
   "errors": {
     "unknown": "Algo salió mal. Inténtalo de nuevo.",
     "settings": {
       "invalidValue": "Ese valor no es válido.",
       "loadFailed": "No se pudieron cargar tus ajustes.",
       "saveFailed": "No se pudieron guardar tus ajustes."
+    },
+    "app": {
+      "shuttingDown": "Privé se está cerrando."
+    },
+    "account": {
+      "notFound": "Esa cuenta ya no existe.",
+      "notLoggedIn": "Hay que volver a vincular esta cuenta.",
+      "connectFailed": "No se pudo conectar esta cuenta. Privé lo seguirá intentando."
+    },
+    "engine": {
+      "notFound": "Esta red no está disponible en esta versión de Privé.",
+      "loginMethodUnsupported": "Esta red no admite esa forma de iniciar sesión.",
+      "capabilityUnsupported": "Esta red no admite esa acción.",
+      "notImplemented": "Esta función todavía no está disponible para esta red."
+    },
+    "message": {
+      "sendFailed": "No se pudo enviar el mensaje."
     }
   }
 }

@@ -35,12 +35,39 @@
       }
     }
   },
+  "account": {
+    "state": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "reconnecting": "Reconnecting…",
+      "loggedOut": "Not linked",
+      "error": "Connection problem"
+    }
+  },
   "errors": {
     "unknown": "Something went wrong. Please try again.",
     "settings": {
       "invalidValue": "That value is not valid.",
       "loadFailed": "Your settings could not be loaded.",
       "saveFailed": "Your settings could not be saved."
+    },
+    "app": {
+      "shuttingDown": "Privé is closing."
+    },
+    "account": {
+      "notFound": "That account no longer exists.",
+      "notLoggedIn": "This account needs to be linked again.",
+      "connectFailed": "Could not connect this account. Privé will keep trying."
+    },
+    "engine": {
+      "notFound": "This network is not available in this version of Privé.",
+      "loginMethodUnsupported": "This network does not support that way of signing in.",
+      "capabilityUnsupported": "This network does not support that action.",
+      "notImplemented": "This feature is not available yet for this network."
+    },
+    "message": {
+      "sendFailed": "The message could not be sent."
     }
   }
 }
