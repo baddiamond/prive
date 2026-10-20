@@ -7,7 +7,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 
 ## Phase 1 — MVP: WhatsApp
 
-### 🟨 0. Bootstrap
+### ✅ 0. Bootstrap
 
 - `LICENSE`, `.gitignore`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, docs and ADRs ✅ (proposal)
 - Wails v2 project with React + TypeScript + Tailwind + Zustand ✅
@@ -19,13 +19,14 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 
 **Test on macOS:** `wails dev` opens an empty window; switching language and theme works and survives a restart.
 
-### ⬜ 1. Core & store
+### 🟨 1. Core & store
 
-- `core`: `Engine`, `Session`, `Manifest`, `Capabilities`, events, `CodedError`
-- `engines`: registry, `all` package, `_template`, `enginetest` conformance suite
-- `core.Manager` with concurrent, isolated sessions per account
-- `store`: accounts/chats/messages tables (SQLite, migrations and settings already exist since phase 0)
-- A fake in-memory engine used by tests
+- `core`: `Engine`, `Session`, `Manifest`, `Capabilities`, events, `CodedError` ✅
+- `engines`: registry, `all` package, `_template`, `enginetest` conformance suite ✅
+- `core.Manager` with concurrent, isolated sessions per account ✅
+- `store`: accounts/chats/messages tables (SQLite, migrations and settings already exist since phase 0) ✅
+- A fake in-memory engine used by tests ✅
+- Bound methods reject with `{code, params}`; backend codes are checked against `en.json` in tests ✅
 
 **Test:** `go test ./...` (includes multi-account scenarios with the fake engine).
 

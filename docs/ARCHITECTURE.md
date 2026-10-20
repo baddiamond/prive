@@ -1,8 +1,9 @@
 # Architecture
 
-> Status: Phase 0 implemented (`platform`, `store` settings, Wails shell). Engine interfaces below are the
-> target design and may be refined during Phase 1.
-> Changes to the engine contract must update this document.
+> Status: phases 0–1 implemented: Wails shell, `platform`, `store`, `core` (contract, events, errors, Manager),
+> engine registry, template, conformance suite and a fake engine. No real network engine yet (phase 2).
+> Changes to the engine contract must update this document. The Go doc comments in `internal/core` are the
+> precise reference; this page is the overview.
 
 ## Goals
 
@@ -54,13 +55,16 @@ prive/
 │   │   ├── types.go            # Account, Chat, Message, IDs
 │   │   ├── events.go           # Event types emitted by sessions and by the manager
 │   │   ├── errors.go           # CodedError + well-known codes
-│   │   └── manager.go          # Account lifecycle, routing, event fan-out
+│   │   ├── queue.go            # EventQueue: unbounded, non-blocking event channel for engines
+│   │   ├── repository.go       # Repository: the persistence the Manager needs (store implements it)
+│   │   └── manager.go          # Account lifecycle, routing, persistence of events, event fan-out
 │   ├── engines/
 │   │   ├── registry.go         # Register / Get / List engines
 │   │   ├── all/all.go          # Blank-imports every bundled engine
 │   │   ├── enginetest/         # Conformance suite every engine must pass
-│   │   ├── _template/          # Skeleton for new engines (ignored by the Go toolchain)
-│   │   └── whatsapp/           # whatsmeow-based engine
+│   │   ├── _template/          # Skeleton for new engines (ignored by the Go toolchain; CI tests a copy)
+│   │   ├── fake/               # In-memory engine for tests (never registered in the app)
+│   │   └── whatsapp/           # whatsmeow-based engine (phase 2)
 │   ├── store/                  # SQLite access + embedded migrations
 │   └── platform/               # Data directory per OS, system locale detection
 ├── frontend/
@@ -75,7 +79,8 @@ prive/
 
 Dependency rules (enforced by review, later by a lint check):
 
-- `core` imports nothing from `engines`, `store` or Wails.
+- `core` imports nothing from `engines`, `store` or Wails. (Its external tests, package `core_test`,
+  may use `store` and `engines/fake` to exercise the Manager end to end.)
 - An engine imports `core` (and its own third-party library) — never another engine, `store` or Wails.
 - `store` imports `core` types only.
 - Only `main.go` / `app.go` know about Wails.
@@ -157,9 +162,10 @@ type Session interface {
     GetMessages(ctx context.Context, chatID ChatID, opts GetMessagesOptions) ([]Message, error)
     SendMessage(ctx context.Context, chatID ChatID, msg OutgoingMessage) (Message, error)
 
-    // SubscribeEvents returns a channel that receives events until Close is called.
+    // SubscribeEvents returns the same channel every time; Close closes it.
+    // Sending must never block the network library (engines use core.EventQueue).
     SubscribeEvents() <-chan Event
-    // Close disconnects without logging out.
+    // Close disconnects without logging out. Safe to call more than once.
     Close() error
 }
 ```
@@ -171,15 +177,19 @@ to the UI as Wails events.
 
 | Wails event | Payload (JSON) | When |
 |---|---|---|
-| `account:state` | `{accountId, state, code?}` | connecting / connected / reconnecting / loggedOut / error |
+| `account:state` | `{accountId, state, code?}` | disconnected / connecting / connected / reconnecting / loggedOut / error |
+| `account:removed` | `{accountId}` | account deleted (emitted by the Manager only) |
 | `login:qr` | `{accountId, code, expiresAt}` | new QR to display |
 | `login:success` | `{accountId, remoteId, displayName}` | pairing completed |
+| `login:failed` | `{accountId, code}` | interactive login ended without success |
 | `chat:updated` | `{accountId, chat}` | new chat, name change, unread count, last message |
 | `message:new` | `{accountId, chatId, message}` | incoming or outgoing message |
 | `message:status` | `{accountId, chatId, messageId, status}` | sent / delivered / read / failed |
 | `sync:progress` | `{accountId, done, total}` | initial history sync |
 
-`state` and `code` values are **translation keys**, not text (see below).
+`code` values are **translation keys**, not text (see below); a `state` is shown with the key
+`account.state.<state>`. Engines leave `accountId` empty: the Manager stamps every event (and the chats and
+messages inside) with the session's own account, so an engine can never write into another account.
 
 ### Errors and user-facing codes
 
@@ -193,7 +203,10 @@ type CodedError struct {
 }
 ```
 
+Bound methods reject with `{ "code": "...", "params": {...} }` (Wails `ErrorFormatter`, see `formatError` in
+`app.go`). Errors without a code are logged and reach the UI as `errors.unknown`, so internal details never leak.
 The frontend renders `t(code, params)`. Unknown codes fall back to `errors.unknown`.
+`core.KnownCodes()` and the app's own codes are checked against `en.json` by `go test`.
 
 ## Storage
 
@@ -211,8 +224,30 @@ Engine-private data (e.g. whatsmeow's device keys and session store) lives in
 `<DataDir>/engines/<engineId>/<accountId>/`, given to the session as `SessionDeps.DataDir`.
 Removing an account deletes its rows and that folder.
 
-Indexes: `chats(account_id, last_message_at DESC)` for the inbox, `messages(account_id, chat_id, timestamp DESC)`
-for history pagination.
+Indexes: `chats(account_id, last_message_at DESC)` and `chats(last_message_at DESC)` for the per-account and unified
+inbox, `messages(account_id, chat_id, timestamp DESC)` for history pagination. Times are stored as Unix milliseconds.
+
+Messages reference their account (cascade delete) but not their chat, because a message can arrive before its chat.
+Transactions start with `BEGIN IMMEDIATE` (`_txlock=immediate`) so concurrent writers from different accounts wait on
+the busy timeout instead of failing with `SQLITE_BUSY`.
+
+## Manager
+
+`core.Manager` is the only component that runs sessions:
+
+- **Start** loads accounts from the `Repository`, creates one session per account and calls `Connect` on all of
+  them in parallel goroutines; it returns immediately. `ErrNotLoggedIn` becomes `loggedOut`, other failures
+  become `error` with a code. An account whose engine is not bundled stays listed with `errors.engine.notFound`.
+- **Event pump**: one goroutine per session reads its events in order, persists what changes (chats, messages,
+  statuses, the remote ID after login), then forwards the event to the UI. Message statuses only move forward
+  (`core.MergeStatus`): a late "delivered" never overwrites "read".
+- **AddAccount / Login / RemoveAccount / SendMessage / ListChats / GetMessages** are what `app.go` exposes to the UI.
+  Removing an account logs out (best effort, so it works offline), closes the session, deletes its rows and its
+  data folder.
+- **Close** cancels pending connections and logins, closes every session and waits for their goroutines.
+
+The Manager depends on interfaces only (`EngineSource`, `Repository`), so tests run it with the fake engine and a
+real SQLite store in a temp folder.
 
 ## Multi-account
 

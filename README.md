@@ -124,7 +124,7 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 **Phase 1 — MVP (WhatsApp)**
 
-- [ ] **0. Bootstrap** — repo docs, Wails + React + TS + Tailwind skeleton, i18n (en/es), dark mode, CI
+- [x] **0. Bootstrap** — repo docs, Wails + React + TS + Tailwind skeleton, i18n (en/es), dark mode, CI
 - [ ] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
 - [ ] **2. WhatsApp login** — QR pairing, persisted sessions, auto-reconnect, unlimited accounts
 - [ ] **3. Chat list** — unified inbox + per-account filter, sorted by last message, unread counters

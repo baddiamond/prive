@@ -4,8 +4,8 @@ An **engine** connects Privé to one messaging network (WhatsApp, Telegram, Slac
 This guide walks you through adding one. It is written so that both people and AI assistants can follow it
 step by step.
 
-> Status: the template and the conformance suite land in Phase 1. Until then this guide describes the target workflow.
 > Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first for the `Engine` and `Session` interfaces.
+> A complete, working example is the test engine in `internal/engines/fake`.
 
 ## Before you start
 
@@ -20,8 +20,9 @@ step by step.
 cp -r internal/engines/_template internal/engines/<id>
 ```
 
-`<id>` is lowercase, no spaces, stable forever (it is stored in the database): `telegram`, `signal`, `slack`.
-Rename the package and the type names inside.
+`<id>` is lowercase letters and digits, stable forever (it is stored in the database): `telegram`, `signal`, `slack`.
+Rename the package (`example` in the template) and replace every `TODO`. The template already passes the
+conformance suite, so you can run `go test ./internal/engines/<id>` from the first minute.
 
 ## 2. Write the manifest
 
@@ -47,8 +48,8 @@ Only declare capabilities you actually implement — the UI trusts them.
 | `Logout` | Unlink on the network side and delete everything in `deps.DataDir` |
 | `ListChats` / `GetMessages` | Map network objects to `core.Chat` / `core.Message`; support pagination options |
 | `SendMessage` | Return the created `core.Message` with a provisional status; confirm later via `MessageStatusEvent` |
-| `SubscribeEvents` | Return a channel; never block the network library's goroutines when the reader is slow |
-| `Close` | Disconnect and release resources without logging out |
+| `SubscribeEvents` | Return the same channel every time; never block the network library's goroutines when the reader is slow (use `core.EventQueue`) |
+| `Close` | Disconnect, release resources and close the event channel, without logging out; safe to call twice |
 
 Rules:
 
@@ -57,6 +58,10 @@ Rules:
 - Log with `deps.Logger`. Never log message text, phone numbers, tokens or keys.
 - Errors that a user may see are `core.CodedError` with a key under `errors.<id>.*`.
 - Reconnect on your own with backoff and emit `AccountStateEvent` on every change.
+- Leave `AccountID` empty in events, chats and messages: the Manager stamps it (an engine can never write
+  into another account).
+- Don't persist chats or messages yourself: emit `ChatUpdatedEvent` / `MessageEvent` and the Manager stores them.
+  Your `DataDir` is for the network library's own state (keys, session).
 
 ## 4. Register it
 
@@ -76,12 +81,18 @@ import _ "github.com/baddiamond/prive/internal/engines/<id>"
 
 ```go
 func TestConformance(t *testing.T) {
-    enginetest.Run(t, New(), enginetest.Options{ /* fakes or recorded fixtures */ })
+    enginetest.Run(t, New(), enginetest.Options{
+        Login:  func(t *testing.T, s core.Session) { /* log in against a fake or recorded server */ },
+        ChatID: "some-chat", // needed when you declare SendText
+    })
 }
 ```
 
-The suite checks the contract: manifest validity, event ordering, concurrent sessions, `Close` without leaks,
-coded errors, and that nothing is written outside `DataDir`. Tests must not hit the real network by default.
+The suite checks the contract: manifest validity, coded errors (`Connect` without a login returns
+`core.ErrNotLoggedIn`, unsupported login methods return `core.ErrLoginMethodUnsupported`), the event channel
+lifecycle, many concurrent sessions, and that nothing is written outside `DataDir`. With `Options.Login` it also
+checks sending, resuming the login after a restart and that `Logout` wipes `DataDir`.
+Tests must not hit the real network by default.
 
 ## 6. Add translations and an icon
 
