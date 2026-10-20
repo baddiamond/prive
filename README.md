@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="assets/brand/social/prive-banner-light.svg">
+  <img alt="Privé — Your conversations, at home." src="assets/brand/social/prive-banner-dark.svg" width="100%">
+</picture>
+
 # Privé
 
 **One fast, private, local-first desktop app for all your messaging accounts.**
@@ -141,15 +146,30 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - Optional encryption at rest for the local database
 - Out-of-process engines (write an engine in any language over stdio)
 
+## Design
+
+- [UI specification](docs/UI.md) — app shell, components, states, keyboard, accessibility
+- [First run](docs/ONBOARDING.md) — onboarding flow
+- [Design sources](design/) — interactive prototype sources
+
+## Brand
+
+Logo, icons, colors, typography, voice and accessibility rules live in the
+[brand guide](docs/brand/BRAND.md). All assets are in [`assets/brand/`](assets/brand/) and are generated from code.
+
 ## Contributing
 
 Contributions from humans and AI-assisted contributors are welcome.
 Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) and the project rules in [`CLAUDE.md`](CLAUDE.md).
 
-## Disclaimer
+## Responsible use, privacy and security
 
 Privé is an independent project, not affiliated with WhatsApp, Meta or any other network.
-Using unofficial clients may violate a network's terms of service; use at your own risk.
+It uses unofficial connections, which a network may restrict — use it at your own risk.
+It is a **personal** client: spam, bulk messaging, scraping and surveillance are not allowed.
+
+- [Disclaimer](DISCLAIMER.md) · [Acceptable Use Policy](ACCEPTABLE_USE.md) · [Privacy](PRIVACY.md)
+- [Security policy](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## License
 

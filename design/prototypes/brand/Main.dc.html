@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — essence and aspirations</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 72px 88px; background: #0F1013; color: #ECEDF0; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 56px">
+
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <div style="display: flex; align-items: center; gap: 28px">
+      <svg width="120" height="120" viewBox="0 0 64 64" role="img" aria-label="Privé logo mark">
+        <circle cx="34" cy="36" r="14" fill="none" stroke="#ECEDF0" stroke-width="7"></circle>
+        <path d="M20 36v22" stroke="#ECEDF0" stroke-width="7" stroke-linecap="round"></path>
+        <path d="M39 12 49 5" stroke="{{accent}}" stroke-width="6.5" stroke-linecap="round"></path>
+      </svg>
+      <span style="font-size: 112px; font-weight: 700; letter-spacing: -0.045em; line-height: 1">priv<span style="color: {{accent}}">é</span></span>
+    </div>
+    <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #868A95">Brand guide · v0.1 draft</span>
+  </div>
+
+  <div style="display: flex; gap: 64px">
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 16px">
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #868A95">Essence</span>
+      <p style="margin: 0; font-size: 44px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.12">Your conversations,<br>at home.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.55; color: #A0A3AD; max-width: 560px">Privé brings every conversation into one calm, fast place that lives only on your computer. No account, no servers in the middle, nothing to sell.</p>
+    </div>
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 16px">
+      <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #868A95">The feeling we aim for</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <div style="padding: 18px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 14px; font-weight: 600; color: #5ED3B5">Feels like</span>
+          <span style="font-size: 15px; line-height: 1.6; color: #C7C9D0">A quiet room with good light<br>A sealed envelope<br>A well-kept notebook<br>A key that only you hold</span>
+        </div>
+        <div style="padding: 18px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 10px">
+          <span style="font-size: 14px; font-weight: 600; color: #F2A65A">Never like</span>
+          <span style="font-size: 15px; line-height: 1.6; color: #C7C9D0">A social feed fighting for attention<br>An ad-supported app<br>A corporate dashboard<br>A noisy notification center</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 16px">
+    <span style="font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #868A95">Five promises</span>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+      <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: {{accent}}">01</span>
+        <strong style="font-size: 17px">Local by design</strong>
+        <span style="font-size: 14px; line-height: 1.5; color: #A0A3AD">Everything stays on your computer. Delete one folder and it is all gone.</span>
+      </div>
+      <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: {{accent}}">02</span>
+        <strong style="font-size: 17px">Yours, no sign-up</strong>
+        <span style="font-size: 14px; line-height: 1.5; color: #A0A3AD">No Privé account, no tracking, no telemetry. Ever.</span>
+      </div>
+      <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: {{accent}}">03</span>
+        <strong style="font-size: 17px">One calm place</strong>
+        <span style="font-size: 14px; line-height: 1.5; color: #A0A3AD">Every account and network speaks the same simple language.</span>
+      </div>
+      <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: {{accent}}">04</span>
+        <strong style="font-size: 17px">Fast and light</strong>
+        <span style="font-size: 14px; line-height: 1.5; color: #A0A3AD">Opens instantly, stays out of the way, respects your battery.</span>
+      </div>
+      <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 13px; font-weight: 700; color: {{accent}}">05</span>
+        <strong style="font-size: 17px">Open to everyone</strong>
+        <span style="font-size: 14px; line-height: 1.5; color: #A0A3AD">Open source, accessible, multilingual, built with its community.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 40px; align-items: center; border-top: 1px solid #22252C; padding-top: 24px; font-size: 14px; color: #A0A3AD">
+    <span><strong style="color: #ECEDF0">Personality</strong></span>
+    <span>Discreet</span><span aria-hidden="true" style="color: #3A3E48">/</span>
+    <span>Calm</span><span aria-hidden="true" style="color: #3A3E48">/</span>
+    <span>Quick</span><span aria-hidden="true" style="color: #3A3E48">/</span>
+    <span>Honest</span><span aria-hidden="true" style="color: #3A3E48">/</span>
+    <span>Welcoming</span>
+    <span style="flex: 1"></span>
+    <span>Name: French for "private". Written <strong style="color: #ECEDF0">Privé</strong> in text, <code style="font-family: ui-monospace, Menlo, monospace; color: #ECEDF0">prive</code> in code.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#8B9CFF","options":["#8B9CFF","#5ED3B5","#F2A65A","#E58AB8"]},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#8B9CFF' };
+  }
+}
+</script>
+</body>
+</html>

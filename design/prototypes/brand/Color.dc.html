@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — color</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 56px 72px; background: #0F1013; color: #ECEDF0; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.02em">Ink &amp; Lavender</h1>
+      <p style="margin: 0; font-size: 15px; color: #A0A3AD">Quiet neutrals carry 95% of the interface. One accent marks what matters. Every ratio below is measured (WCAG 2.2).</p>
+    </div>
+    <span style="font-size: 13px; color: #868A95">AA text ≥ 4.5 · UI parts ≥ 3.0</span>
+  </div>
+
+  <div style="display: flex; gap: 20px">
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #868A95">Dark theme (default)</span>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{dark}}" as="s" hint-placeholder-count="10">
+          <div style="border-radius: 12px; overflow: hidden; border: 1px solid #22252C; background: #131418">
+            <div style="height: 64px; background: {{s.hex}}; display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box">
+              <span style="font-size: 12px; font-weight: 600; color: {{s.on}}">{{s.ratio}}</span>
+            </div>
+            <div style="padding: 8px 10px; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 12px; font-weight: 600">{{s.name}}</span>
+              <span style="font: 11px JetBrains Mono, ui-monospace, monospace; color: #A0A3AD">{{s.hex}}</span>
+              <span style="font-size: 11px; color: #A0A3AD">{{s.role}}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 10px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #868A95">Light theme</span>
+      <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{light}}" as="s" hint-placeholder-count="10">
+          <div style="border-radius: 12px; overflow: hidden; border: 1px solid #22252C; background: #131418">
+            <div style="height: 64px; background: {{s.hex}}; display: flex; align-items: flex-end; padding: 8px; box-sizing: border-box">
+              <span style="font-size: 12px; font-weight: 600; color: {{s.on}}">{{s.ratio}}</span>
+            </div>
+            <div style="padding: 8px 10px; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 12px; font-weight: 600">{{s.name}}</span>
+              <span style="font: 11px JetBrains Mono, ui-monospace, monospace; color: #A0A3AD">{{s.hex}}</span>
+              <span style="font-size: 11px; color: #A0A3AD">{{s.role}}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 20px">
+    <div style="flex: 3 1 0; padding: 18px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline">
+        <strong style="font-size: 15px">Account colors</strong>
+        <span style="font-size: 12px; color: #A0A3AD">Chosen by the user per account · always paired with an initial and a name</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{accounts}}" as="a" hint-placeholder-count="6">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 4px">
+              <span style="flex: 1; height: 44px; border-radius: 10px; background: {{a.dark}}; color: #0B0C10; font-weight: 700; display: flex; align-items: center; justify-content: center">{{a.initial}}</span>
+              <span style="flex: 1; height: 44px; border-radius: 10px; background: {{a.light}}; color: #FFFFFF; font-weight: 700; display: flex; align-items: center; justify-content: center">{{a.initial}}</span>
+            </div>
+            <span style="font-size: 12px; font-weight: 600">{{a.name}}</span>
+            <span style="font: 10px/1.5 JetBrains Mono, ui-monospace, monospace; color: #A0A3AD">{{a.dark}} · {{a.darkRatio}}<br>{{a.light}} · {{a.lightRatio}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="flex: 2 1 0; padding: 18px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 12px">
+      <strong style="font-size: 15px">Status</strong>
+      <sc-for list="{{status}}" as="st" hint-placeholder-count="3">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 28px; height: 28px; border-radius: 8px; background: {{st.dark}}"></span>
+          <span style="width: 28px; height: 28px; border-radius: 8px; background: {{st.light}}"></span>
+          <span style="flex: 1; font-size: 13px; font-weight: 600">{{st.name}}</span>
+          <span style="font: 11px JetBrains Mono, ui-monospace, monospace; color: #A0A3AD">{{st.note}}</span>
+        </div>
+      </sc-for>
+      <span style="font-size: 12px; line-height: 1.5; color: #A0A3AD">Status is always icon + word, never color alone.</span>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 32px; font-size: 13px; color: #A0A3AD; border-top: 1px solid #22252C; padding-top: 16px">
+    <span><strong style="color: #ECEDF0">90 / 8 / 2</strong> — neutrals / account colors / accent.</span>
+    <span><strong style="color: #ECEDF0">No brand colors</strong> of WhatsApp, Telegram… inside the UI: identity is the account.</span>
+    <span><strong style="color: #ECEDF0">No gradients</strong>, no glows. Flat, calm surfaces.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var dark = [
+      { name: 'Ink 950', hex: '#0A0B0D', role: 'Account rail', on: '#ECEDF0', ratio: '' },
+      { name: 'Ink 900', hex: '#0F1013', role: 'Background', on: '#ECEDF0', ratio: '' },
+      { name: 'Ink 850', hex: '#131418', role: 'Surface', on: '#ECEDF0', ratio: '' },
+      { name: 'Ink 800', hex: '#1B1D23', role: 'Raised, fields', on: '#ECEDF0', ratio: '' },
+      { name: 'Ink 700', hex: '#22252C', role: 'Dividers (decor)', on: '#ECEDF0', ratio: '' },
+      { name: 'Ink 500', hex: '#6A6E7A', role: 'Control borders', on: '#0F1013', ratio: '3.7 : 1' },
+      { name: 'Mist 400', hex: '#868A95', role: 'Faint text', on: '#0F1013', ratio: '5.5 : 1' },
+      { name: 'Mist 300', hex: '#A0A3AD', role: 'Secondary text', on: '#0F1013', ratio: '7.6 : 1' },
+      { name: 'Paper 100', hex: '#ECEDF0', role: 'Primary text', on: '#0F1013', ratio: '16.3 : 1' },
+      { name: 'Lavender 400', hex: '#8B9CFF', role: 'Accent', on: '#0F1013', ratio: '7.5 : 1' }
+    ];
+    var light = [
+      { name: 'White', hex: '#FFFFFF', role: 'Background', on: '#15161A', ratio: '' },
+      { name: 'Paper 50', hex: '#F8F8FA', role: 'Surface', on: '#15161A', ratio: '' },
+      { name: 'Paper 200', hex: '#EEEFF3', role: 'Raised, fields', on: '#15161A', ratio: '' },
+      { name: 'Paper 300', hex: '#E3E4E9', role: 'Dividers (decor)', on: '#15161A', ratio: '' },
+      { name: 'Slate 400', hex: '#7D818C', role: 'Control borders', on: '#FFFFFF', ratio: '3.9 : 1' },
+      { name: 'Slate 500', hex: '#6B6F7A', role: 'Faint text', on: '#FFFFFF', ratio: '5.0 : 1' },
+      { name: 'Slate 600', hex: '#585C67', role: 'Secondary text', on: '#FFFFFF', ratio: '6.7 : 1' },
+      { name: 'Ink 900', hex: '#15161A', role: 'Primary text', on: '#FFFFFF', ratio: '18.1 : 1' },
+      { name: 'Indigo 600', hex: '#4453D6', role: 'Accent', on: '#FFFFFF', ratio: '6.1 : 1' },
+      { name: 'Indigo 100', hex: '#E4E8FF', role: 'Accent tint', on: '#15161A', ratio: '' }
+    ];
+    var accounts = [
+      { name: 'Green', initial: 'G', dark: '#3FB68B', light: '#1A7D5A', darkRatio: '7.7', lightRatio: '5.1' },
+      { name: 'Amber', initial: 'A', dark: '#E0A43A', light: '#976209', darkRatio: '8.9', lightRatio: '5.2' },
+      { name: 'Rose', initial: 'R', dark: '#D46A9A', light: '#B4477A', darkRatio: '5.9', lightRatio: '5.1' },
+      { name: 'Sky', initial: 'S', dark: '#4AA3DF', light: '#1F78B4', darkRatio: '7.1', lightRatio: '4.8' },
+      { name: 'Violet', initial: 'V', dark: '#9C8CFF', light: '#6B5AE0', darkRatio: '7.1', lightRatio: '5.0' },
+      { name: 'Coral', initial: 'C', dark: '#E5765C', light: '#C2533A', darkRatio: '6.6', lightRatio: '4.6' }
+    ];
+    var status = [
+      { name: 'Success / connected', dark: '#5ED3B5', light: '#1A7D5A', note: '10.4 · 5.1' },
+      { name: 'Warning / reconnecting', dark: '#F2A65A', light: '#976209', note: '9.4 · 5.2' },
+      { name: 'Error / failed', dark: '#F2A0A8', light: '#B3261E', note: '9.4 · 6.5' }
+    ];
+    return { dark: dark, light: light, accounts: accounts, status: status };
+  }
+}
+</script>
+</body>
+</html>

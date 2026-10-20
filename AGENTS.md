@@ -12,6 +12,7 @@ The non-negotiable rules, in short:
 4. **Local-first and private**: no telemetry, no external servers, no accounts.
 5. Every network is an **engine** implementing `core.Engine` / `core.Session` and passing `internal/engines/enginetest`.
 6. Unlimited **multi-account**: never assume one account per network; every event carries `accountId`.
+7. Use the **brand tokens** (`assets/brand/tokens`) — no hardcoded colors; meet WCAG 2.2 AA ([`docs/brand/BRAND.md`](./docs/brand/BRAND.md)).
 
 Useful docs:
 
