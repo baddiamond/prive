@@ -110,7 +110,9 @@
     "account": {
       "notFound": "Esa cuenta ya no existe.",
       "notLoggedIn": "Hay que volver a vincular esta cuenta.",
-      "connectFailed": "No se pudo conectar esta cuenta. Privé lo seguirá intentando."
+      "connectFailed": "No se pudo conectar esta cuenta. Privé lo seguirá intentando.",
+      "invalidName": "Usa un nombre de hasta 40 caracteres.",
+      "invalidColor": "Elige uno de los colores de cuenta."
     },
     "engine": {
       "notFound": "Esta red no está disponible en esta versión de Privé.",
@@ -125,6 +127,17 @@
       "locked": "Privé no puede desbloquear tus datos: su clave ya no está en el llavero de este equipo. Para empezar de cero, cierra Privé y borra su carpeta de datos; podrás vincular tus cuentas de nuevo.",
       "keychainUnavailable": "Privé no pudo acceder al llavero del sistema, donde guarda la clave que protege tus datos. Asegúrate de que el llavero esté desbloqueado y vuelve a abrir Privé.",
       "corrupt": "El archivo de claves de Privé está dañado, así que no se pueden desbloquear tus datos."
+    },
+    "whatsapp": {
+      "qrTimeout": "El código caducó antes de escanearlo. Inténtalo de nuevo con un código nuevo.",
+      "pairingFailed": "La vinculación no terminó. Inténtalo de nuevo con un código nuevo.",
+      "clientOutdated": "WhatsApp ya no acepta esta versión de Privé. Actualiza Privé para seguir usando esta cuenta.",
+      "multideviceRequired": "Actualiza WhatsApp en tu teléfono para vincular dispositivos y vuelve a intentarlo.",
+      "alreadyLinked": "Esta cuenta ya está vinculada.",
+      "loggedOutRemotely": "Este dispositivo se quitó de Dispositivos vinculados en tu teléfono. Tus chats locales se conservan.",
+      "streamReplaced": "Esta cuenta se abrió en otro lugar con la misma sesión. Cierra la otra copia de Privé.",
+      "temporaryBan": "WhatsApp ha bloqueado temporalmente esta cuenta. Inténtalo más tarde.",
+      "unlinkOnPhone": "Se quitó de este equipo. Para terminar, quita Privé de Dispositivos vinculados en tu teléfono."
     }
   }
 }

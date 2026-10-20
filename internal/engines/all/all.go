@@ -6,4 +6,6 @@
 //	_ "github.com/baddiamond/prive/internal/engines/<id>"
 package all
 
-// No engines are bundled yet. WhatsApp arrives in roadmap phase 2.
+import (
+	_ "github.com/baddiamond/prive/internal/engines/whatsapp" // WhatsApp (whatsmeow)
+)

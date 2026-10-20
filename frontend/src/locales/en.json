@@ -110,7 +110,9 @@
     "account": {
       "notFound": "That account no longer exists.",
       "notLoggedIn": "This account needs to be linked again.",
-      "connectFailed": "Could not connect this account. Privé will keep trying."
+      "connectFailed": "Could not connect this account. Privé will keep trying.",
+      "invalidName": "Use a name of up to 40 characters.",
+      "invalidColor": "Choose one of the account colors."
     },
     "engine": {
       "notFound": "This network is not available in this version of Privé.",
@@ -125,6 +127,17 @@
       "locked": "Privé can't unlock your data: its key is no longer in this computer's keychain. To start fresh, quit Privé and delete its data folder; you can link your accounts again.",
       "keychainUnavailable": "Privé couldn't reach your system keychain, where it keeps the key that protects your data. Make sure the keychain is unlocked and open Privé again.",
       "corrupt": "Privé's key file is damaged, so your data can't be unlocked."
+    },
+    "whatsapp": {
+      "qrTimeout": "The code expired before it was scanned. Try again with a new code.",
+      "pairingFailed": "Linking didn't finish. Try again with a new code.",
+      "clientOutdated": "WhatsApp no longer accepts this version of Privé. Update Privé to keep using this account.",
+      "multideviceRequired": "Update WhatsApp on your phone to link devices, then try again.",
+      "alreadyLinked": "This account is already linked.",
+      "loggedOutRemotely": "This device was removed from Linked devices on your phone. Your local chats are kept.",
+      "streamReplaced": "This account was opened somewhere else with the same session. Close the other copy of Privé.",
+      "temporaryBan": "WhatsApp has temporarily blocked this account. Try again later.",
+      "unlinkOnPhone": "Removed from this computer. To finish, remove Privé from Linked devices on your phone."
     }
   }
 }
