@@ -151,10 +151,14 @@ Logo, icons, colors, typography, voice and accessibility rules live in the
 Contributions from humans and AI-assisted contributors are welcome.
 Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) and the project rules in [`CLAUDE.md`](CLAUDE.md).
 
-## Disclaimer
+## Responsible use, privacy and security
 
 Privé is an independent project, not affiliated with WhatsApp, Meta or any other network.
-Using unofficial clients may violate a network's terms of service; use at your own risk.
+It uses unofficial connections, which a network may restrict — use it at your own risk.
+It is a **personal** client: spam, bulk messaging, scraping and surveillance are not allowed.
+
+- [Disclaimer](DISCLAIMER.md) · [Acceptable Use Policy](ACCEPTABLE_USE.md) · [Privacy](PRIVACY.md)
+- [Security policy](SECURITY.md) · [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## License
 

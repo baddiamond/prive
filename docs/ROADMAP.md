@@ -11,6 +11,8 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 
 - `LICENSE`, `.gitignore`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, docs and ADRs ✅ (proposal)
 - Brand identity: guide, logo, app/tray icons, banners, design tokens and generator ✅
+- Legal and community: disclaimer, acceptable use, privacy, security policy, code of conduct ✅
+- Onboarding design and spec ✅ ([`docs/ONBOARDING.md`](ONBOARDING.md))
 - Wails v2 project with React + TypeScript + Tailwind + Zustand
 - react-i18next with `en.json` / `es.json`, OS language detection, language selector persisted locally
 - Light/dark theme from the brand tokens (follows the OS, overridable in Settings)
@@ -31,6 +33,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 ### ⬜ 2. WhatsApp login
 
 - WhatsApp engine on whatsmeow
+- First-run onboarding ([`docs/ONBOARDING.md`](ONBOARDING.md)): welcome, responsible-use agreement, connect, link, ready
 - Add-account flow with QR code in the app
 - Session persisted per account; automatic `Connect` on startup; reconnection with backoff
 - Logout / remove account
