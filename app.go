@@ -304,7 +304,11 @@ func (a *App) ListAccounts() ([]core.AccountStatus, error) {
 	if a.failure != nil {
 		return nil, a.failure
 	}
-	return a.manager.Accounts(), nil
+	list := a.manager.Accounts()
+	if list == nil {
+		list = []core.AccountStatus{}
+	}
+	return list, nil
 }
 
 // AddAccount creates an account for a network. It starts logged out: call Login next.
@@ -364,4 +368,25 @@ func validateAccountInput(displayName, color string) (string, error) {
 		return "", errInvalidAccountColor
 	}
 	return name, nil
+}
+
+// ListChats returns the stored chats for the inbox, pinned first then most recent.
+// An empty accountID returns the unified inbox of every account.
+func (a *App) ListChats(accountID string) ([]core.Chat, error) {
+	if a.failure != nil {
+		return nil, a.failure
+	}
+	chats, err := a.manager.ListChats(a.context(), core.ChatFilter{AccountID: core.AccountID(accountID)})
+	if chats == nil && err == nil {
+		chats = []core.Chat{} // JSON [] rather than null
+	}
+	return chats, err
+}
+
+// UnreadSummary counts unread messages per account (muted and archived chats excluded).
+func (a *App) UnreadSummary() (core.UnreadSummary, error) {
+	if a.failure != nil {
+		return core.UnreadSummary{}, a.failure
+	}
+	return a.manager.UnreadSummary(a.context())
 }

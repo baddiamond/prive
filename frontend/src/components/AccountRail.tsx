@@ -1,6 +1,9 @@
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { shortcutLabel } from "../lib/platform";
 import { linkedAccounts, useAccounts } from "../state/accounts";
+import { unreadCounts, useChats } from "../state/chats";
 import { useUI } from "../state/ui";
 import type { AccountStatus } from "../lib/accounts";
 import AccountTile from "./accounts/AccountTile";
@@ -19,6 +22,8 @@ export default function AccountRail() {
   const openSettings = useUI((s) => s.openSettings);
   const openAddAccount = useUI((s) => s.openAddAccount);
   const accounts = linkedAccounts(useAccounts((s) => s.accounts));
+  const chats = useChats((s) => s.chats);
+  const unread = useMemo(() => unreadCounts(chats), [chats]);
   const inbox = screen === "inbox";
 
   return (
@@ -31,15 +36,16 @@ export default function AccountRail() {
 
       <button
         type="button"
-        aria-label={t("rail.allInboxes")}
+        aria-label={withUnread(t("rail.allInboxes"), unread.total, t)}
         title={`${t("rail.allInboxes")} (${shortcutLabel("0")})`}
         aria-pressed={inbox && scope === "all"}
         onClick={() => setScope("all")}
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-card text-text transition-colors duration-fast ease-prive ${
+        className={`relative flex h-12 w-12 shrink-0 items-center justify-center rounded-card text-text transition-colors duration-fast ease-prive ${
           inbox && scope === "all" ? `bg-raised ${selectedRing}` : "hover:bg-raised"
         }`}
       >
         <InboxIcon size={22} />
+        <UnreadBadge count={unread.total} />
       </button>
 
       {accounts.map((s, i) => (
@@ -47,6 +53,7 @@ export default function AccountRail() {
           key={s.account.id}
           status={s}
           index={i}
+          unread={unread.perAccount[s.account.id] ?? 0}
           selected={inbox && scope === s.account.id}
           onSelect={() => setScope(s.account.id)}
         />
@@ -83,18 +90,21 @@ export default function AccountRail() {
 interface RailAccountProps {
   status: AccountStatus;
   index: number;
+  unread: number;
   selected: boolean;
   onSelect: () => void;
 }
 
-function RailAccount({ status, index, selected, onSelect }: RailAccountProps) {
+function RailAccount({ status, index, unread, selected, onSelect }: RailAccountProps) {
   const { t } = useTranslation();
   const label = accountLabel(status);
   const issue = hasIssue(status);
   // Accessible name: "{label} · {network}" plus the state when it needs attention.
-  const name = [label, status.manifest.name, issue ? t(`account.state.${status.state}`) : null]
-    .filter(Boolean)
-    .join(" · ");
+  const name = withUnread(
+    [label, status.manifest.name, issue ? t(`account.state.${status.state}`) : null].filter(Boolean).join(" · "),
+    unread,
+    t,
+  );
   const shortcut = index < 9 ? ` (${shortcutLabel(String(index + 1))})` : "";
 
   return (
@@ -113,6 +123,7 @@ function RailAccount({ status, index, selected, onSelect }: RailAccountProps) {
       >
         {status.manifest.shortName}
       </span>
+      <UnreadBadge count={unread} />
       {issue && (
         <span
           aria-hidden
@@ -125,4 +136,22 @@ function RailAccount({ status, index, selected, onSelect }: RailAccountProps) {
       )}
     </button>
   );
+}
+
+/** Unread count badge at the top right of a rail item, capped at 99+. */
+function UnreadBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span
+      aria-hidden
+      className="absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-rail bg-accent px-1 text-micro font-bold leading-none text-on-accent"
+    >
+      {count > 99 ? "99+" : count}
+    </span>
+  );
+}
+
+/** Adds the unread count to an accessible name. */
+function withUnread(name: string, count: number, t: TFunction): string {
+  return count > 0 ? `${name} · ${t("chatList.unreadCount", { count })}` : name;
 }

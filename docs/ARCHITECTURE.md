@@ -192,7 +192,12 @@ to the UI as Wails events.
 | `chat:updated` | `{accountId, chat}` | new chat, name change, unread count, last message |
 | `message:new` | `{accountId, chatId, message}` | incoming or outgoing message |
 | `message:status` | `{accountId, chatId, messageId, status}` | sent / delivered / read / failed |
+| `chats:synced` | `{accountId, chats, messages}` | a history batch was stored; the UI reloads the chat list (emitted by the Manager only) |
 | `sync:progress` | `{accountId, done, total}` | initial history sync |
+
+Some session events are internal and never reach the UI as such: `history:batch` (chats and messages from a
+history sync, marked authoritative or not) becomes `chats:synced`, and `chat:patch` (archive, pin, mute, read,
+rename from another device) becomes `chat:updated` once stored.
 
 `code` values are **translation keys**, not text (see below); a `state` is shown with the key
 `account.state.<state>`. Engines leave `accountId` empty: the Manager stamps every event (and the chats and
@@ -274,6 +279,10 @@ the busy timeout instead of failing with `SQLITE_BUSY`.
 - **Event pump**: one goroutine per session reads its events in order, persists what changes (chats, messages,
   statuses, the remote ID after login), then forwards the event to the UI. Message statuses only move forward
   (`core.MergeStatus`): a late "delivered" never overwrites "read".
+  Live messages go through `Repository.ApplyMessage` (creates the chat if needed, updates the preview and the unread
+  count); history batches go through `Repository.ImportHistory`. Authoritative batches (the initial sync) may set
+  unread counts and chat state; non-authoritative ones (e.g. history fetched on demand) only add messages and never
+  overwrite newer state.
 - **AddAccount / UpdateAccount / Login / Reconnect / RemoveAccount / SendMessage / ListChats / GetMessages** are what
   `app.go` exposes to the UI. Accounts that were added but never linked (e.g. the window closed on the QR step) are
   removed at startup.

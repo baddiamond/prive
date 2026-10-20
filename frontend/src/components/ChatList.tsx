@@ -1,10 +1,14 @@
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { reconnectAccount, type AccountStatus } from "../lib/accounts";
+import type { Chat } from "../lib/chats";
 import { translateCode } from "../lib/errors";
 import { shortcutLabel } from "../lib/platform";
 import { linkedAccounts, useAccounts } from "../state/accounts";
+import { useChats } from "../state/chats";
 import { useUI, type ChatFilter } from "../state/ui";
 import { accountLabel, hasIssue } from "./accounts/accountLabel";
+import ChatRow from "./chats/ChatRow";
 import { ChatIcon, PlusIcon, RefreshIcon, SearchIcon } from "./icons";
 
 const filters: readonly ChatFilter[] = ["all", "unread", "groups"];
@@ -12,7 +16,7 @@ const maxBanners = 2;
 
 /**
  * Middle column (docs/UI.md §2.2): scope title, search, filters, account status banners
- * and the chats. Chats arrive with phase 3; until then it shows the empty states.
+ * and the chats of the selected scope.
  */
 export default function ChatList() {
   const { t } = useTranslation();
@@ -20,10 +24,32 @@ export default function ChatList() {
   const setChatFilter = useUI((s) => s.setChatFilter);
   const scope = useUI((s) => s.scope);
   const openAddAccount = useUI((s) => s.openAddAccount);
-  const accounts = linkedAccounts(useAccounts((s) => s.accounts));
+  const allAccounts = useAccounts((s) => s.accounts);
+  const accounts = useMemo(() => linkedAccounts(allAccounts), [allAccounts]);
   const scoped = scope === "all" ? accounts : accounts.filter((s) => s.account.id === scope);
   const scopeAccount = scope === "all" ? undefined : scoped[0];
   const issues = scoped.filter(hasIssue);
+  const allChats = useChats((s) => s.chats);
+  const syncProgress = useChats((s) => s.syncProgress);
+  const selectedChat = useUI((s) => s.selectedChat);
+  const selectChat = useUI((s) => s.selectChat);
+  const onSelect = useCallback((c: Chat) => selectChat(c.accountId, c.id), [selectChat]);
+  const accountById = useMemo(() => new Map(accounts.map((a) => [a.account.id, a])), [accounts]);
+
+  const visible = useMemo(
+    () =>
+      allChats.filter(
+        (c) =>
+          accountById.has(c.accountId) &&
+          (scope === "all" || c.accountId === scope) &&
+          (chatFilter !== "unread" || c.unreadCount > 0) &&
+          (chatFilter !== "groups" || c.kind === "group"),
+      ),
+    [allChats, accountById, scope, chatFilter],
+  );
+  const syncing = scoped
+    .map((a) => syncProgress[a.account.id])
+    .filter((p): p is number => p !== undefined);
 
   const title = scopeAccount ? accountLabel(scopeAccount) : t("chatList.allInboxes");
   const subtitle = scopeAccount
@@ -71,6 +97,12 @@ export default function ChatList() {
         </div>
       </div>
 
+      {syncing.length > 0 && (
+        <p role="status" className="mx-4 mb-2 text-caption text-text-secondary">
+          {t("chatList.importing", { percent: Math.min(...syncing) })}
+        </p>
+      )}
+
       {issues.slice(0, maxBanners).map((s) => (
         <StatusBanner key={s.account.id} status={s} />
       ))}
@@ -80,27 +112,44 @@ export default function ChatList() {
         </p>
       )}
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-        <span className="flex h-14 w-14 items-center justify-center rounded-bubble bg-raised text-text-secondary">
-          <ChatIcon size={26} />
-        </span>
-        <strong className="text-body-strong font-semibold">{t("chatList.empty.title")}</strong>
-        {accounts.length === 0 ? (
-          <>
-            <span className="max-w-[240px] text-text-secondary">{t("chatList.empty.body")}</span>
-            <button
-              type="button"
-              onClick={() => openAddAccount()}
-              className="flex h-[38px] items-center gap-2 rounded-control bg-accent px-4 font-bold text-on-accent"
-            >
-              <PlusIcon size={16} />
-              {t("chatList.empty.action")}
-            </button>
-          </>
-        ) : (
-          <span className="max-w-[260px] text-text-secondary">{t("chatList.empty.syncSoon")}</span>
-        )}
-      </div>
+      {visible.length > 0 ? (
+        <div role="list" aria-label={t("chatList.label")} className="flex-1 overflow-y-auto px-2 pb-2">
+          {visible.map((c) => (
+            <div role="listitem" key={`${c.accountId}\u0000${c.id}`}>
+              <ChatRow
+                chat={c}
+                account={accountById.get(c.accountId)}
+                selected={selectedChat === `${c.accountId}\u0000${c.id}`}
+                onSelect={onSelect}
+              />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-bubble bg-raised text-text-secondary">
+            <ChatIcon size={26} />
+          </span>
+          <strong className="text-body-strong font-semibold">{t("chatList.empty.title")}</strong>
+          {accounts.length === 0 ? (
+            <>
+              <span className="max-w-[240px] text-text-secondary">{t("chatList.empty.body")}</span>
+              <button
+                type="button"
+                onClick={() => openAddAccount()}
+                className="flex h-[38px] items-center gap-2 rounded-control bg-accent px-4 font-bold text-on-accent"
+              >
+                <PlusIcon size={16} />
+                {t("chatList.empty.action")}
+              </button>
+            </>
+          ) : (
+            <span className="max-w-[260px] text-text-secondary">
+              {chatFilter !== "all" ? t("chatList.empty.filtered") : t("chatList.empty.waiting")}
+            </span>
+          )}
+        </div>
+      )}
     </section>
   );
 }

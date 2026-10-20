@@ -38,10 +38,14 @@ export default function QRCodeView({ value, overlay }: QRCodeViewProps) {
       {value && code ? (
         <StyledQR code={code} />
       ) : (
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-qr-ink/20 border-t-qr-ink/70 motion-reduce:animate-none" />
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-divider border-t-qr-ink motion-reduce:animate-none" />
       )}
       {overlay && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-card bg-qr-paper/90">{overlay}</div>
+        <div className="absolute inset-0 flex items-center justify-center rounded-card">
+          {/* Tailwind can't add opacity to a CSS-variable color, so the veil is its own layer. */}
+          <span aria-hidden className="absolute inset-0 rounded-card bg-qr-paper opacity-90" />
+          <span className="relative">{overlay}</span>
+        </div>
       )}
     </div>
   );

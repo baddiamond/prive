@@ -47,16 +47,31 @@ type Chat struct {
 	LastMessagePreview string    `json:"lastMessagePreview"`
 	// LastMessageAt is the zero time when the chat has no messages.
 	LastMessageAt time.Time `json:"lastMessageAt"`
-	Muted         bool      `json:"muted"`
-	Archived      bool      `json:"archived"`
+	// LastMessageKind and LastMessageFromMe let the UI render a translated preview
+	// ("Photo", "You: …") without the backend producing text.
+	LastMessageKind   MessageKind `json:"lastMessageKind"`
+	LastMessageFromMe bool        `json:"lastMessageFromMe"`
+	Muted             bool        `json:"muted"`
+	Archived          bool        `json:"archived"`
+	Pinned            bool        `json:"pinned"`
 }
 
 // MessageKind is the type of content a message carries.
 type MessageKind string
 
-// Message kinds. More (image, audio…) arrive with media support.
+// Message kinds. Media content itself arrives with media support; until then the kind
+// lets the UI show what a message is ("Photo", "Voice message").
 const (
-	MessageText MessageKind = "text"
+	MessageText     MessageKind = "text"
+	MessageImage    MessageKind = "image"
+	MessageVideo    MessageKind = "video"
+	MessageAudio    MessageKind = "audio"
+	MessageVoice    MessageKind = "voice"
+	MessageDocument MessageKind = "document"
+	MessageSticker  MessageKind = "sticker"
+	MessageLocation MessageKind = "location"
+	MessageContact  MessageKind = "contact"
+	MessagePoll     MessageKind = "poll"
 	// MessageUnsupported is content Privé cannot display yet.
 	MessageUnsupported MessageKind = "unsupported"
 )
@@ -142,6 +157,24 @@ type GetMessagesOptions struct {
 	Limit int
 	// Before, if set, returns only messages older than this time.
 	Before time.Time
+}
+
+// ChatPatch changes some fields of a stored chat. Nil fields are left as they are.
+type ChatPatch struct {
+	ChatID   ChatID  `json:"chatId"`
+	Name     *string `json:"name,omitempty"`
+	Muted    *bool   `json:"muted,omitempty"`
+	Archived *bool   `json:"archived,omitempty"`
+	Pinned   *bool   `json:"pinned,omitempty"`
+	// Read true clears the unread count; false marks the chat unread (at least 1).
+	Read *bool `json:"read,omitempty"`
+}
+
+// UnreadSummary counts unread messages for the rail badges. Muted and archived chats
+// are not counted.
+type UnreadSummary struct {
+	Total      int               `json:"total"`
+	PerAccount map[AccountID]int `json:"perAccount"`
 }
 
 // ChatFilter selects chats from local storage for the inbox.

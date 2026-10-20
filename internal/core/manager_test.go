@@ -510,3 +510,61 @@ func TestReconnect(t *testing.T) {
 		t.Errorf("Reconnect(unknown) = %v", err)
 	}
 }
+
+func TestHistoryBatchAndPatches(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("A")
+	s := e.fake.Session(a.ID)
+
+	s.Emit(core.HistoryBatchEvent{
+		Authoritative: true,
+		Chats: []core.Chat{
+			{ID: "c1", Name: "Ana", Kind: core.ChatDirect, UnreadCount: 2, LastMessageAt: time.Unix(100, 0)},
+			{ID: "g1", Name: "Team", Kind: core.ChatGroup, LastMessageAt: time.Unix(200, 0)},
+		},
+		Messages: []core.Message{{ChatID: "c1", ID: "m1", Kind: core.MessageText, Text: "hi", Timestamp: time.Unix(100, 0)}},
+	})
+	waitFor(t, "chats imported", func() bool {
+		chats, _ := e.manager.ListChats(ctx, core.ChatFilter{AccountID: a.ID})
+		return len(chats) == 2
+	})
+	waitFor(t, "chats:synced event", func() bool {
+		for _, ev := range e.events.snapshot() {
+			if synced, ok := ev.(core.ChatsSyncedEvent); ok && synced.AccountID == a.ID && synced.Chats == 2 && synced.Messages == 1 {
+				return true
+			}
+		}
+		return false
+	})
+	for _, ev := range e.events.snapshot() {
+		if _, ok := ev.(core.HistoryBatchEvent); ok {
+			t.Fatal("history batches must not be forwarded to the UI")
+		}
+	}
+
+	name := "Ana García"
+	read := true
+	s.Emit(core.ChatPatchEvent{Patch: core.ChatPatch{ChatID: "c1", Name: &name, Read: &read}})
+	s.Emit(core.ChatPatchEvent{Patch: core.ChatPatch{ChatID: "unknown", Name: &name}})
+	waitFor(t, "patched chat forwarded", func() bool {
+		for _, ev := range e.events.snapshot() {
+			if u, ok := ev.(core.ChatUpdatedEvent); ok && u.Chat.ID == "c1" && u.Chat.Name == name && u.Chat.UnreadCount == 0 {
+				return true
+			}
+		}
+		return false
+	})
+	for _, ev := range e.events.snapshot() {
+		if u, ok := ev.(core.ChatUpdatedEvent); ok && u.Chat.ID == "unknown" {
+			t.Error("a patch for a missing chat must not create it")
+		}
+	}
+
+	// A live incoming message counts as unread and is forwarded with its chat.
+	s.Receive("g1", "Team", "new message")
+	waitFor(t, "unread counted", func() bool {
+		sum, _ := e.manager.UnreadSummary(ctx)
+		return sum.Total == 1 && sum.PerAccount[a.ID] == 1
+	})
+}

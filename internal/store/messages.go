@@ -21,27 +21,32 @@ func (s *Store) UpsertMessage(ctx context.Context, m core.Message) error {
 		if err != nil {
 			return err
 		}
-		status := core.MergeStatus(current, m.Status)
-		_, err = tx.ExecContext(ctx, `
-			INSERT INTO messages (account_id, chat_id, id, sender_id, sender_name, from_me,
-			                      timestamp, kind, text, status, reply_to)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			ON CONFLICT (account_id, chat_id, id) DO UPDATE SET
-				sender_id = excluded.sender_id,
-				sender_name = excluded.sender_name,
-				from_me = excluded.from_me,
-				timestamp = excluded.timestamp,
-				kind = excluded.kind,
-				text = excluded.text,
-				status = excluded.status,
-				reply_to = excluded.reply_to`,
-			m.AccountID, m.ChatID, m.ID, m.SenderID, m.SenderName, boolToInt(m.FromMe),
-			toMillis(m.Timestamp), string(m.Kind), m.Text, string(status), string(m.ReplyTo))
-		if err != nil {
-			return fmt.Errorf("upsert message: %w", err)
-		}
-		return nil
+		return upsertMessage(ctx, tx, m, current)
 	})
+}
+
+// upsertMessage writes m; current is the stored status ("" when the message is new).
+func upsertMessage(ctx context.Context, tx *sql.Tx, m core.Message, current core.MessageStatus) error {
+	status := core.MergeStatus(current, m.Status)
+	_, err := tx.ExecContext(ctx, `
+		INSERT INTO messages (account_id, chat_id, id, sender_id, sender_name, from_me,
+		                      timestamp, kind, text, status, reply_to)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		ON CONFLICT (account_id, chat_id, id) DO UPDATE SET
+			sender_id = excluded.sender_id,
+			sender_name = excluded.sender_name,
+			from_me = excluded.from_me,
+			timestamp = excluded.timestamp,
+			kind = excluded.kind,
+			text = excluded.text,
+			status = excluded.status,
+			reply_to = excluded.reply_to`,
+		m.AccountID, m.ChatID, m.ID, m.SenderID, m.SenderName, boolToInt(m.FromMe),
+		toMillis(m.Timestamp), string(m.Kind), m.Text, string(status), string(m.ReplyTo))
+	if err != nil {
+		return fmt.Errorf("upsert message: %w", err)
+	}
+	return nil
 }
 
 // UpdateMessageStatus implements core.Repository.

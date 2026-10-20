@@ -1,6 +1,7 @@
 // Typed subscriptions to the backend's Wails events (docs/ARCHITECTURE.md, "Events").
 import { EventsOn } from "../../wailsjs/runtime/runtime";
 import type { AccountState } from "./accounts";
+import type { ChatPayload } from "./chats";
 
 /** Payloads of the events the UI listens to. Every one carries its accountId. */
 export interface BackendEvents {
@@ -13,6 +14,9 @@ export interface BackendEvents {
   "login:qr": { accountId: string; code: string; expiresAt: string };
   "login:success": { accountId: string; remoteId: string; displayName: string };
   "login:failed": { accountId: string; code: string };
+  "chat:updated": { accountId: string; chat: ChatPayload };
+  "chats:synced": { accountId: string; chats: number; messages: number };
+  "sync:progress": { accountId: string; done: number; total: number };
 }
 
 /** Subscribes to one backend event; returns the unsubscribe function. */

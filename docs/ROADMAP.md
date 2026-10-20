@@ -66,18 +66,28 @@ with a second number, then run `go run ./cmd/prive-dev accounts` again later: bo
 
 **Test on macOS:** link two WhatsApp numbers, quit the app, reopen it — both reconnect without scanning again.
 
-### ⬜ 3. Chat list
+### 🟨 3. Chat list
 
-- Initial history sync into SQLite
-- Unified inbox and per-account filter, sorted by last message
-- Unread counters per chat, per account and in total
-- Recovery phrase banner after the first account finishes its initial sync ([ADR 0007](adr/0007-encryption-at-rest.md))
+**3a**
+- Initial history sync into SQLite (the recent history WhatsApp sends after linking; chat names from contacts,
+  push names and group info; archive, pin, mute and read state from app-state sync) ✅
+- Unified inbox and per-account filter, pinned first, then by last message; "Unread" and "Groups" filters ✅
+- Unread counters per chat, per account and in total ✅
+- Import progress in the chat list; selecting a chat shows a placeholder until phase 4 ✅
 
-**Test:** your real chats appear in the right order with correct unread counts.
+**3b**
+- Recovery phrase banner after the first account finishes its initial sync, with Privé's own English and Spanish
+  word lists ([ADR 0007](adr/0007-encryption-at-rest.md))
+
+**Test:** your real chats appear in the right order with correct unread counts. Accounts linked before phase 3
+must be removed and linked again to import their history.
 
 ### ⬜ 4. Message history
 
 - Paginated history (infinite scroll upwards), cached locally
+- Older history on demand: when the user scrolls past what is stored, ask the phone for more
+  (whatsmeow `BuildHistorySyncRequest` + `SendPeerMessage`; the answer arrives as an `ON_DEMAND` history sync,
+  which phase 3 already stores without overwriting newer state)
 
 **Test:** open a chat and scroll back through older messages; reopening is instant.
 
@@ -106,7 +116,7 @@ Decisions are recorded in the linked ADRs; system requirements and defaults are 
 ### Privacy and security
 
 - 🟨 **Encryption at rest, on by default** — data key in the OS keychain and encrypted databases are done
-  (phase 1). Still to do: 12-word recovery phrase with Privé's own word lists (shown after the first sync, phase 3),
+  (phase 1). Still to do: 12-word recovery phrase with Privé's own word lists (shown after the first sync, phase 3b),
   optional app password, media encryption ([ADR 0007](adr/0007-encryption-at-rest.md)).
 - ⬜ **Exclude from search and lock** chats and accounts, unlocked with Touch ID / Windows Hello
   ([ADR 0010](adr/0010-chat-and-account-privacy.md), step 1).

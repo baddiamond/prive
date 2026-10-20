@@ -8,8 +8,9 @@ import (
 )
 
 // With the devfake build tag (wails dev -tags devfake), the in-memory test engine is offered
-// as a network: it links instantly, so the account UI can be developed without a phone.
+// as a network: it links instantly and imports a fictional history, so the account and
+// chat UI can be developed without a phone.
 // Release builds never include it.
 func init() {
-	engines.Register(fake.New())
+	engines.Register(fake.NewDemo())
 }

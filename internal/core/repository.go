@@ -19,6 +19,20 @@ type Repository interface {
 	// ListChats returns chats matching filter, most recent first.
 	ListChats(ctx context.Context, filter ChatFilter) ([]Chat, error)
 
+	// GetChat returns one stored chat and whether it exists.
+	GetChat(ctx context.Context, account AccountID, id ChatID) (Chat, bool, error)
+	// PatchChat applies a partial change to an existing chat and returns the result.
+	// It reports false, without error, when the chat does not exist.
+	PatchChat(ctx context.Context, account AccountID, patch ChatPatch) (Chat, bool, error)
+	// UnreadSummary counts unread messages per account, leaving out muted and archived chats.
+	UnreadSummary(ctx context.Context) (UnreadSummary, error)
+	// ImportHistory stores a history batch in one transaction (see HistoryBatchEvent).
+	ImportHistory(ctx context.Context, account AccountID, chats []Chat, msgs []Message, authoritative bool) error
+	// ApplyMessage stores a live message, creating its chat (with kind and name) if needed,
+	// moves the chat's last message forward and, when countUnread is true and the message is
+	// new and incoming, increments the unread count. It returns the chat afterwards.
+	ApplyMessage(ctx context.Context, msg Message, kind ChatKind, name string, countUnread bool) (Chat, error)
+
 	// UpsertMessage inserts or updates a message. An existing message keeps the
 	// most advanced status (see MergeStatus).
 	UpsertMessage(ctx context.Context, msg Message) error

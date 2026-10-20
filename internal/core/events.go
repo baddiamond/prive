@@ -70,9 +70,42 @@ type ChatUpdatedEvent struct {
 }
 
 // MessageEvent carries a new incoming or outgoing message, or a new version of one.
+// The Manager stores it, updates the chat's last message and, for new incoming messages,
+// its unread count.
 type MessageEvent struct {
 	AccountID AccountID `json:"accountId"`
 	Message   Message   `json:"message"`
+	// ChatKind and ChatName describe the chat in case it is not stored yet.
+	ChatKind ChatKind `json:"-"`
+	ChatName string   `json:"-"`
+}
+
+// HistoryBatchEvent carries chats and messages from a history sync. The Manager stores them
+// in one transaction and tells the UI with a ChatsSyncedEvent; the batch itself is not
+// forwarded.
+type HistoryBatchEvent struct {
+	AccountID AccountID `json:"accountId"`
+	Chats     []Chat    `json:"-"`
+	Messages  []Message `json:"-"`
+	// Authoritative is true when Chats hold the current state (name, unread count, flags),
+	// as in the initial sync. Batches of older messages fetched on demand set it to false:
+	// they only add messages and never overwrite newer chat state.
+	Authoritative bool `json:"-"`
+}
+
+// ChatPatchEvent changes some fields of a chat (a contact renamed, read on the phone,
+// archived…). The Manager applies it and forwards the full chat as a ChatUpdatedEvent.
+type ChatPatchEvent struct {
+	AccountID AccountID `json:"accountId"`
+	Patch     ChatPatch `json:"patch"`
+}
+
+// ChatsSyncedEvent is emitted by the Manager (never by sessions) after a history batch is
+// stored, so the UI reloads its chat list once instead of per chat.
+type ChatsSyncedEvent struct {
+	AccountID AccountID `json:"accountId"`
+	Chats     int       `json:"chats"`
+	Messages  int       `json:"messages"`
 }
 
 // MessageStatusEvent reports a delivery status change.
@@ -130,6 +163,15 @@ func (SyncProgressEvent) EventName() string { return "sync:progress" }
 func (AccountRemovedEvent) EventName() string { return "account:removed" }
 
 // EventName implements Event.
+func (HistoryBatchEvent) EventName() string { return "history:batch" }
+
+// EventName implements Event.
+func (ChatPatchEvent) EventName() string { return "chat:patch" }
+
+// EventName implements Event.
+func (ChatsSyncedEvent) EventName() string { return "chats:synced" }
+
+// EventName implements Event.
 func (AccountUpdatedEvent) EventName() string { return "account:updated" }
 
 func (e AccountStateEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
@@ -161,3 +203,21 @@ func (e MessageEvent) stamped(id AccountID) Event {
 }
 
 func (e MessageStatusEvent) stamped(id AccountID) Event { e.AccountID = id; return e }
+func (e ChatPatchEvent) stamped(id AccountID) Event     { e.AccountID = id; return e }
+func (e ChatsSyncedEvent) stamped(id AccountID) Event   { e.AccountID = id; return e }
+
+func (e HistoryBatchEvent) stamped(id AccountID) Event {
+	e.AccountID = id
+	chats := make([]Chat, len(e.Chats))
+	for i, c := range e.Chats {
+		c.AccountID = id
+		chats[i] = c
+	}
+	msgs := make([]Message, len(e.Messages))
+	for i, m := range e.Messages {
+		m.AccountID = id
+		msgs[i] = m
+	}
+	e.Chats, e.Messages = chats, msgs
+	return e
+}

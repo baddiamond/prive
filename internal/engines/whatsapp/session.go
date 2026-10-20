@@ -229,15 +229,21 @@ func (s *Session) device(ctx context.Context) (*store.Device, error) {
 	return device, nil
 }
 
-// newClient creates a whatsmeow client whose connection events become account states.
+// newClient creates a whatsmeow client whose connection events become account states and
+// whose history, messages and app-state changes become chats and messages.
 func (s *Session) newClient(device *store.Device) *whatsmeow.Client {
 	client := whatsmeow.NewClient(device, s.waLog.Sub("client"))
 	client.EnableAutoReconnect = true
 	client.InitialAutoReconnect = true // a network outage at startup retries instead of failing
+	// Archive, pin, mute, read and contact names from the phone's full sync arrive as events too.
+	client.EmitAppStateEventsOnFullSync = true
+	y := newSyncer(client, s.events.Push, func(msg string, args ...any) { s.log.Warn(msg, args...) })
 	client.AddEventHandler(func(evt any) {
 		if e, ok := stateEvent(evt); ok {
 			s.events.Push(e)
+			return
 		}
+		y.handle(evt)
 	})
 	return client
 }

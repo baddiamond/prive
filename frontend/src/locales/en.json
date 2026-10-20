@@ -34,7 +34,8 @@
       "title": "No chats yet",
       "body": "Add an account to see your conversations here.",
       "action": "Add account",
-      "syncSoon": "Chats from your linked accounts appear here in an upcoming version."
+      "filtered": "No chats match this filter.",
+      "waiting": "Your chats appear here as soon as the first sync arrives from your phone."
     },
     "accountsCount_one": "{{count}} account",
     "accountsCount_other": "{{count}} accounts",
@@ -54,7 +55,12 @@
         "title": "Problem with {{account}}",
         "action": "Retry"
       }
-    }
+    },
+    "importing": "Importing chats… {{percent}}%",
+    "unknownChat": "Unknown chat",
+    "unreadCount_one": "{{count}} unread message",
+    "unreadCount_other": "{{count}} unread messages",
+    "you": "You: {{text}}"
   },
   "inbox": {
     "welcome": {
@@ -273,5 +279,26 @@
         "step3": "Tap Link a device and point your phone at this screen"
       }
     }
+  },
+  "conversation": {
+    "comingSoon": "Messages of this chat appear here in the next version."
+  },
+  "message": {
+    "kind": {
+      "text": "Message",
+      "image": "Photo",
+      "video": "Video",
+      "audio": "Audio",
+      "voice": "Voice message",
+      "document": "Document",
+      "sticker": "Sticker",
+      "location": "Location",
+      "contact": "Contact",
+      "poll": "Poll",
+      "unsupported": "Message not supported yet"
+    }
+  },
+  "time": {
+    "yesterday": "Yesterday"
   }
 }

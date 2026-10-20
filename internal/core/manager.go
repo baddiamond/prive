@@ -317,6 +317,15 @@ func (m *Manager) ListChats(ctx context.Context, filter ChatFilter) ([]Chat, err
 	return chats, nil
 }
 
+// UnreadSummary counts unread messages per account for the rail badges.
+func (m *Manager) UnreadSummary(ctx context.Context) (UnreadSummary, error) {
+	sum, err := m.repo.UnreadSummary(ctx)
+	if err != nil {
+		return UnreadSummary{}, ErrUnknown.Wrap(err)
+	}
+	return sum, nil
+}
+
 // GetMessages returns a page of a chat's stored history in chronological order.
 func (m *Manager) GetMessages(ctx context.Context, id AccountID, chat ChatID, opts GetMessagesOptions) ([]Message, error) {
 	if _, err := m.lookup(id); err != nil {
@@ -350,10 +359,12 @@ func (m *Manager) SendMessage(ctx context.Context, id AccountID, chat ChatID, ou
 	msg.AccountID = id
 	msg.ChatID = chat
 	msg.FromMe = true
-	if err := m.repo.UpsertMessage(ctx, msg); err != nil {
-		m.logger.Error("store sent message", "account", id, "err", err)
-	}
 	m.emit(MessageEvent{AccountID: id, Message: msg})
+	if updated, err := m.repo.ApplyMessage(ctx, msg, ChatDirect, "", false); err != nil {
+		m.logger.Error("store sent message", "account", id, "err", err)
+	} else {
+		m.emit(ChatUpdatedEvent{AccountID: id, Chat: updated})
+	}
 	return msg, nil
 }
 
@@ -501,8 +512,16 @@ func (m *Manager) pump(ra *runningAccount) {
 	}
 }
 
-// handle persists what an event changes and forwards it to the UI.
+// handle persists what an event changes and forwards the result to the UI.
 func (m *Manager) handle(ra *runningAccount, ev Event) {
+	for _, out := range m.persist(ra, ev) {
+		m.emit(out)
+	}
+}
+
+// persist stores what an event changes and returns the events the UI should receive:
+// usually the event itself, sometimes a summary (history batches) or the resulting chat.
+func (m *Manager) persist(ra *runningAccount, ev Event) []Event {
 	// Writes must land even while the app is shutting down.
 	ctx := context.Background()
 	id := ra.accountID()
@@ -523,11 +542,11 @@ func (m *Manager) handle(ra *runningAccount, ev Event) {
 		if err := m.repo.UpdateAccount(ctx, acc); err != nil {
 			m.logger.Error("store login", "account", id, "err", err)
 		}
-		m.emit(AccountUpdatedEvent{AccountID: id, Account: acc})
+		return []Event{ev, AccountUpdatedEvent{AccountID: id, Account: acc}}
 	case ChatUpdatedEvent:
 		if e.Chat.ID == "" {
 			m.logger.Warn("dropping chat without id", "account", id)
-			return
+			return nil
 		}
 		if err := m.repo.UpsertChat(ctx, e.Chat); err != nil {
 			m.logger.Error("store chat", "account", id, "err", err)
@@ -535,17 +554,35 @@ func (m *Manager) handle(ra *runningAccount, ev Event) {
 	case MessageEvent:
 		if e.Message.ID == "" || e.Message.ChatID == "" {
 			m.logger.Warn("dropping message without id or chat", "account", id)
-			return
+			return nil
 		}
-		if err := m.repo.UpsertMessage(ctx, e.Message); err != nil {
+		chat, err := m.repo.ApplyMessage(ctx, e.Message, e.ChatKind, e.ChatName, true)
+		if err != nil {
 			m.logger.Error("store message", "account", id, "err", err)
+			return []Event{ev}
 		}
+		return []Event{ev, ChatUpdatedEvent{AccountID: id, Chat: chat}}
+	case HistoryBatchEvent:
+		if err := m.repo.ImportHistory(ctx, id, e.Chats, e.Messages, e.Authoritative); err != nil {
+			m.logger.Error("store history", "account", id, "err", err)
+			return nil
+		}
+		return []Event{ChatsSyncedEvent{AccountID: id, Chats: len(e.Chats), Messages: len(e.Messages)}}
+	case ChatPatchEvent:
+		chat, found, err := m.repo.PatchChat(ctx, id, e.Patch)
+		if err != nil {
+			m.logger.Error("update chat", "account", id, "err", err)
+		}
+		if !found || err != nil {
+			return nil // e.g. a contact without a chat
+		}
+		return []Event{ChatUpdatedEvent{AccountID: id, Chat: chat}}
 	case MessageStatusEvent:
 		if err := m.repo.UpdateMessageStatus(ctx, id, e.ChatID, e.MessageID, e.Status); err != nil {
 			m.logger.Error("store message status", "account", id, "err", err)
 		}
 	}
-	m.emit(ev)
+	return []Event{ev}
 }
 
 // setState records and announces a manager-detected state change.

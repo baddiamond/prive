@@ -31,6 +31,8 @@ type Engine struct {
 	sessions map[core.AccountID]*Session
 	// connectErr, if set, is returned by every Connect call.
 	connectErr error
+	// demo makes linked accounts import a fictional history (see NewDemo).
+	demo bool
 }
 
 // New returns a fake engine.
@@ -136,6 +138,9 @@ func (s *Session) Login(_ context.Context, method core.LoginMethod) error {
 	s.events.Push(core.LoginQREvent{Code: "fake-qr", ExpiresAt: time.Now().Add(time.Minute)})
 	s.events.Push(core.LoginSuccessEvent{RemoteID: RemoteID(s.account.ID), DisplayName: "Fake user"})
 	s.events.Push(core.AccountStateEvent{State: core.StateConnected})
+	if s.engine.demo {
+		go s.importDemo()
+	}
 	return nil
 }
 
@@ -272,11 +277,12 @@ func (s *Session) addMessage(chatID core.ChatID, m core.Message, name ...string)
 	if !m.FromMe {
 		chat.UnreadCount++
 	}
-	snapshot := *chat
+	chatName, kind := chat.Name, chat.Kind
 	s.mu.Unlock()
 
-	s.events.Push(core.MessageEvent{Message: m})
-	s.events.Push(core.ChatUpdatedEvent{Chat: snapshot})
+	// Like a real engine: only the message; the core derives the chat's last message and
+	// unread count from it.
+	s.events.Push(core.MessageEvent{Message: m, ChatKind: kind, ChatName: chatName})
 	return m
 }
 

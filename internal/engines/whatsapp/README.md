@@ -15,7 +15,7 @@ Links WhatsApp accounts to Privé as **companion devices** (like WhatsApp Web), 
 | Feature | Phase |
 |---|---|
 | Link with QR, resume on startup, automatic reconnection, log out | 2 ✅ |
-| Chat list and initial history sync | 3 |
+| Chat list and initial history sync | 3 ✅ |
 | Message history | 4 |
 | Sending, delivery and read receipts | 5 |
 
@@ -32,12 +32,20 @@ The manifest declares no capabilities yet; each one is added in the phase that i
   (`errors.whatsapp.qrTimeout`). Canceling (removing the half-created account) stops it.
 - **Logout** unlinks the device on WhatsApp's side when online and always deletes the local session. Offline,
   it deletes local data and returns `errors.whatsapp.unlinkOnPhone` so the user can remove the device on the phone.
+- **History sync:** `INITIAL_BOOTSTRAP`, `RECENT` and `FULL` batches are stored as authoritative (unread counts,
+  archive, pin, mute); `ON_DEMAND` batches only add messages; `PUSH_NAME` batches update contact names.
+  Chats are keyed by phone-number JID even when WhatsApp sends a LID. Names come from the contact store
+  (full name, first name, business name, push name) and group info, falling back to the number.
+- **Chat state from other devices:** archive, pin, mute and mark-as-read app-state events become `chat:patch`.
 - **Logs:** only warnings and errors from whatsmeow are kept, and long numbers (phone numbers, JIDs) are redacted.
 
 ## Known limitations
 
-- History that WhatsApp sends right after linking is not stored until phase 3. Accounts linked before phase 3
-  will need to be linked again to import their history.
+- Accounts linked before phase 3 must be linked again to import their history: WhatsApp sends it only once,
+  right after linking.
+- Only the recent history WhatsApp sends after linking is imported. Asking the phone for older messages on demand
+  comes in phase 4.
+- Media is shown as its kind (photo, voice message, …); downloading media comes later.
 
 ## Tests
 

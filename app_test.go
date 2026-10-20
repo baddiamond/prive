@@ -267,3 +267,22 @@ func TestRenderQR(t *testing.T) {
 		t.Errorf("first row starts %q, want a finder pattern", q.Modules[:8])
 	}
 }
+
+func TestChatsAPI(t *testing.T) {
+	app := newTestApp(t)
+	acc, _ := app.AddAccount(fake.EngineID, "A", "green")
+	if err := app.Login(string(acc.ID), "qr"); err != nil {
+		t.Fatal(err)
+	}
+	chats, err := app.ListChats("")
+	if err != nil || chats == nil || len(chats) != 0 {
+		t.Fatalf("ListChats = %v, %v", chats, err)
+	}
+	if _, err := app.ListChats("unknown"); !errors.Is(err, core.ErrAccountNotFound) {
+		t.Errorf("unknown account = %v", err)
+	}
+	sum, err := app.UnreadSummary()
+	if err != nil || sum.Total != 0 {
+		t.Errorf("UnreadSummary = %+v, %v", sum, err)
+	}
+}

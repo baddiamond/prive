@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import AccountRail from "./components/AccountRail";
 import AddAccountDialog from "./components/accounts/AddAccountDialog";
 import ChatList from "./components/ChatList";
+import ConversationPlaceholder from "./components/chats/ConversationPlaceholder";
 import LogoMark from "./components/LogoMark";
 import Onboarding from "./components/onboarding/Onboarding";
 import SettingsScreen from "./components/settings/SettingsScreen";
@@ -11,6 +12,7 @@ import { errorCode, translateCode } from "./lib/errors";
 import { hasCommandKey } from "./lib/platform";
 import { applyTheme } from "./lib/theme";
 import { linkedAccounts, useAccounts } from "./state/accounts";
+import { useChats } from "./state/chats";
 import { needsOnboarding, useOnboarding } from "./state/onboarding";
 import { useSettings } from "./state/settings";
 import { useUI } from "./state/ui";
@@ -34,7 +36,7 @@ export default function App() {
 
   useEffect(() => {
     if (status !== "ready") return;
-    Promise.all([useOnboarding.getState().load(), useAccounts.getState().load()])
+    Promise.all([useOnboarding.getState().load(), useAccounts.getState().load(), useChats.getState().load()])
       .then(() => setDataReady(true))
       .catch((err: unknown) => setDataError(errorCode(err)));
   }, [status]);
@@ -70,13 +72,14 @@ export default function App() {
 
 function Shell() {
   const screen = useUI((s) => s.screen);
+  const hasSelection = useUI((s) => s.selectedChat !== null);
   return (
     <div className="flex h-full">
       <AccountRail />
       {screen === "inbox" ? (
         <>
           <ChatList />
-          <Welcome />
+          {hasSelection ? <ConversationPlaceholder /> : <Welcome />}
         </>
       ) : (
         <SettingsScreen />

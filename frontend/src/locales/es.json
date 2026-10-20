@@ -34,7 +34,8 @@
       "title": "Aún no hay chats",
       "body": "Añade una cuenta para ver aquí tus conversaciones.",
       "action": "Añadir cuenta",
-      "syncSoon": "Los chats de tus cuentas vinculadas aparecerán aquí en una próxima versión."
+      "filtered": "Ningún chat coincide con este filtro.",
+      "waiting": "Tus chats aparecen aquí en cuanto llegue la primera sincronización desde tu teléfono."
     },
     "accountsCount_one": "{{count}} cuenta",
     "accountsCount_other": "{{count}} cuentas",
@@ -54,7 +55,12 @@
         "title": "Problema con {{account}}",
         "action": "Reintentar"
       }
-    }
+    },
+    "importing": "Importando chats… {{percent}} %",
+    "unknownChat": "Chat desconocido",
+    "unreadCount_one": "{{count}} mensaje sin leer",
+    "unreadCount_other": "{{count}} mensajes sin leer",
+    "you": "Tú: {{text}}"
   },
   "inbox": {
     "welcome": {
@@ -273,5 +279,26 @@
         "step3": "Toca Vincular un dispositivo y apunta a esta pantalla"
       }
     }
+  },
+  "conversation": {
+    "comingSoon": "Los mensajes de este chat aparecerán aquí en la próxima versión."
+  },
+  "message": {
+    "kind": {
+      "text": "Mensaje",
+      "image": "Foto",
+      "video": "Vídeo",
+      "audio": "Audio",
+      "voice": "Mensaje de voz",
+      "document": "Documento",
+      "sticker": "Sticker",
+      "location": "Ubicación",
+      "contact": "Contacto",
+      "poll": "Encuesta",
+      "unsupported": "Mensaje aún no compatible"
+    }
+  },
+  "time": {
+    "yesterday": "Ayer"
   }
 }

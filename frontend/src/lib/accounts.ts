@@ -100,7 +100,7 @@ export function accountFromBackend(a: Parameters<typeof toAccount>[0]): Account 
 }
 
 export async function listAccounts(): Promise<AccountStatus[]> {
-  const list = await ListAccounts();
+  const list = (await ListAccounts()) ?? [];
   return list.map((s) => ({
     account: toAccount(s.account),
     state: s.state as AccountState,
@@ -110,7 +110,7 @@ export async function listAccounts(): Promise<AccountStatus[]> {
 }
 
 export async function listEngines(): Promise<Manifest[]> {
-  return (await ListEngines()) as Manifest[];
+  return ((await ListEngines()) ?? []) as Manifest[];
 }
 
 export async function addAccount(engineId: string, displayName: string, color: AccountColor): Promise<Account> {
