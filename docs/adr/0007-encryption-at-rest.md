@@ -1,7 +1,8 @@
 # 0007 — Encryption at rest and recovery phrase
 
 - **Status:** accepted — partly implemented: DEK, keychain slot, per-database derived keys and encrypted
-  databases (phase 1). Recovery phrase, app password and media encryption are still planned.
+  databases (phase 1); recovery phrase slot, banner, dialog and unlock screen (phase 3b). App password, OS
+  authentication before showing the phrase, and media encryption are still planned.
 - **Date:** 2026-10-20
 
 ## Context
@@ -73,6 +74,19 @@ UI copy and docs say exactly this:
   Accounts can be linked again and networks may sync part of the history back.
 
 "Delete everything" (Settings and `PRIVACY.md`) also deletes the keychain entry.
+
+### Implementation notes (phase 3b)
+
+- The phrase's 128 bits are derived from the DEK with HKDF and the slot ID (`recovery-1`), and the slot's
+  wrapping key is derived from those bits with HKDF. So the phrase can be shown again at any time while the app is
+  unlocked, without storing it anywhere; regenerating it means a new slot ID (`recovery-2`) and removing the old
+  slot. Plain HKDF (no Argon2id) is enough because the input already has 128 bits of entropy.
+- Checksum: the high 4 bits of `SHA-256("prive/recovery/v1/" ‖ entropy)`, stored in the last word.
+- Lists never share a word, so the language is detected from the words; every language spells the same bits.
+  Input ignores case, accents, numbering and punctuation, and four letters identify a word.
+- Data created before phase 3b gets its recovery slot on the next start.
+- Settings → Privacy shows the words after a click, without OS authentication for now; Touch ID / Windows Hello
+  arrives with the lock feature of [ADR 0010](0010-chat-and-account-privacy.md) and will guard this too.
 
 ## Consequences
 

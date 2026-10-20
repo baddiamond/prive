@@ -66,7 +66,8 @@ prive/
 │   │   ├── fake/               # In-memory engine for tests (never registered in the app)
 │   │   └── whatsapp/           # whatsmeow-based engine
 │   ├── store/                  # SQLite access + embedded migrations
-│   ├── keys/                   # Data encryption key and keychain slot
+│   ├── keys/                   # Data encryption key, keychain and recovery phrase slots
+│   ├── crypto/wordlists/       # Privé's recovery phrase word lists (en, es)
 │   ├── bootstrap/              # Opens local data for the app and cmd/prive-dev
 │   └── platform/               # Data directory per OS, system locale detection
 ├── frontend/
@@ -227,13 +228,17 @@ Every database file is **encrypted at rest** with the `adiantum` VFS ([ADR 0007]
 
 - `internal/keys` creates a random 256-bit data key (DEK) on first run, wraps it into `<DataDir>/keys.json` and keeps
   the wrapping key in the OS keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service), so the app
-  opens without a prompt. The recovery phrase and app password slots come later.
+  opens without a prompt. A second slot is wrapped by the **recovery phrase**: 12 words from Privé's own lists
+  (128 bits plus a 4-bit checksum). The phrase is derived from the DEK, so it can be shown again while the app is
+  unlocked, and any language's words unlock the same data. The app password slot comes later.
 - Each database gets its own key, derived from the DEK with HKDF and a label: `prive.db` for the app database,
   `engine/<engineId>/<accountId>/<name>` for engine databases.
 - `temp_store=MEMORY` keeps temporary data off the disk. A database left in clear by a development build is
   encrypted in place on first open.
-- If the keychain cannot be reached or no longer has the key, the window still opens and shows a translated
-  explanation (`errors.encryption.*`) instead of quitting.
+- If the keychain no longer has the key (new computer, reinstalled system), the window opens on the unlock screen:
+  `UnlockWithPhrase` recovers the DEK from the phrase, stores a new keychain slot and starts the accounts.
+  Other failures (keychain unreachable, damaged `keys.json`) show a translated explanation (`errors.encryption.*`)
+  instead of quitting.
 
 One app database per installation at `<DataDir>/prive.db` (see the README for OS paths):
 

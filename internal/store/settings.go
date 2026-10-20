@@ -24,6 +24,9 @@ const (
 	SettingOnboardingStep = "onboarding.step"
 	// SettingOnboardingCompletedAt holds when onboarding finished (RFC 3339).
 	SettingOnboardingCompletedAt = "onboarding.completedAt"
+	// SettingRecoveryConfirmedAt holds when the user confirmed they wrote down the recovery
+	// phrase (RFC 3339). Absent means the "Save your recovery phrase" banner is still offered.
+	SettingRecoveryConfirmedAt = "recovery.confirmedAt"
 )
 
 // Setting returns the value stored under key and whether it exists.

@@ -66,7 +66,7 @@ with a second number, then run `go run ./cmd/prive-dev accounts` again later: bo
 
 **Test on macOS:** link two WhatsApp numbers, quit the app, reopen it — both reconnect without scanning again.
 
-### 🟨 3. Chat list
+### ✅ 3. Chat list
 
 **3a**
 - Initial history sync into SQLite (the recent history WhatsApp sends after linking; chat names from contacts,
@@ -76,8 +76,9 @@ with a second number, then run `go run ./cmd/prive-dev accounts` again later: bo
 - Import progress in the chat list; selecting a chat shows a placeholder until phase 4 ✅
 
 **3b**
-- Recovery phrase banner after the first account finishes its initial sync, with Privé's own English and Spanish
-  word lists ([ADR 0007](adr/0007-encryption-at-rest.md))
+- Recovery phrase with Privé's own English and Spanish word lists; banner once the first chats are imported,
+  dialog with a three-word check, Settings → Privacy rows ([ADR 0007](adr/0007-encryption-at-rest.md)) ✅
+- Unlock screen: on a new computer or when the keychain entry is gone, the phrase unlocks the data ✅
 
 **Test:** your real chats appear in the right order with correct unread counts. Accounts linked before phase 3
 must be removed and linked again to import their history.
@@ -115,9 +116,9 @@ Decisions are recorded in the linked ADRs; system requirements and defaults are 
 
 ### Privacy and security
 
-- 🟨 **Encryption at rest, on by default** — data key in the OS keychain and encrypted databases are done
-  (phase 1). Still to do: 12-word recovery phrase with Privé's own word lists (shown after the first sync, phase 3b),
-  optional app password, media encryption ([ADR 0007](adr/0007-encryption-at-rest.md)).
+- 🟨 **Encryption at rest, on by default** — data key in the OS keychain and encrypted databases (phase 1),
+  recovery phrase and unlock screen (phase 3b) are done. Still to do: optional app password, OS authentication
+  before showing the phrase, media encryption ([ADR 0007](adr/0007-encryption-at-rest.md)).
 - ⬜ **Exclude from search and lock** chats and accounts, unlocked with Touch ID / Windows Hello
   ([ADR 0010](adr/0010-chat-and-account-privacy.md), step 1).
 - ⬜ **Hidden chats and accounts** in an encrypted vault, revealed with a secret code

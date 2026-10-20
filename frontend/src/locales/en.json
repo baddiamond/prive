@@ -115,7 +115,15 @@
       "local": "Everything is stored locally in an SQLite database on this computer.",
       "noServers": "No Privé account, no Privé servers, no telemetry.",
       "networkOnly": "Network traffic goes only to the messaging networks you connect.",
-      "dataPath": "Your data lives in"
+      "dataPath": "Your data lives in",
+      "encryption": "Encryption",
+      "encryptionOn": "On. Your chats are encrypted on this computer, and the key is kept in the system keychain.",
+      "encryptionScope": "Protects your chats if this computer is lost or its files are copied. It can't protect against harmful software running in your user account.",
+      "recoveryPhrase": "Recovery phrase",
+      "recoverySaved": "Saved",
+      "recoveryNotSaved": "Not saved yet",
+      "recoveryShow": "Show words",
+      "recoverySave": "Save phrase"
     },
     "about": {
       "title": "About",
@@ -161,7 +169,7 @@
       "sendFailed": "The message could not be sent."
     },
     "encryption": {
-      "locked": "Privé can't unlock your data: its key is no longer in this computer's keychain. To start fresh, quit Privé and delete its data folder; you can link your accounts again.",
+      "locked": "Privé can't unlock your data: its key is no longer in this computer's keychain. Type your recovery phrase to unlock it.",
       "keychainUnavailable": "Privé couldn't reach your system keychain, where it keeps the key that protects your data. Make sure the keychain is unlocked and open Privé again.",
       "corrupt": "Privé's key file is damaged, so your data can't be unlocked."
     },
@@ -175,6 +183,16 @@
       "streamReplaced": "This account was opened somewhere else with the same session. Close the other copy of Privé.",
       "temporaryBan": "WhatsApp has temporarily blocked this account. Try again later.",
       "unlinkOnPhone": "Removed from this computer. To finish, remove Privé from Linked devices on your phone."
+    },
+    "recovery": {
+      "wordCount": "A recovery phrase has 12 words. You typed {{count}}.",
+      "unknownWord": "Word {{position}} isn't in the recovery word list. Check the spelling.",
+      "mixedLists": "The words mix two languages. Type them exactly as you wrote them.",
+      "checksum": "One of the words is wrong, or two are swapped. Check them against your paper.",
+      "noMatch": "This phrase belongs to other data. Check that it's the phrase for the chats on this computer.",
+      "wrongWord": "Word {{position}} doesn't match. Check your paper.",
+      "tooFewAnswers": "Type every word that's asked.",
+      "notLocked": "Your chats are already unlocked."
     }
   },
   "legal": {
@@ -300,5 +318,51 @@
   },
   "time": {
     "yesterday": "Yesterday"
+  },
+  "recovery": {
+    "banner": {
+      "title": "Save your recovery phrase",
+      "body": "12 words that open your chats on a new computer or if this computer's keychain is reset.",
+      "action": "Save now",
+      "later": "Later"
+    },
+    "dialog": {
+      "title": "Recovery phrase",
+      "step": "Step {{current}} of {{total}}",
+      "intro": {
+        "title": "Your chats are encrypted on this computer",
+        "body": "The key that opens them is kept in this computer's keychain. If you move to a new computer, reinstall the system or the keychain is reset, these 12 words are the only way to open your chats again.",
+        "paper": "Write the words on paper and keep it somewhere safe.",
+        "noCopies": "Don't take a screenshot or save them online.",
+        "neverAsked": "Privé never asks for them, except on its own unlock screen.",
+        "action": "Show the words"
+      },
+      "words": {
+        "title": "Write down these 12 words",
+        "body": "Keep them in this order. When you type them back, the first four letters of each word are enough.",
+        "list": "Recovery phrase words",
+        "next": "I wrote them down"
+      },
+      "confirm": {
+        "title": "Check your copy",
+        "body": "Type these words from your paper.",
+        "word": "Word {{position}}",
+        "action": "Confirm",
+        "back": "See the words again"
+      },
+      "done": {
+        "title": "Recovery phrase saved",
+        "body": "Keep the paper safe. You can see the words again in Settings, under Privacy."
+      }
+    }
+  },
+  "unlock": {
+    "title": "Unlock your chats",
+    "body": "Privé can't find its key in this computer's keychain. This happens on a new computer, after reinstalling the system or when the keychain is reset. Type your 12-word recovery phrase to open your chats.",
+    "label": "Recovery phrase",
+    "hint": "Separate the words with spaces. Capitals and accents don't matter.",
+    "action": "Unlock",
+    "working": "Unlocking…",
+    "lost": "Lost the phrase? Your chats on this computer can't be opened without it. To start again, quit Privé, delete its data folder and link your accounts again. The folder is:"
   }
 }

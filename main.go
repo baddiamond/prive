@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"embed"
+	"errors"
 	"log/slog"
 	"os"
 
@@ -53,10 +54,15 @@ func run(logger *slog.Logger) error {
 
 	local, dataDir, err := bootstrap.Open(context.Background(), keys.OSKeychain())
 	var app *App
-	if err != nil {
+	switch {
+	case errors.Is(err, keys.ErrLocked):
+		// The keychain entry is gone (new computer, OS reinstall): ask for the recovery phrase.
+		logger.Warn("local data is locked", "err", err)
+		app = NewLockedApp(dataDir, engines.Default(), keys.OSKeychain(), logger)
+	case err != nil:
 		logger.Error("open local data", "err", err)
 		app = NewFailedApp(err, dataDir, logger)
-	} else {
+	default:
 		defer func() { _ = local.Close() }()
 		app = NewApp(local, engines.Default(), logger)
 	}

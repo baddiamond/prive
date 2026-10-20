@@ -6,6 +6,8 @@ import ChatList from "./components/ChatList";
 import ConversationPlaceholder from "./components/chats/ConversationPlaceholder";
 import LogoMark from "./components/LogoMark";
 import Onboarding from "./components/onboarding/Onboarding";
+import RecoveryDialog from "./components/recovery/RecoveryDialog";
+import UnlockScreen from "./components/recovery/UnlockScreen";
 import SettingsScreen from "./components/settings/SettingsScreen";
 import Welcome from "./components/Welcome";
 import { errorCode, translateCode } from "./lib/errors";
@@ -14,6 +16,7 @@ import { applyTheme } from "./lib/theme";
 import { linkedAccounts, useAccounts } from "./state/accounts";
 import { useChats } from "./state/chats";
 import { needsOnboarding, useOnboarding } from "./state/onboarding";
+import { useRecovery } from "./state/recovery";
 import { useSettings } from "./state/settings";
 import { useUI } from "./state/ui";
 
@@ -36,7 +39,12 @@ export default function App() {
 
   useEffect(() => {
     if (status !== "ready") return;
-    Promise.all([useOnboarding.getState().load(), useAccounts.getState().load(), useChats.getState().load()])
+    Promise.all([
+      useOnboarding.getState().load(),
+      useAccounts.getState().load(),
+      useChats.getState().load(),
+      useRecovery.getState().load(),
+    ])
       .then(() => setDataReady(true))
       .catch((err: unknown) => setDataError(errorCode(err)));
   }, [status]);
@@ -44,6 +52,9 @@ export default function App() {
   useShortcuts(dataReady && !needsOnboarding(onboarding));
 
   const failure = status === "error" ? (settingsError ?? "errors.unknown") : dataError;
+  if (failure === lockedCode) {
+    return <UnlockScreen />;
+  }
   if (failure) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
@@ -70,6 +81,9 @@ export default function App() {
   return <Shell />;
 }
 
+/** The backend's code for data whose key is not in the keychain (internal/keys). */
+const lockedCode = "errors.encryption.locked";
+
 function Shell() {
   const screen = useUI((s) => s.screen);
   const hasSelection = useUI((s) => s.selectedChat !== null);
@@ -85,6 +99,7 @@ function Shell() {
         <SettingsScreen />
       )}
       <AddAccountDialog />
+      <RecoveryDialog />
     </div>
   );
 }
@@ -98,7 +113,7 @@ function useShortcuts(enabled: boolean) {
     if (!enabled) return;
     const onKey = (e: KeyboardEvent) => {
       const ui = useUI.getState();
-      if (ui.addAccount.open) return; // the dialog handles its own keys
+      if (ui.addAccount.open || useRecovery.getState().dialog) return; // dialogs handle their own keys
       if (hasCommandKey(e)) {
         if (e.key === ",") {
           e.preventDefault();

@@ -26,8 +26,11 @@ What this protects against: a lost or stolen computer, backups and disk copies, 
 someone copying the data folder. What it does not protect against: malicious software running as you while Privé
 is open. The encryption hides contents but does not detect tampering.
 
-A recovery phrase, to move your data to another computer or recover it if the keychain entry is lost, is coming.
-Until then, if the keychain entry is lost, the local data cannot be read; your accounts can be linked again.
+Once your chats have synced, Privé offers a **recovery phrase**: 12 words, created on your computer and never
+sent anywhere, that unlock your data on a new computer or if the keychain entry is lost. Write it on paper; you can
+see it again in Settings → Privacy. Anyone with the words and a copy of your data folder can read your chats, so
+keep the paper safe. If both the keychain entry and the phrase are lost, the local data cannot be read; your
+accounts can be linked again.
 
 ## What Privé sends, and to whom
 
@@ -52,4 +55,4 @@ The networks you connect have their own privacy policies, which still apply to y
 
 Any change to this page is made in public, in this repository, with its history visible in git.
 
-_Last updated: 2026-10-20 · Version 2_
+_Last updated: 2026-10-20 · Version 3_

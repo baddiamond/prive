@@ -10,7 +10,8 @@ interface DialogProps {
 }
 
 /**
- * Modal dialog on a scrim (docs/UI.md §1). Esc closes it, focus moves inside on open and
+ * Modal dialog on a scrim (docs/UI.md §1). Esc closes it, focus moves inside on open (to the
+ * element marked data-autofocus, else the first focusable one) and
  * returns to the previously focused element on close, and Tab stays inside.
  */
 export default function Dialog({ labelledBy, onClose, children, width = "max-w-[520px]" }: DialogProps) {
@@ -18,7 +19,9 @@ export default function Dialog({ labelledBy, onClose, children, width = "max-w-[
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    const first = ref.current?.querySelector<HTMLElement>(focusable);
+    // An element marked data-autofocus (the step's main action) wins over the first one.
+    const first =
+      ref.current?.querySelector<HTMLElement>("[data-autofocus]") ?? ref.current?.querySelector<HTMLElement>(focusable);
     (first ?? ref.current)?.focus();
     return () => previous?.focus();
   }, []);

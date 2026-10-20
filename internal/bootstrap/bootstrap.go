@@ -39,6 +39,20 @@ func OpenAt(ctx context.Context, dataDir string, kc keys.Keychain) (*Local, erro
 	if err != nil {
 		return nil, err
 	}
+	return open(ctx, dataDir, k)
+}
+
+// Recover unlocks the data folder with the recovery phrase (when Open failed with
+// keys.ErrLocked) and opens the database. The next Open needs no phrase.
+func Recover(ctx context.Context, dataDir, phrase string, kc keys.Keychain) (*Local, error) {
+	k, err := keys.Recover(dataDir, phrase, kc)
+	if err != nil {
+		return nil, err
+	}
+	return open(ctx, dataDir, k)
+}
+
+func open(ctx context.Context, dataDir string, k *keys.Keys) (*Local, error) {
 	st, err := store.Open(ctx, filepath.Join(dataDir, store.FileName), store.Options{Key: k.Derive(store.FileName)})
 	if err != nil {
 		return nil, err

@@ -115,7 +115,15 @@
       "local": "Todo se guarda localmente en una base de datos SQLite en este equipo.",
       "noServers": "Sin cuenta de Privé, sin servidores de Privé, sin telemetría.",
       "networkOnly": "El tráfico de red va solo a las redes de mensajería que conectes.",
-      "dataPath": "Tus datos están en"
+      "dataPath": "Tus datos están en",
+      "encryption": "Cifrado",
+      "encryptionOn": "Activado. Tus chats están cifrados en este equipo y la llave se guarda en el llavero del sistema.",
+      "encryptionScope": "Protege tus chats si pierdes este equipo o alguien copia sus archivos. No protege contra programas dañinos que se ejecuten en tu usuario.",
+      "recoveryPhrase": "Frase de recuperación",
+      "recoverySaved": "Guardada",
+      "recoveryNotSaved": "Aún no guardada",
+      "recoveryShow": "Ver palabras",
+      "recoverySave": "Guardar frase"
     },
     "about": {
       "title": "Acerca de",
@@ -161,7 +169,7 @@
       "sendFailed": "No se pudo enviar el mensaje."
     },
     "encryption": {
-      "locked": "Privé no puede desbloquear tus datos: su clave ya no está en el llavero de este equipo. Para empezar de cero, cierra Privé y borra su carpeta de datos; podrás vincular tus cuentas de nuevo.",
+      "locked": "Privé no puede desbloquear tus datos: su llave ya no está en el llavero de este equipo. Escribe tu frase de recuperación para desbloquearlos.",
       "keychainUnavailable": "Privé no pudo acceder al llavero del sistema, donde guarda la clave que protege tus datos. Asegúrate de que el llavero esté desbloqueado y vuelve a abrir Privé.",
       "corrupt": "El archivo de claves de Privé está dañado, así que no se pueden desbloquear tus datos."
     },
@@ -175,6 +183,16 @@
       "streamReplaced": "Esta cuenta se abrió en otro lugar con la misma sesión. Cierra la otra copia de Privé.",
       "temporaryBan": "WhatsApp ha bloqueado temporalmente esta cuenta. Inténtalo más tarde.",
       "unlinkOnPhone": "Se quitó de este equipo. Para terminar, quita Privé de Dispositivos vinculados en tu teléfono."
+    },
+    "recovery": {
+      "wordCount": "Una frase de recuperación tiene 12 palabras. Escribiste {{count}}.",
+      "unknownWord": "La palabra {{position}} no está en la lista de recuperación. Revisa cómo se escribe.",
+      "mixedLists": "Las palabras mezclan dos idiomas. Escríbelas tal como las anotaste.",
+      "checksum": "Una de las palabras está mal o hay dos cambiadas de sitio. Compáralas con tu papel.",
+      "noMatch": "Esta frase es de otros datos. Comprueba que sea la frase de los chats de este equipo.",
+      "wrongWord": "La palabra {{position}} no coincide. Revisa tu papel.",
+      "tooFewAnswers": "Escribe todas las palabras que se piden.",
+      "notLocked": "Tus chats ya están desbloqueados."
     }
   },
   "legal": {
@@ -300,5 +318,51 @@
   },
   "time": {
     "yesterday": "Ayer"
+  },
+  "recovery": {
+    "banner": {
+      "title": "Guarda tu frase de recuperación",
+      "body": "12 palabras que abren tus chats en un equipo nuevo o si se borra el llavero de este.",
+      "action": "Guardar ahora",
+      "later": "Más tarde"
+    },
+    "dialog": {
+      "title": "Frase de recuperación",
+      "step": "Paso {{current}} de {{total}}",
+      "intro": {
+        "title": "Tus chats están cifrados en este equipo",
+        "body": "La llave que los abre se guarda en el llavero del sistema. Si cambias de equipo, reinstalas el sistema o se borra el llavero, estas 12 palabras son la única forma de volver a abrir tus chats.",
+        "paper": "Escribe las palabras en papel y guárdalo en un lugar seguro.",
+        "noCopies": "No hagas captura de pantalla ni las guardes en internet.",
+        "neverAsked": "Privé nunca te las pide, salvo en su propia pantalla de desbloqueo.",
+        "action": "Ver las palabras"
+      },
+      "words": {
+        "title": "Escribe estas 12 palabras",
+        "body": "Mantén este orden. Al escribirlas de nuevo, bastan las cuatro primeras letras de cada una.",
+        "list": "Palabras de la frase de recuperación",
+        "next": "Ya las escribí"
+      },
+      "confirm": {
+        "title": "Comprueba tu copia",
+        "body": "Escribe estas palabras desde tu papel.",
+        "word": "Palabra {{position}}",
+        "action": "Confirmar",
+        "back": "Ver las palabras otra vez"
+      },
+      "done": {
+        "title": "Frase de recuperación guardada",
+        "body": "Guarda bien el papel. Puedes volver a ver las palabras en Configuración, en Privacidad."
+      }
+    }
+  },
+  "unlock": {
+    "title": "Desbloquea tus chats",
+    "body": "Privé no encuentra su llave en el llavero de este equipo. Pasa en un equipo nuevo, después de reinstalar el sistema o si se borra el llavero. Escribe tu frase de recuperación de 12 palabras para abrir tus chats.",
+    "label": "Frase de recuperación",
+    "hint": "Separa las palabras con espacios. Mayúsculas y tildes dan igual.",
+    "action": "Desbloquear",
+    "working": "Desbloqueando…",
+    "lost": "¿Perdiste la frase? Sin ella no se pueden abrir los chats guardados en este equipo. Para empezar de nuevo, cierra Privé, borra su carpeta de datos y vuelve a vincular tus cuentas. La carpeta es:"
   }
 }

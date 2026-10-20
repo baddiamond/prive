@@ -10,6 +10,7 @@ import { useUI, type ChatFilter } from "../state/ui";
 import { accountLabel, hasIssue } from "./accounts/accountLabel";
 import ChatRow from "./chats/ChatRow";
 import { ChatIcon, PlusIcon, RefreshIcon, SearchIcon } from "./icons";
+import RecoveryBanner from "./recovery/RecoveryBanner";
 
 const filters: readonly ChatFilter[] = ["all", "unread", "groups"];
 const maxBanners = 2;
@@ -111,6 +112,8 @@ export default function ChatList() {
           {t("chatList.banner.more", { count: issues.length - maxBanners })}
         </p>
       )}
+
+      <RecoveryBanner />
 
       {visible.length > 0 ? (
         <div role="list" aria-label={t("chatList.label")} className="flex-1 overflow-y-auto px-2 pb-2">

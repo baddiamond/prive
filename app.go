@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"regexp"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -15,6 +16,7 @@ import (
 
 	"github.com/baddiamond/prive/internal/bootstrap"
 	"github.com/baddiamond/prive/internal/core"
+	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/platform"
 	"github.com/baddiamond/prive/internal/store"
 )
@@ -68,6 +70,7 @@ var languageTag = regexp.MustCompile(`^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$`)
 type App struct {
 	ctx     context.Context
 	store   *store.Store
+	keys    *keys.Keys
 	engines engineCatalog
 	manager *core.Manager
 	dataDir string
@@ -75,6 +78,11 @@ type App struct {
 	// failure is set when local data could not be opened; every data method returns it so
 	// the UI can explain the problem instead of the app quitting silently.
 	failure *core.CodedError
+	// unlock opens locked data with the recovery phrase; nil unless the app started locked.
+	unlock   unlocker
+	unlockMu sync.Mutex
+	// ownedLocal is local data opened by UnlockWithPhrase, closed on shutdown.
+	ownedLocal *bootstrap.Local
 }
 
 // AppInfo is static information shown in Settings.
@@ -97,9 +105,15 @@ type Settings struct {
 // NewApp creates the bound API on top of opened local data. The account manager is
 // created here and started once the window exists (see startup).
 func NewApp(local *bootstrap.Local, engines engineCatalog, logger *slog.Logger) *App {
-	a := &App{store: local.Store, engines: engines, dataDir: local.DataDir, logger: logger}
-	a.manager = core.NewManager(local.ManagerConfig(engines, logger, a.emit))
+	a := &App{engines: engines, logger: logger}
+	a.attach(local)
 	return a
+}
+
+// attach wires opened local data and creates the account manager.
+func (a *App) attach(local *bootstrap.Local) {
+	a.store, a.keys, a.dataDir = local.Store, local.Keys, local.DataDir
+	a.manager = core.NewManager(local.ManagerConfig(a.engines, a.logger, a.emit))
 }
 
 // NewFailedApp creates an App that only reports why local data could not be opened.
@@ -147,6 +161,11 @@ func (a *App) shutdown(context.Context) {
 	}
 	if err := a.manager.Close(); err != nil {
 		a.logger.Warn("close accounts", "err", err)
+	}
+	if a.ownedLocal != nil {
+		if err := a.ownedLocal.Close(); err != nil {
+			a.logger.Warn("close local data", "err", err)
+		}
 	}
 }
 

@@ -173,7 +173,7 @@ func TestAppCodesHaveTranslations(t *testing.T) {
 	if err := json.Unmarshal(raw, &locale); err != nil {
 		t.Fatal(err)
 	}
-	codes := append(append([]*core.CodedError{}, appErrorCodes...), keys.Codes()...)
+	codes := append(append(append([]*core.CodedError{}, appErrorCodes...), recoveryErrorCodes...), keys.Codes()...)
 	for _, e := range codes {
 		if !hasTranslation(locale, e.Code) {
 			t.Errorf("code %q has no translation in en.json", e.Code)
@@ -284,5 +284,70 @@ func TestChatsAPI(t *testing.T) {
 	sum, err := app.UnreadSummary()
 	if err != nil || sum.Total != 0 {
 		t.Errorf("UnreadSummary = %+v, %v", sum, err)
+	}
+}
+
+func TestRecoveryPhraseAPI(t *testing.T) {
+	app := newTestApp(t)
+	if s, err := app.GetRecoveryStatus(); err != nil || s.Confirmed {
+		t.Fatalf("GetRecoveryStatus = %+v, %v", s, err)
+	}
+	words, err := app.GetRecoveryPhrase("es")
+	if err != nil || len(words) != keys.PhraseWords {
+		t.Fatalf("GetRecoveryPhrase = %v, %v", words, err)
+	}
+
+	wrong := []RecoveryAnswer{{1, words[0]}, {2, words[2]}, {3, words[2]}}
+	if words[1] != words[2] {
+		if err := app.ConfirmRecoveryPhrase(wrong); !errors.Is(err, errRecoveryWrongWord) {
+			t.Errorf("wrong word = %v", err)
+		}
+	}
+	if err := app.ConfirmRecoveryPhrase([]RecoveryAnswer{{1, words[0]}, {1, words[0]}}); !errors.Is(err, errRecoveryTooFewAnswers) {
+		t.Errorf("too few answers = %v", err)
+	}
+	right := []RecoveryAnswer{{1, words[0]}, {7, strings.ToUpper(words[6])}, {12, words[11]}}
+	if err := app.ConfirmRecoveryPhrase(right); err != nil {
+		t.Fatal(err)
+	}
+	if s, _ := app.GetRecoveryStatus(); !s.Confirmed || s.ConfirmedAt == "" {
+		t.Errorf("status after confirming = %+v", s)
+	}
+}
+
+func TestUnlockWithPhrase(t *testing.T) {
+	dir := t.TempDir()
+	local, err := bootstrap.OpenAt(context.Background(), dir, keys.NewMemoryKeychain())
+	if err != nil {
+		t.Fatal(err)
+	}
+	phrase := strings.Join(local.Keys.RecoveryPhrase("en"), " ")
+	_ = local.Close()
+
+	reg := engines.NewRegistry()
+	if err := reg.Register(fake.New()); err != nil {
+		t.Fatal(err)
+	}
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	// A new computer: the keychain does not have the key.
+	app := NewLockedApp(dir, reg, keys.NewMemoryKeychain(), logger)
+	t.Cleanup(func() { app.shutdown(context.Background()) })
+	if _, err := app.GetSettings(); !errors.Is(err, keys.ErrLocked) {
+		t.Fatalf("GetSettings while locked = %v", err)
+	}
+	if err := app.UnlockWithPhrase("one two three"); !errors.Is(err, keys.ErrPhraseWordCount) {
+		t.Errorf("short phrase = %v", err)
+	}
+	if err := app.UnlockWithPhrase(phrase); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := app.GetSettings(); err != nil {
+		t.Errorf("GetSettings after unlocking = %v", err)
+	}
+	if _, err := app.ListAccounts(); err != nil {
+		t.Errorf("ListAccounts after unlocking = %v", err)
+	}
+	if err := app.UnlockWithPhrase(phrase); !errors.Is(err, errNotLocked) {
+		t.Errorf("second unlock = %v", err)
 	}
 }

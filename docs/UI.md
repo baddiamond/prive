@@ -123,6 +123,8 @@ Left nav: General · Accounts · Notifications · Privacy · About. Sections:
 - **Accounts:** rows with color tile, label, `network · masked id`, state dot + text, Rename, Log out (`danger` outline).
 - **Notifications:** see §2.8.
 - **Privacy:** the three local-first statements and the data folder path; links to PRIVACY.md and DISCLAIMER.md.
+  Below them, an "Encryption" row (on, where the key lives, what it protects against) and a "Recovery phrase" row
+  with its status dot ("Saved" / "Not saved yet") and a button that opens the recovery dialog (§2.9).
 - **About:** version, license, links to source, Acceptable Use Policy and Security policy.
 
 ### 2.8 Notifications
@@ -138,6 +140,21 @@ Shown by the OS; Privé only supplies title, body and icon. Settings:
 | Per-account switch | On for each account |
 
 Muted chats and muted accounts never notify and are not counted in the badge.
+
+### 2.9 Recovery phrase and unlock
+
+[ADR 0007](adr/0007-encryption-at-rest.md). Never part of onboarding.
+
+- **Banner** (ChatList, below the account banners, `accent` border, lock icon): "Save your recovery phrase",
+  one line on why, "Save now" (primary) and "Later". Shown once chats exist and no account is importing.
+  "Later" hides it until the next start; confirming the phrase removes it for good.
+- **Dialog** (520–560 px, steps 1–3): 1) why the phrase matters, three short rules (paper, no screenshots,
+  Privé never asks for it); 2) the 12 words in a numbered 3 × 4 grid in the UI language's list (English when the
+  language has none), monospace; 3) three random positions to type back (first four letters are enough, case
+  and accents ignored); then "Recovery phrase saved". From Settings after confirming, only step 2 is shown.
+- **Unlock screen** (full window, replaces the app when `errors.encryption.locked`): logo, "Unlock your chats",
+  why this happens, a monospace textarea for the 12 words (numbers and punctuation ignored), "Unlock", errors
+  under the field (`errors.recovery.*`), and a footnote with the data folder path for starting over.
 
 ## 3. State matrix
 
@@ -204,7 +221,7 @@ Not designed yet; the decisions are in ADRs and the spec will be extended before
 
 | Feature | Touches | ADR |
 |---|---|---|
-| Recovery phrase banner, unlock screen, Privacy rows (encryption status, recovery phrase, app password) | ChatList banner, Settings → Privacy, new unlock screen | [0007](adr/0007-encryption-at-rest.md) |
+| App password (on/off, change), password prompt at start; OS authentication before showing the recovery phrase | Settings → Privacy, unlock screen | [0007](adr/0007-encryption-at-rest.md) |
 | Transcribe action and transcript under voice bubbles; "On this computer" Settings section (models, download) | Conversation, Settings | [0008](adr/0008-local-voice-transcription.md) |
 | "Voice notes" result group, "Similar meaning" label, search filters, one-time semantic search offer | SearchPalette | [0009](adr/0009-hybrid-local-search.md) |
 | Lock / hide / exclude from search; "Locked chats" row; secret code in ⌘K | DetailsPanel, ChatList, AccountRail, Settings → Privacy | [0010](adr/0010-chat-and-account-privacy.md) |

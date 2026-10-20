@@ -146,14 +146,14 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - [x] **0. Bootstrap** — repo docs, Wails + React + TS + Tailwind skeleton, i18n (en/es), dark mode, CI
 - [x] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
 - [x] **2. WhatsApp login** — QR pairing, persisted sessions, auto-reconnect, unlimited accounts
-- [ ] **3. Chat list** — unified inbox + per-account filter, sorted by last message, unread counters
+- [x] **3. Chat list** — history import, unified inbox + per-account filter, unread counters, recovery phrase
 - [ ] **4. History** — paginated message history cached locally
 - [ ] **5. Real time** — send and receive text messages live, mark as read
 - [ ] **6. Polish** — keyboard shortcuts, startup/memory profiling, macOS/Windows/Linux builds
 
 **Future features** ([details](docs/ROADMAP.md#future-features))
 
-- Recovery phrase and optional app password for the encrypted database (encryption itself is already on)
+- Optional app password for the encrypted database (encryption and the recovery phrase are already on)
 - Lock and hide chats or whole accounts, exclude them from search
 - Search across all accounts: full-text, plus opt-in semantic search — all on this computer
 - Opt-in voice note transcription on this computer
