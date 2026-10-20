@@ -5,7 +5,13 @@
   },
   "common": {
     "comingSoon": "Próximamente",
-    "nextVersion": "Llega en la próxima versión."
+    "nextVersion": "Llega en la próxima versión.",
+    "back": "Atrás",
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "done": "Hecho",
+    "save": "Guardar"
   },
   "rail": {
     "label": "Cuentas",
@@ -27,7 +33,27 @@
     "empty": {
       "title": "Aún no hay chats",
       "body": "Añade una cuenta para ver aquí tus conversaciones.",
-      "action": "Añadir cuenta"
+      "action": "Añadir cuenta",
+      "syncSoon": "Los chats de tus cuentas vinculadas aparecerán aquí en una próxima versión."
+    },
+    "accountsCount_one": "{{count}} cuenta",
+    "accountsCount_other": "{{count}} cuentas",
+    "banner": {
+      "more_one": "+{{count}} cuenta más necesita atención",
+      "more_other": "+{{count}} cuentas más necesitan atención",
+      "reconnecting": {
+        "title": "Reconectando con {{account}}…",
+        "body": "Puede que tu teléfono o este equipo estén sin conexión. No se pierde nada; se reconecta sola."
+      },
+      "loggedOut": {
+        "title": "Se cerró la sesión de {{account}}",
+        "body": "Vincúlala de nuevo para seguir usándola. Tus chats locales se conservan.",
+        "action": "Vincular de nuevo"
+      },
+      "error": {
+        "title": "Problema con {{account}}",
+        "action": "Reintentar"
+      }
     }
   },
   "inbox": {
@@ -71,7 +97,12 @@
     "accounts": {
       "title": "Cuentas",
       "add": "Añadir cuenta",
-      "empty": "Aún no hay cuentas. La vinculación de WhatsApp llega en la próxima versión."
+      "empty": "Aún no hay cuentas.",
+      "rename": "Renombrar",
+      "renameTitle": "Renombrar cuenta",
+      "logOut": "Cerrar sesión",
+      "logOutTitle": "¿Cerrar sesión de {{account}}?",
+      "logOutBody": "Privé desvincula este equipo de {{network}} y borra los datos de esta cuenta en este equipo. Tus chats siguen en tu teléfono."
     },
     "privacy": {
       "title": "Privacidad",
@@ -138,6 +169,109 @@
       "streamReplaced": "Esta cuenta se abrió en otro lugar con la misma sesión. Cierra la otra copia de Privé.",
       "temporaryBan": "WhatsApp ha bloqueado temporalmente esta cuenta. Inténtalo más tarde.",
       "unlinkOnPhone": "Se quitó de este equipo. Para terminar, quita Privé de Dispositivos vinculados en tu teléfono."
+    }
+  },
+  "legal": {
+    "disclaimer": "Aviso legal",
+    "acceptableUse": "Uso aceptable",
+    "privacy": "Privacidad"
+  },
+  "link": {
+    "title": "Vincular {{network}}",
+    "body": "Escanea el código con el teléfono que tiene la cuenta que quieres añadir.",
+    "qrAlt": "Código QR para vincular la cuenta. Escanéalo con tu teléfono.",
+    "accountName": "Nombre de la cuenta",
+    "accountColor": "Color de la cuenta",
+    "colors": {
+      "green": "Verde",
+      "amber": "Ámbar",
+      "rose": "Rosa",
+      "sky": "Celeste",
+      "violet": "Violeta",
+      "coral": "Coral"
+    },
+    "preview": "{{network}} · vista previa en la barra de cuentas",
+    "selected": "Seleccionada",
+    "available": "Disponible",
+    "status": {
+      "starting": "Obteniendo un código…",
+      "waiting": "Esperando el escaneo · el código se renueva solo",
+      "linked": "Vinculada. Ya puedes continuar."
+    },
+    "tryAgain": "Intentar de nuevo"
+  },
+  "addAccount": {
+    "title": "Añadir cuenta",
+    "subtitle": "Elige una red. Puedes añadir todas las cuentas que quieras.",
+    "stepOf": "Paso {{step}} de {{total}}",
+    "buildEngine": "Cada red es un engine. ¿Quieres una que no está aquí?",
+    "buildEngineLink": "Crea un engine"
+  },
+  "onboarding": {
+    "progress": "Progreso de la configuración",
+    "steps": {
+      "welcome": "Bienvenida",
+      "privacy": "Privacidad",
+      "connect": "Conectar",
+      "link": "Vincular",
+      "ready": "Listo"
+    },
+    "welcome": {
+      "title": "Te damos la bienvenida a Privé",
+      "body": "Todas tus conversaciones en un solo lugar privado. Sin crear cuentas, sin servidores de por medio.",
+      "language": "Idioma",
+      "detected": "detectado de tu sistema",
+      "appearance": "Apariencia",
+      "getStarted": "Empezar",
+      "footer": "Software libre y de código abierto"
+    },
+    "privacy": {
+      "title": "Antes de empezar",
+      "body": "Tres cosas que conviene saber. Toma 20 segundos.",
+      "agree": "Entiendo y acepto el Aviso legal y la Política de uso aceptable.",
+      "facts": {
+        "local": {
+          "title": "Todo se queda en este equipo",
+          "body": "Tus mensajes y sesiones se guardan solo aquí, cifrados. Sin cuenta de Privé y sin telemetría, nunca."
+        },
+        "unofficial": {
+          "title": "Conexiones no oficiales",
+          "body": "Privé se conecta como un dispositivo vinculado. Las redes pueden limitar apps de terceros, así que tus cuentas son tu responsabilidad."
+        },
+        "personal": {
+          "title": "Para tus propias conversaciones",
+          "body": "Nada de spam, envíos masivos, extracción de datos ni vigilar a otras personas. Privé es una herramienta personal."
+        }
+      }
+    },
+    "connect": {
+      "title": "Conecta tu primera cuenta",
+      "body": "Después puedes añadir todas las que quieras, incluso varias de la misma red.",
+      "suggest": "¿Falta una red?",
+      "suggestLink": "Propón o crea un engine",
+      "skip": "Omitir por ahora"
+    },
+    "ready": {
+      "title": "Todo listo",
+      "body": "Tu cuenta está vinculada y se mantiene conectada. Tus chats aparecerán en Privé en una próxima versión.",
+      "skippedTitle": "Privé está listo",
+      "skippedBody": "Conecta una cuenta cuando quieras con el botón + de la barra lateral.",
+      "openInbox": "Abrir mi bandeja",
+      "addAnother": "Añadir otra cuenta",
+      "tips": {
+        "search": "Buscar en todo",
+        "jump": "Ir a una cuenta",
+        "add": "Añadir cuenta"
+      }
+    }
+  },
+  "engines": {
+    "whatsapp": {
+      "loginSteps": {
+        "step1": "Abre WhatsApp en tu teléfono",
+        "step2": "Ve a Ajustes → Dispositivos vinculados",
+        "step3": "Toca Vincular un dispositivo y apunta a esta pantalla"
+      }
     }
   }
 }

@@ -1,10 +1,12 @@
 import { useTranslation } from "react-i18next";
 import { shortcutLabel } from "../lib/platform";
+import { linkedAccounts, useAccounts } from "../state/accounts";
 import LogoMark from "./LogoMark";
 
-/** Conversation area while there are no accounts (docs/UI.md, "empty" state). */
+/** Conversation area while no chat is open (docs/UI.md, "empty" state). */
 export default function Welcome() {
   const { t } = useTranslation();
+  const hasAccounts = linkedAccounts(useAccounts((s) => s.accounts)).length > 0;
   const tips = [
     { key: shortcutLabel("N"), label: t("inbox.welcome.tips.addAccount") },
     { key: shortcutLabel("K"), label: t("inbox.welcome.tips.search") },
@@ -15,7 +17,7 @@ export default function Welcome() {
     <main className="flex min-w-0 flex-1 flex-col items-center justify-center gap-5 bg-bg p-6 text-center">
       <LogoMark width={72} height={72} tone="muted" />
       <h2 className="text-title font-bold tracking-[-0.01em]">{t("inbox.welcome.title")}</h2>
-      <p className="max-w-[380px] leading-relaxed text-text-secondary">{t("inbox.welcome.body")}</p>
+      {!hasAccounts && <p className="max-w-[380px] leading-relaxed text-text-secondary">{t("inbox.welcome.body")}</p>}
       <ul className="flex flex-wrap justify-center gap-2">
         {tips.map((tip) => (
           <li

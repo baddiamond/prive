@@ -5,7 +5,13 @@
   },
   "common": {
     "comingSoon": "Coming soon",
-    "nextVersion": "Arrives in the next version."
+    "nextVersion": "Arrives in the next version.",
+    "back": "Back",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "close": "Close",
+    "done": "Done",
+    "save": "Save"
   },
   "rail": {
     "label": "Accounts",
@@ -27,7 +33,27 @@
     "empty": {
       "title": "No chats yet",
       "body": "Add an account to see your conversations here.",
-      "action": "Add account"
+      "action": "Add account",
+      "syncSoon": "Chats from your linked accounts appear here in an upcoming version."
+    },
+    "accountsCount_one": "{{count}} account",
+    "accountsCount_other": "{{count}} accounts",
+    "banner": {
+      "more_one": "+{{count}} more account needs attention",
+      "more_other": "+{{count}} more accounts need attention",
+      "reconnecting": {
+        "title": "Reconnecting to {{account}}…",
+        "body": "Your phone or this computer may be offline. Nothing is lost; it reconnects on its own."
+      },
+      "loggedOut": {
+        "title": "{{account}} was logged out",
+        "body": "Link it again to keep using it. Your local chats are kept.",
+        "action": "Link again"
+      },
+      "error": {
+        "title": "Problem with {{account}}",
+        "action": "Retry"
+      }
     }
   },
   "inbox": {
@@ -71,7 +97,12 @@
     "accounts": {
       "title": "Accounts",
       "add": "Add account",
-      "empty": "No accounts yet. Linking WhatsApp arrives in the next version."
+      "empty": "No accounts yet.",
+      "rename": "Rename",
+      "renameTitle": "Rename account",
+      "logOut": "Log out",
+      "logOutTitle": "Log out of {{account}}?",
+      "logOutBody": "Privé unlinks this computer from {{network}} and deletes this account's data from this computer. Your chats stay on your phone."
     },
     "privacy": {
       "title": "Privacy",
@@ -138,6 +169,109 @@
       "streamReplaced": "This account was opened somewhere else with the same session. Close the other copy of Privé.",
       "temporaryBan": "WhatsApp has temporarily blocked this account. Try again later.",
       "unlinkOnPhone": "Removed from this computer. To finish, remove Privé from Linked devices on your phone."
+    }
+  },
+  "legal": {
+    "disclaimer": "Disclaimer",
+    "acceptableUse": "Acceptable use",
+    "privacy": "Privacy"
+  },
+  "link": {
+    "title": "Link {{network}}",
+    "body": "Scan the code with the phone that has the account you want to add.",
+    "qrAlt": "QR code to link the account. Scan it with your phone.",
+    "accountName": "Account name",
+    "accountColor": "Account color",
+    "colors": {
+      "green": "Green",
+      "amber": "Amber",
+      "rose": "Rose",
+      "sky": "Sky",
+      "violet": "Violet",
+      "coral": "Coral"
+    },
+    "preview": "{{network}} · preview in the account rail",
+    "selected": "Selected",
+    "available": "Available",
+    "status": {
+      "starting": "Getting a code…",
+      "waiting": "Waiting for scan · the code refreshes automatically",
+      "linked": "Linked. You can continue."
+    },
+    "tryAgain": "Try again"
+  },
+  "addAccount": {
+    "title": "Add account",
+    "subtitle": "Choose a network. You can add as many accounts as you like.",
+    "stepOf": "Step {{step}} of {{total}}",
+    "buildEngine": "Every network is an engine. Want one that is not here?",
+    "buildEngineLink": "Build an engine"
+  },
+  "onboarding": {
+    "progress": "Setup progress",
+    "steps": {
+      "welcome": "Welcome",
+      "privacy": "Privacy",
+      "connect": "Connect",
+      "link": "Link",
+      "ready": "Ready"
+    },
+    "welcome": {
+      "title": "Welcome to Privé",
+      "body": "All your conversations in one private place. No account to create, no servers in the middle.",
+      "language": "Language",
+      "detected": "detected from your system",
+      "appearance": "Appearance",
+      "getStarted": "Get started",
+      "footer": "Free and open source software"
+    },
+    "privacy": {
+      "title": "Before you start",
+      "body": "Three things worth knowing. It takes 20 seconds.",
+      "agree": "I understand and agree to the Disclaimer and the Acceptable Use Policy.",
+      "facts": {
+        "local": {
+          "title": "Everything stays on this computer",
+          "body": "Your messages and sessions are stored only here, encrypted. No Privé account, no telemetry, ever."
+        },
+        "unofficial": {
+          "title": "Unofficial connections",
+          "body": "Privé connects like a linked device. Networks may limit third-party apps, so you are responsible for your accounts."
+        },
+        "personal": {
+          "title": "For your own conversations",
+          "body": "No spam, bulk messaging, scraping or monitoring other people. Privé is a personal tool."
+        }
+      }
+    },
+    "connect": {
+      "title": "Connect your first account",
+      "body": "Add as many as you like later, even several of the same network.",
+      "suggest": "Missing a network?",
+      "suggestLink": "Suggest or build an engine",
+      "skip": "Skip for now"
+    },
+    "ready": {
+      "title": "You are all set",
+      "body": "Your account is linked and stays connected. Your chats will appear in Privé in an upcoming version.",
+      "skippedTitle": "Privé is ready",
+      "skippedBody": "Connect an account whenever you like with the + button in the sidebar.",
+      "openInbox": "Open my inbox",
+      "addAnother": "Add another account",
+      "tips": {
+        "search": "Search everything",
+        "jump": "Jump to an account",
+        "add": "Add an account"
+      }
+    }
+  },
+  "engines": {
+    "whatsapp": {
+      "loginSteps": {
+        "step1": "Open WhatsApp on your phone",
+        "step2": "Go to Settings → Linked devices",
+        "step3": "Tap Link a device and point your phone at this screen"
+      }
     }
   }
 }

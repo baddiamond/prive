@@ -1,0 +1,24 @@
+// Typed subscriptions to the backend's Wails events (docs/ARCHITECTURE.md, "Events").
+import { EventsOn } from "../../wailsjs/runtime/runtime";
+import type { AccountState } from "./accounts";
+
+/** Payloads of the events the UI listens to. Every one carries its accountId. */
+export interface BackendEvents {
+  "account:state": { accountId: string; state: AccountState; code?: string };
+  "account:updated": {
+    accountId: string;
+    account: { id: string; engineId: string; remoteId: string; displayName: string; color: string; position: number };
+  };
+  "account:removed": { accountId: string };
+  "login:qr": { accountId: string; code: string; expiresAt: string };
+  "login:success": { accountId: string; remoteId: string; displayName: string };
+  "login:failed": { accountId: string; code: string };
+}
+
+/** Subscribes to one backend event; returns the unsubscribe function. */
+export function onBackendEvent<K extends keyof BackendEvents>(
+  name: K,
+  handler: (payload: BackendEvents[K]) => void,
+): () => void {
+  return EventsOn(name, (payload: BackendEvents[K]) => handler(payload));
+}
