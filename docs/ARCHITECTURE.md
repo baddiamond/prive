@@ -259,7 +259,9 @@ the busy timeout instead of failing with `SQLITE_BUSY`.
   `account:*` events), `onboarding` (first-run step, legal acceptance) and `ui` (screen, scope, dialogs).
 - `src/lib/` wraps bound methods with typed functions (`api.ts`, `accounts.ts`) and subscribes to Wails events
   (`events.ts`). Bound methods reject with JSON `{code, params}` text, decoded by `lib/errors.ts`.
-- QR codes are rendered in Go (`App.RenderQR`, `rsc.io/qr`) and drawn as one SVG path, always dark on white.
+- QR codes are encoded in Go (`App.RenderQR`, `rsc.io/qr`, error correction Q) and drawn by the frontend in the
+  brand style: round dots, rounded finder patterns with an indigo center and the mark in the middle, using the
+  `qr*` tokens, which are dark on white in both themes.
 - The window shows onboarding until `onboarding.completedAt` is set and the current legal version is accepted.
 
 ## Manager

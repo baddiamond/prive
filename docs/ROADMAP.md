@@ -40,7 +40,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 
 **Test:** `go test ./...` (includes multi-account scenarios with the fake engine).
 
-### 🟨 2. WhatsApp login
+### ✅ 2. WhatsApp login
 
 **2a — backend**
 

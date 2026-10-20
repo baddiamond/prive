@@ -35,7 +35,7 @@ export default function LinkPanel({ manifest, flow, name, color, onName, onColor
           : t("link.status.waiting");
 
   return (
-    <div className="grid gap-8 md:grid-cols-[260px_1fr]">
+    <div className="grid gap-8 md:grid-cols-[300px_1fr]">
       <div className="flex flex-col items-center gap-3">
         <QRCodeView
           value={flow.phase === "failed" ? null : flow.qr}

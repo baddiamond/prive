@@ -73,10 +73,10 @@ export interface Onboarding {
   legalVersion: number;
 }
 
-/** A QR code as one SVG path over a size×size grid. */
+/** A QR code's module grid: size×size characters, row by row, "1" dark and "0" light. */
 export interface QRCode {
   size: number;
-  path: string;
+  modules: string;
 }
 
 export function isAccountColor(value: string): value is AccountColor {

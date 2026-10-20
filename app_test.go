@@ -259,7 +259,11 @@ func TestRenderQR(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if q.Size < 21 || !strings.HasPrefix(q.Path, "M0 0h7") {
-		t.Errorf("unexpected QR: size %d, path starts %q", q.Size, q.Path[:min(len(q.Path), 10)])
+	if q.Size < 21 || len(q.Modules) != q.Size*q.Size || strings.Trim(q.Modules, "01") != "" {
+		t.Fatalf("unexpected QR: size %d, %d modules", q.Size, len(q.Modules))
+	}
+	// Every QR code starts with a finder pattern: a dark 7-module row in the top-left corner.
+	if q.Modules[:7] != "1111111" || q.Modules[7] != '0' {
+		t.Errorf("first row starts %q, want a finder pattern", q.Modules[:8])
 	}
 }
