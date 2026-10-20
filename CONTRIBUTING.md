@@ -24,13 +24,16 @@ wails dev      # run with hot reload
 ## Before you open a pull request
 
 ```bash
-gofmt -l .            # must print nothing
+gofmt -l main.go app.go internal   # must print nothing
 go vet ./...
 go test ./...
 cd frontend
 npm run lint
-npm run typecheck
+npm run typecheck   # needs the Wails bindings: run `wails dev` or `wails generate module` once
 ```
+
+On Linux with WebKitGTK 4.1 only (e.g. Ubuntu 24.04), add `-tags webkit2_41` to the Go commands.
+CI runs the same checks (`.github/workflows/ci.yml`).
 
 - Add or update tests for behavior you change.
 - Update docs when you change behavior, architecture or the engine contract.

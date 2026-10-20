@@ -10,10 +10,12 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 ### 🟨 0. Bootstrap
 
 - `LICENSE`, `.gitignore`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, docs and ADRs ✅ (proposal)
-- Wails v2 project with React + TypeScript + Tailwind + Zustand
-- react-i18next with `en.json` / `es.json`, OS language detection, language selector persisted locally
-- Light/dark theme (follows the OS, overridable in Settings)
-- GitHub issue/PR templates; CI running `go vet`, `go test`, frontend lint and typecheck
+- Wails v2 project with React + TypeScript + Tailwind + Zustand ✅
+- react-i18next with `en.json` / `es.json`, OS language detection, language selector persisted locally ✅
+- Light/dark theme (follows the OS, overridable in Settings) ✅
+- GitHub issue/PR templates; CI running `go vet`, `go test`, frontend lint and typecheck ✅
+- Brought forward from phase 1: `internal/store` with embedded migrations and the `settings` table only,
+  so preferences live in SQLite from day one ✅
 
 **Test on macOS:** `wails dev` opens an empty window; switching language and theme works and survives a restart.
 
@@ -22,7 +24,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - `core`: `Engine`, `Session`, `Manifest`, `Capabilities`, events, `CodedError`
 - `engines`: registry, `all` package, `_template`, `enginetest` conformance suite
 - `core.Manager` with concurrent, isolated sessions per account
-- `store`: SQLite (`modernc.org/sqlite`), embedded migrations, accounts/chats/messages/settings
+- `store`: accounts/chats/messages tables (SQLite, migrations and settings already exist since phase 0)
 - A fake in-memory engine used by tests
 
 **Test:** `go test ./...` (includes multi-account scenarios with the fake engine).
@@ -63,6 +65,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - Keyboard shortcuts (switch chat, search, send)
 - Startup time and memory profiling
 - Builds: `darwin/universal`, `windows/amd64`, `linux/amd64`
+- App icon and platform metadata committed under `build/` (ignored until then)
 
 **Test:** `wails build -platform darwin/universal` produces `build/bin/prive.app`.
 

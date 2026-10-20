@@ -1,6 +1,7 @@
 # Architecture
 
-> Status: **proposal** (Phase 0). Interfaces below are the target design and may be refined during Phase 1.
+> Status: Phase 0 implemented (`platform`, `store` settings, Wails shell). Engine interfaces below are the
+> target design and may be refined during Phase 1.
 > Changes to the engine contract must update this document.
 
 ## Goals
