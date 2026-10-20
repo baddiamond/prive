@@ -1,0 +1,23 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-20T03:20:00Z"},
+  "title": "Privé — Brand identity",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1440, "h": 900, "title": "01 · Essence & aspirations"},
+    "Logo.dc.html": {"x": 1520, "y": 0, "w": 1440, "h": 900, "title": "02 · Logo concepts"},
+    "LogoSystem.dc.html": {"x": 3040, "y": 0, "w": 1440, "h": 900, "title": "03 · Logo system (concept C)"},
+    "Color.dc.html": {"x": 0, "y": 1200, "w": 1440, "h": 900, "title": "04 · Color"},
+    "Type.dc.html": {"x": 1520, "y": 1200, "w": 1440, "h": 900, "title": "05 · Type, icons, shape & motion"},
+    "Voice.dc.html": {"x": 0, "y": 2400, "w": 1440, "h": 900, "title": "06 · Voice & tone"},
+    "Access.dc.html": {"x": 1520, "y": 2400, "w": 1440, "h": 900, "title": "07 · Accessibility commitments"}
+  },
+  "order": ["Main.dc.html", "Logo.dc.html", "LogoSystem.dc.html", "Color.dc.html", "Type.dc.html", "Voice.dc.html", "Access.dc.html"],
+  "notes": {
+    "rowA": {"x": 0, "y": -300, "text": "Privé brand guide — who we are and how we look", "kind": "title1", "maxW": 4480},
+    "rowB": {"x": 0, "y": 960, "text": "Visual language", "kind": "title1", "maxW": 2960},
+    "rowC": {"x": 0, "y": 2160, "text": "How we speak and who we include", "kind": "title1", "maxW": 2960}
+  },
+  "designSystems": []
+}

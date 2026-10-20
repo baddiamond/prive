@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — voice and tone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 56px 72px; background: #0F1013; color: #ECEDF0; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.02em">Voice &amp; tone</h1>
+      <p style="margin: 0; font-size: 15px; color: #A0A3AD">We sound like a calm friend who knows computers: plain, brief, kind and honest.</p>
+    </div>
+    <div role="group" aria-label="Example language" style="display: inline-flex; padding: 4px; border-radius: 12px; background: #1B1D23; gap: 4px">
+      <sc-for list="{{langs}}" as="l" hint-placeholder-count="2">
+        <button type="button" onClick="{{l.pick}}" aria-pressed="{{l.pressed}}" style="height: 36px; padding: 0 16px; border-radius: 9px; border: none; background: {{l.bg}}; color: {{l.fg}}; font: 600 13px Inter, system-ui, sans-serif; cursor: pointer">{{l.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+    <sc-for list="{{principles}}" as="p" hint-placeholder-count="5">
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 6px">
+        <strong style="font-size: 16px">{{p.title}}</strong>
+        <span style="font-size: 13px; line-height: 1.5; color: #A0A3AD">{{p.text}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #868A95; padding: 0 4px">
+      <span>Moment</span><span style="color: #5ED3B5">We say</span><span style="color: #F2A0A8">We don't say</span>
+    </div>
+    <sc-for list="{{examples}}" as="e" hint-placeholder-count="6">
+      <div style="display: grid; grid-template-columns: 200px minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: stretch">
+        <span style="padding: 14px 4px; font-size: 14px; font-weight: 600; color: #C7C9D0">{{e.moment}}</span>
+        <span style="padding: 14px 16px; border-radius: 12px; background: #13261F; border: 1px solid #1F3A33; font-size: 14px; line-height: 1.45">{{e.yes}}</span>
+        <span style="padding: 14px 16px; border-radius: 12px; background: #2A1719; border: 1px solid #4A2A2E; font-size: 14px; line-height: 1.45; color: #E3C4C8">{{e.no}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; gap: 28px; font-size: 13px; color: #A0A3AD; border-top: 1px solid #22252C; padding-top: 16px; flex-wrap: wrap">
+    <span><strong style="color: #ECEDF0">Sentence case</strong> everywhere.</span>
+    <span><strong style="color: #ECEDF0">No emoji</strong> in UI copy, no exclamation marks in errors.</span>
+    <span><strong style="color: #ECEDF0">Errors</strong> = what happened + what to do. Never blame the person.</span>
+    <span><strong style="color: #ECEDF0">Spanish</strong> uses "tú" and neutral Latin American vocabulary.</span>
+    <span><strong style="color: #ECEDF0">No dark patterns</strong>: no guilt, no fake urgency.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'en' };
+  }
+
+  renderVals() {
+    var self = this;
+    var lang = this.state.lang;
+    var principles = [
+      { title: 'Plain', text: 'Everyday words. "Log out", not "terminate session".' },
+      { title: 'Brief', text: 'Say it once, in as few words as clarity allows.' },
+      { title: 'Kind', text: 'Patient and warm. People are often in a hurry or stressed.' },
+      { title: 'Honest', text: 'Never overpromise. We say exactly what we store and where.' },
+      { title: 'Calm', text: 'No hype, no alarms unless something truly needs attention.' }
+    ];
+    var ex = {
+      en: [
+        { moment: 'Send failed', yes: 'Couldn’t send. Check your connection and try again.', no: 'Oops! Something went wrong \u{1F605}' },
+        { moment: 'Empty inbox', yes: 'No chats yet. Add an account to get started.', no: 'Wow, so empty! Let’s fix that!!' },
+        { moment: 'Privacy', yes: 'Stored only on this computer.', no: 'Your data is 100% secure and unhackable.' },
+        { moment: 'Reconnecting', yes: 'Reconnecting to Work… Your messages are safe.', no: 'ERROR: socket closed (code 1006)' },
+        { moment: 'Remove account', yes: 'Remove “Work”? Its chats will be deleted from this computer.', no: 'Are you sure? You’ll lose EVERYTHING!' },
+        { moment: 'Pairing', yes: 'Scan this code with WhatsApp on your phone.', no: 'Initiate multi-device handshake.' }
+      ],
+      es: [
+        { moment: 'Send failed', yes: 'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.', no: '¡Ups! Algo salió mal \u{1F605}' },
+        { moment: 'Empty inbox', yes: 'Aún no hay chats. Añade una cuenta para empezar.', no: '¡Qué vacío! ¡¡Vamos a arreglarlo!!' },
+        { moment: 'Privacy', yes: 'Guardado solo en este equipo.', no: 'Tus datos están 100 % seguros e inhackeables.' },
+        { moment: 'Reconnecting', yes: 'Reconectando con Trabajo… Tus mensajes están a salvo.', no: 'ERROR: socket cerrado (código 1006)' },
+        { moment: 'Remove account', yes: '¿Quitar “Trabajo”? Sus chats se borrarán de este equipo.', no: '¿Seguro? ¡Vas a perderlo TODO!' },
+        { moment: 'Pairing', yes: 'Escanea este código con WhatsApp en tu teléfono.', no: 'Inicia el handshake multidispositivo.' }
+      ]
+    };
+    var langs = [{ id: 'en', label: 'English' }, { id: 'es', label: 'Español' }].map(function (l) {
+      var sel = l.id === lang;
+      return Object.assign({}, l, {
+        pressed: sel ? 'true' : 'false',
+        bg: sel ? '#ECEDF0' : 'transparent',
+        fg: sel ? '#0F1013' : '#A0A3AD',
+        pick: function () { self.setState({ lang: l.id }); }
+      });
+    });
+    return { principles: principles, examples: ex[lang], langs: langs };
+  }
+}
+</script>
+</body>
+</html>

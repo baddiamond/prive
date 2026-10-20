@@ -13,6 +13,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - Brand identity: guide, logo, app/tray icons, banners, design tokens and generator ✅
 - Legal and community: disclaimer, acceptable use, privacy, security policy, code of conduct ✅
 - Onboarding design and spec ✅ ([`docs/ONBOARDING.md`](ONBOARDING.md))
+- UI design and spec: inbox, states, search, details, add account, settings, notifications ✅ ([`docs/UI.md`](UI.md))
 - Wails v2 project with React + TypeScript + Tailwind + Zustand
 - react-i18next with `en.json` / `es.json`, OS language detection, language selector persisted locally
 - Light/dark theme from the brand tokens (follows the OS, overridable in Settings)

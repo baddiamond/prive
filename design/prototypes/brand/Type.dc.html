@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — type, icons, shape and motion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; padding: 56px 72px; background: #0F1013; color: #ECEDF0; font-family: Inter, system-ui, sans-serif; display: flex; gap: 32px">
+
+  <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 20px">
+    <h1 style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.02em">Typography</h1>
+    <div style="display: flex; gap: 16px">
+      <div style="flex: 1; padding: 18px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 6px">
+        <span style="font-size: 56px; font-weight: 600; letter-spacing: -0.03em; line-height: 1">Aa</span>
+        <strong style="font-size: 15px">Inter</strong>
+        <span style="font-size: 12px; line-height: 1.5; color: #A0A3AD">Interface and wordmark · 400 / 500 / 600 / 700 · SIL Open Font License</span>
+      </div>
+      <div style="flex: 1; padding: 18px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 6px">
+        <span style="font: 500 56px/1 JetBrains Mono, ui-monospace, monospace">{ }</span>
+        <strong style="font-size: 15px">JetBrains Mono</strong>
+        <span style="font-size: 12px; line-height: 1.5; color: #A0A3AD">Code, IDs, file paths · 400 / 500 · SIL Open Font License</span>
+      </div>
+    </div>
+    <div style="padding: 18px 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{scale}}" as="s" hint-placeholder-count="7">
+        <div style="display: flex; align-items: baseline; gap: 16px">
+          <span style="width: 120px; flex: 0 0 120px; font: 11px JetBrains Mono, ui-monospace, monospace; color: #A0A3AD">{{s.token}}</span>
+          <span style="flex: 1; font-size: {{s.size}}; font-weight: {{s.weight}}; letter-spacing: {{s.track}}; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{s.sample}}</span>
+          <span style="font: 11px JetBrains Mono, ui-monospace, monospace; color: #868A95">{{s.spec}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size: 13px; line-height: 1.55; color: #A0A3AD">Fonts ship <strong style="color: #ECEDF0">inside the app</strong> — never loaded from the internet (privacy). Sizes use rem so the system text size and Privé's own zoom (80–200%) scale everything. Body line height 1.45, max 72 characters per line.</span>
+  </div>
+
+  <div style="flex: 1 1 0; display: flex; flex-direction: column; gap: 20px">
+    <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 14px">
+      <strong style="font-size: 16px">Icons</strong>
+      <div style="display: flex; gap: 18px; color: #ECEDF0">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Search icon"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Send icon"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Lock icon"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Attach icon"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Plus icon"><path d="M12 5v14M5 12h14"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Read receipt icon"><path d="m2 13 4 4 9-10M10 15l2 2 9-10"></path></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Info icon"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+      </div>
+      <span style="font-size: 13px; line-height: 1.55; color: #A0A3AD">Lucide set (ISC license) · 24 grid · 1.75 stroke · round caps. Icons inherit text color. Icon-only buttons always carry a translated label.</span>
+    </div>
+
+    <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 14px">
+      <strong style="font-size: 16px">Shape &amp; space</strong>
+      <div style="display: flex; align-items: flex-end; gap: 14px">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 44px; height: 44px; border-radius: 6px; background: #262C52; border: 1px solid #8B9CFF"></span><span style="font: 11px JetBrains Mono, monospace; color: #A0A3AD">6</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 44px; height: 44px; border-radius: 10px; background: #262C52; border: 1px solid #8B9CFF"></span><span style="font: 11px JetBrains Mono, monospace; color: #A0A3AD">10</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 44px; height: 44px; border-radius: 14px; background: #262C52; border: 1px solid #8B9CFF"></span><span style="font: 11px JetBrains Mono, monospace; color: #A0A3AD">14</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 44px; height: 44px; border-radius: 20px; background: #262C52; border: 1px solid #8B9CFF"></span><span style="font: 11px JetBrains Mono, monospace; color: #A0A3AD">20</span></div>
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><span style="width: 44px; height: 44px; border-radius: 22px; background: #262C52; border: 1px solid #8B9CFF"></span><span style="font: 11px JetBrains Mono, monospace; color: #A0A3AD">full</span></div>
+        <span style="flex: 1"></span>
+        <div style="display: flex; align-items: flex-end; gap: 4px">
+          <span style="width: 4px; height: 4px; background: #8B9CFF"></span>
+          <span style="width: 8px; height: 8px; background: #8B9CFF"></span>
+          <span style="width: 12px; height: 12px; background: #8B9CFF"></span>
+          <span style="width: 16px; height: 16px; background: #8B9CFF"></span>
+          <span style="width: 24px; height: 24px; background: #8B9CFF"></span>
+          <span style="width: 32px; height: 32px; background: #8B9CFF"></span>
+        </div>
+      </div>
+      <span style="font-size: 13px; line-height: 1.55; color: #A0A3AD">Radii: 6 tags · 10 buttons &amp; fields · 14 cards &amp; avatars · 20 dialogs. Spacing on a 4-point scale (4, 8, 12, 16, 24, 32). Bubbles: 16 with a 4 corner pointing to the sender.</span>
+    </div>
+
+    <div style="padding: 20px; border-radius: 16px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 12px">
+      <strong style="font-size: 16px">Motion</strong>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+        <div style="padding: 12px; border-radius: 12px; background: #1B1D23; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 20px">120 ms</strong><span style="font-size: 12px; color: #A0A3AD">Hover, press, toggles</span></div>
+        <div style="padding: 12px; border-radius: 12px; background: #1B1D23; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 20px">200 ms</strong><span style="font-size: 12px; color: #A0A3AD">Panels, dialogs, new message</span></div>
+        <div style="padding: 12px; border-radius: 12px; background: #1B1D23; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 20px">0 ms</strong><span style="font-size: 12px; color: #A0A3AD">When "reduce motion" is on</span></div>
+      </div>
+      <span style="font-size: 13px; line-height: 1.55; color: #A0A3AD">Easing <code style="font-family: JetBrains Mono, monospace; color: #ECEDF0">cubic-bezier(0.2, 0, 0, 1)</code>. Fade and short slides only; no bounces, no parallax, nothing that loops.</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      scale: [
+        { token: 'display', size: '32px', weight: 700, track: '-0.02em', sample: 'Your conversations', spec: '32 / 700' },
+        { token: 'title', size: '24px', weight: 600, track: '-0.01em', sample: 'Settings', spec: '24 / 600' },
+        { token: 'heading', size: '18px', weight: 600, track: '-0.01em', sample: 'All inboxes', spec: '18 / 600' },
+        { token: 'body-strong', size: '15px', weight: 600, track: '0', sample: 'Lucía Romero', spec: '15 / 600' },
+        { token: 'body', size: '14px', weight: 400, track: '0', sample: 'Great, I booked a table for eight.', spec: '14 / 400' },
+        { token: 'caption', size: '12px', weight: 500, track: '0', sample: 'Work · WhatsApp · 09:41', spec: '12 / 500' },
+        { token: 'micro', size: '11px', weight: 600, track: '0.02em', sample: 'Sent · Delivered · Read', spec: '11 / 600' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

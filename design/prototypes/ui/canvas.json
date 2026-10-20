@@ -1,0 +1,238 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-20T03:00:00Z"
+  },
+  "title": "Privé — UI proposal",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "Unified inbox — dark (scenario tweak shows every state)",
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "LightInbox.dc.html": {
+      "x": 1360,
+      "y": 0,
+      "w": 1280,
+      "h": 800,
+      "title": "Unified inbox — light",
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "AddAccount.dc.html": {
+      "x": 0,
+      "y": 1100,
+      "w": 1280,
+      "h": 800,
+      "title": "Add account (any engine)",
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "Settings.dc.html": {
+      "x": 1360,
+      "y": 1100,
+      "w": 1280,
+      "h": 800,
+      "title": "Settings — language, theme, accounts, privacy",
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "Model.dc.html": {
+      "x": 0,
+      "y": 2200,
+      "w": 1440,
+      "h": 860,
+      "title": "One model: engines → Privé model → one UI"
+    },
+    "Onboarding.dc.html": {
+      "x": 0,
+      "y": 3400,
+      "title": "First run · 1 Welcome (full interactive flow)",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "OnbPrivacy.dc.html": {
+      "x": 1360,
+      "y": 3400,
+      "title": "First run · 2 Before you start",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "OnbConnect.dc.html": {
+      "x": 2720,
+      "y": 3400,
+      "title": "First run · 3 Connect (coming soon sources)",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "OnbLink.dc.html": {
+      "x": 0,
+      "y": 4320,
+      "title": "First run · 4 Link WhatsApp",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "OnbReady.dc.html": {
+      "x": 1360,
+      "y": 4320,
+      "title": "First run · 5 Ready",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxEmpty.dc.html": {
+      "x": 0,
+      "y": 5540,
+      "title": "Inbox · empty (no accounts yet)",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxReconnecting.dc.html": {
+      "x": 1360,
+      "y": 5540,
+      "title": "Inbox · account reconnecting",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxLoggedOut.dc.html": {
+      "x": 2720,
+      "y": 5540,
+      "title": "Inbox · account logged out",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxSendError.dc.html": {
+      "x": 0,
+      "y": 6460,
+      "title": "Inbox · message failed to send",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxSearch.dc.html": {
+      "x": 1360,
+      "y": 6460,
+      "title": "Search all accounts (⌘K)",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "InboxDetails.dc.html": {
+      "x": 2720,
+      "y": 6460,
+      "title": "Chat details panel",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    },
+    "Notifications.dc.html": {
+      "x": 0,
+      "y": 7380,
+      "title": "Notifications · settings and privacy levels",
+      "w": 1280,
+      "h": 800,
+      "expand": "fill",
+      "is_interactive": true,
+      "radius": 12
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "LightInbox.dc.html",
+    "AddAccount.dc.html",
+    "Settings.dc.html",
+    "Model.dc.html",
+    "Onboarding.dc.html",
+    "OnbPrivacy.dc.html",
+    "OnbConnect.dc.html",
+    "OnbLink.dc.html",
+    "OnbReady.dc.html",
+    "InboxEmpty.dc.html",
+    "InboxReconnecting.dc.html",
+    "InboxLoggedOut.dc.html",
+    "InboxSendError.dc.html",
+    "InboxSearch.dc.html",
+    "InboxDetails.dc.html",
+    "Notifications.dc.html"
+  ],
+  "notes": {
+    "row1": {
+      "x": 0,
+      "y": -300,
+      "text": "Unified inbox: every account, every network, one skeleton",
+      "kind": "title1",
+      "maxW": 2640
+    },
+    "row2": {
+      "x": 0,
+      "y": 840,
+      "text": "Adding accounts & settings",
+      "kind": "title1",
+      "maxW": 2640
+    },
+    "row3": {
+      "x": 0,
+      "y": 1940,
+      "text": "How each network translates into the Privé model",
+      "kind": "title1",
+      "maxW": 1440
+    },
+    "row4": {
+      "x": 0,
+      "y": 3110,
+      "text": "First run: from download to inbox in under a minute",
+      "kind": "title1",
+      "maxW": 4000
+    },
+    "row5": {
+      "x": 0,
+      "y": 5250,
+      "text": "Inbox states, search, details and notifications",
+      "kind": "title1",
+      "maxW": 4000
+    }
+  },
+  "designSystems": []
+}

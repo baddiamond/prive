@@ -141,6 +141,12 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - Optional encryption at rest for the local database
 - Out-of-process engines (write an engine in any language over stdio)
 
+## Design
+
+- [UI specification](docs/UI.md) — app shell, components, states, keyboard, accessibility
+- [First run](docs/ONBOARDING.md) — onboarding flow
+- [Design sources](design/) — interactive prototype sources
+
 ## Brand
 
 Logo, icons, colors, typography, voice and accessibility rules live in the

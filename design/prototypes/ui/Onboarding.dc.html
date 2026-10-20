@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — first run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: {{c.bg}}; color: {{c.text}}; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 28px 16px 32px">
+
+  <nav aria-label="{{t.progress}}" style="width: 100%; max-width: 760px; margin-bottom: 28px">
+    <ol style="list-style: none; margin: 0; padding: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+        <li aria-current="{{s.current}}" style="display: flex; align-items: center; gap: 8px">
+          <span style="width: 24px; height: 24px; border-radius: 50%; background: {{s.dotBg}}; color: {{s.dotFg}}; border: 1.5px solid {{s.dotBorder}}; box-sizing: border-box; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{s.mark}}</span>
+          <span style="font-size: 13px; font-weight: {{s.weight}}; color: {{s.labelColor}}">{{s.label}}</span>
+          <sc-if value="{{s.notLast}}" hint-placeholder-val="{{true}}">
+            <span aria-hidden="true" style="width: 28px; height: 1.5px; background: {{c.divider}}; margin-left: 4px"></span>
+          </sc-if>
+        </li>
+      </sc-for>
+    </ol>
+  </nav>
+
+  <main style="width: 100%; max-width: 760px; flex: 1; display: flex; flex-direction: column">
+
+    <sc-if value="{{is.welcome}}" hint-placeholder-val="{{true}}">
+      <section aria-labelledby="h-welcome" style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px; padding-top: 24px">
+        <svg width="96" height="96" viewBox="0 0 64 64" role="img" aria-label="Privé">
+          <circle cx="34" cy="36" r="14" fill="none" stroke="{{c.text}}" stroke-width="7"></circle>
+          <path d="M20 36v22" stroke="{{c.text}}" stroke-width="7" stroke-linecap="round"></path>
+          <path d="M39 12 49 5" stroke="{{c.accent}}" stroke-width="6.5" stroke-linecap="round"></path>
+        </svg>
+        <div style="display: flex; flex-direction: column; gap: 10px; max-width: 520px">
+          <h1 id="h-welcome" style="margin: 0; font-size: 36px; font-weight: 700; letter-spacing: -0.02em">{{t.welcomeTitle}}</h1>
+          <p style="margin: 0; font-size: 16px; line-height: 1.55; color: {{c.text2}}">{{t.welcomeBody}}</p>
+        </div>
+
+        <div style="width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 18px; text-align: left">
+          <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+            <legend style="font-size: 13px; font-weight: 600; color: {{c.text2}}; padding: 0; margin-bottom: 8px">{{t.language}} <span style="font-weight: 500; color: {{c.faint}}">· {{t.detected}}</span></legend>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+              <sc-for list="{{langs}}" as="l" hint-placeholder-count="2">
+                <button type="button" onClick="{{l.pick}}" aria-pressed="{{l.pressed}}" style="height: 44px; border-radius: 10px; border: 1.5px solid {{l.border}}; background: {{l.bg}}; color: {{c.text}}; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer">{{l.label}}</button>
+              </sc-for>
+            </div>
+          </fieldset>
+          <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+            <legend style="font-size: 13px; font-weight: 600; color: {{c.text2}}; padding: 0; margin-bottom: 8px">{{t.theme}}</legend>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+                <button type="button" onClick="{{th.pick}}" aria-pressed="{{th.pressed}}" style="height: 44px; border-radius: 10px; border: 1.5px solid {{th.border}}; background: {{th.bg}}; color: {{c.text}}; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer">{{th.label}}</button>
+              </sc-for>
+            </div>
+          </fieldset>
+        </div>
+
+        <button type="button" onClick="{{next}}" style="height: 48px; padding: 0 32px; border-radius: 12px; border: none; background: {{c.accent}}; color: {{c.onAccent}}; font: 700 15px Inter, system-ui, sans-serif; cursor: pointer">{{t.getStarted}}</button>
+        <span style="font-size: 12px; color: {{c.faint}}">{{t.footer}}</span>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{is.privacy}}" hint-placeholder-val="{{false}}">
+      <section aria-labelledby="h-privacy" style="display: flex; flex-direction: column; gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <h1 id="h-privacy" style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">{{t.privacyTitle}}</h1>
+          <p style="margin: 0; font-size: 15px; color: {{c.text2}}">{{t.privacyBody}}</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <sc-for list="{{facts}}" as="f" hint-placeholder-count="3">
+            <div style="display: flex; gap: 16px; padding: 18px; border-radius: 14px; background: {{c.surface}}; border: 1px solid {{c.divider}}">
+              <span style="flex: 0 0 40px; width: 40px; height: 40px; border-radius: 12px; background: {{c.tint}}; color: {{c.accent}}; display: flex; align-items: center; justify-content: center">
+                <sc-if value="{{f.isLock}}" hint-placeholder-val="{{false}}">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+                </sc-if>
+                <sc-if value="{{f.isLink}}" hint-placeholder-val="{{false}}">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"></path></svg>
+                </sc-if>
+                <sc-if value="{{f.isPerson}}" hint-placeholder-val="{{false}}">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+                </sc-if>
+              </span>
+              <span style="display: flex; flex-direction: column; gap: 4px">
+                <strong style="font-size: 16px">{{f.title}}</strong>
+                <span style="font-size: 14px; line-height: 1.55; color: {{c.text2}}">{{f.text}}</span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+        <label style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 12px; border: 1.5px solid {{agreeBorder}}; cursor: pointer">
+          <input type="checkbox" checked="{{agreed}}" onChange="{{toggleAgree}}" style="width: 20px; height: 20px; margin: 1px 0 0; accent-color: {{c.accent}}">
+          <span style="font-size: 14px; line-height: 1.5">{{t.agree}}</span>
+        </label>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px">
+          <a href="https://github.com/baddiamond/prive/blob/main/DISCLAIMER.md" style="color: {{c.accent}}">{{t.disclaimer}}</a>
+          <a href="https://github.com/baddiamond/prive/blob/main/ACCEPTABLE_USE.md" style="color: {{c.accent}}">{{t.acceptableUse}}</a>
+          <a href="https://github.com/baddiamond/prive/blob/main/PRIVACY.md" style="color: {{c.accent}}">{{t.privacy}}</a>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{is.connect}}" hint-placeholder-val="{{false}}">
+      <section aria-labelledby="h-connect" style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <h1 id="h-connect" style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">{{t.connectTitle}}</h1>
+          <p style="margin: 0; font-size: 15px; color: {{c.text2}}">{{t.connectBody}}</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px">
+          <sc-for list="{{engines}}" as="e" hint-placeholder-count="10">
+            <button type="button" onClick="{{e.pick}}" disabled="{{e.disabled}}" aria-pressed="{{e.pressed}}" style="text-align: left; display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; border: 1.5px solid {{e.border}}; background: {{e.bg}}; color: {{c.text}}; cursor: {{e.cursor}}; font-family: Inter, system-ui, sans-serif">
+              <span style="display: flex; align-items: center; gap: 10px">
+                <span style="width: 34px; height: 34px; border-radius: 10px; background: {{c.raised}}; color: {{e.shortColor}}; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{e.short}}</span>
+                <span style="font-size: 14px; font-weight: 600; color: {{e.nameColor}}">{{e.name}}</span>
+              </span>
+              <span style="align-self: flex-start; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: {{e.badgeBg}}; color: {{e.badgeFg}}">{{e.badge}}</span>
+            </button>
+          </sc-for>
+        </div>
+        <p style="margin: 0; font-size: 13px; color: {{c.text2}}">{{t.suggest}} <a href="https://github.com/baddiamond/prive/issues/new?template=engine_proposal.md" style="color: {{c.accent}}">{{t.suggestLink}}</a></p>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{is.link}}" hint-placeholder-val="{{false}}">
+      <section aria-labelledby="h-link" style="display: flex; flex-direction: column; gap: 22px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <h1 id="h-link" style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">{{t.linkTitle}}</h1>
+          <p style="margin: 0; font-size: 15px; color: {{c.text2}}">{{t.linkBody}}</p>
+        </div>
+        <div style="display: flex; gap: 28px; flex-wrap: wrap">
+          <div style="flex: 0 0 236px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+            <button type="button" onClick="{{simulateScan}}" aria-label="{{t.qrAlt}}" style="width: 236px; height: 236px; border-radius: 16px; border: none; padding: 0; background: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center">
+              <sc-if value="{{linkedNot}}" hint-placeholder-val="{{true}}">
+                <span style="width: 188px; height: 188px; border: 2px dashed #6B6F7A; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #585C67; font: 600 12px Inter, system-ui, sans-serif">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"></path></svg>
+                  {{t.qrPlaceholder}}
+                </span>
+              </sc-if>
+              <sc-if value="{{linked}}" hint-placeholder-val="{{false}}">
+                <span style="width: 72px; height: 72px; border-radius: 50%; background: #1A7D5A; color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+                </span>
+              </sc-if>
+            </button>
+            <span role="status" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: {{c.text2}}">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: {{statusDot}}"></span>{{statusText}}
+            </span>
+          </div>
+          <div style="flex: 1 1 280px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+            <ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5">
+              <li>{{t.linkStep1}}</li>
+              <li>{{t.linkStep2}}</li>
+              <li>{{t.linkStep3}}</li>
+            </ol>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <label for="acc-name" style="font-size: 13px; font-weight: 600; color: {{c.text2}}">{{t.accountName}}</label>
+              <input id="acc-name" type="text" value="{{label}}" onChange="{{onLabel}}" style="height: 44px; padding: 0 12px; border-radius: 10px; border: 1.5px solid {{c.border}}; background: {{c.raised}}; color: {{c.text}}; font: 400 14px Inter, system-ui, sans-serif">
+            </div>
+            <fieldset style="border: none; margin: 0; padding: 0">
+              <legend style="font-size: 13px; font-weight: 600; color: {{c.text2}}; padding: 0; margin-bottom: 10px">{{t.accountColor}}</legend>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap">
+                <sc-for list="{{swatches}}" as="sw" hint-placeholder-count="6">
+                  <button type="button" onClick="{{sw.pick}}" aria-label="{{sw.name}}" aria-pressed="{{sw.pressed}}" style="width: 36px; height: 36px; border-radius: 50%; border: none; background: {{sw.color}}; cursor: pointer; box-shadow: {{sw.ring}}"></button>
+                </sc-for>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{is.ready}}" hint-placeholder-val="{{false}}">
+      <section aria-labelledby="h-ready" style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; padding-top: 12px">
+        <span style="width: 72px; height: 72px; border-radius: 50%; background: {{c.tint}}; color: {{c.accent}}; display: flex; align-items: center; justify-content: center">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 8px; max-width: 520px">
+          <h1 id="h-ready" style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.02em">{{readyTitle}}</h1>
+          <p style="margin: 0; font-size: 15px; line-height: 1.55; color: {{c.text2}}">{{readyBody}}</p>
+        </div>
+        <sc-if value="{{hasAccount}}" hint-placeholder-val="{{true}}">
+          <div style="width: 100%; max-width: 460px; display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; background: {{c.surface}}; border: 1px solid {{c.divider}}; text-align: left">
+            <span style="width: 42px; height: 42px; border-radius: 12px; background: {{accountColor}}; color: {{c.onAccount}}; font-weight: 700; display: flex; align-items: center; justify-content: center">{{initial}}</span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 14px; font-weight: 600">{{label}} · WhatsApp</span>
+              <span role="progressbar" aria-label="{{t.importing}}" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100" style="height: 6px; border-radius: 3px; background: {{c.raised}}; overflow: hidden; display: block">
+                <span style="display: block; width: 64%; height: 100%; background: {{c.accent}}"></span>
+              </span>
+              <span style="font-size: 12px; color: {{c.text2}}">{{t.importing}} · 64%</span>
+            </span>
+          </div>
+        </sc-if>
+        <div style="width: 100%; max-width: 460px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{tips}}" as="tip" hint-placeholder-count="3">
+            <div style="padding: 12px; border-radius: 12px; border: 1px solid {{c.divider}}; display: flex; flex-direction: column; gap: 6px; align-items: center">
+              <kbd style="font: 600 12px ui-monospace, Menlo, monospace; padding: 3px 8px; border-radius: 6px; border: 1px solid {{c.border}}; background: {{c.raised}}; color: {{c.text}}">{{tip.key}}</kbd>
+              <span style="font-size: 12px; color: {{c.text2}}">{{tip.text}}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center">
+          <a href="Main.dc.html" style="height: 48px; padding: 0 28px; border-radius: 12px; background: {{c.accent}}; color: {{c.onAccent}}; font: 700 15px Inter, system-ui, sans-serif; text-decoration: none; display: flex; align-items: center">{{t.openInbox}}</a>
+          <button type="button" onClick="{{addAnother}}" style="height: 48px; padding: 0 22px; border-radius: 12px; border: 1.5px solid {{c.border}}; background: transparent; color: {{c.text}}; font: 600 15px Inter, system-ui, sans-serif; cursor: pointer">{{t.addAnother}}</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{showNav}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; align-items: center; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid {{c.divider}}">
+        <button type="button" onClick="{{back}}" style="height: 44px; padding: 0 18px; border-radius: 10px; border: 1.5px solid {{c.border}}; background: transparent; color: {{c.text}}; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer">{{t.back}}</button>
+        <span style="flex: 1"></span>
+        <sc-if value="{{is.connect}}" hint-placeholder-val="{{false}}">
+          <button type="button" onClick="{{skip}}" style="height: 44px; padding: 0 14px; border: none; background: transparent; color: {{c.text2}}; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; text-decoration: underline">{{t.skip}}</button>
+        </sc-if>
+        <button type="button" onClick="{{next}}" disabled="{{nextDisabled}}" style="height: 44px; padding: 0 24px; border-radius: 10px; border: none; background: {{nextBg}}; color: {{nextFg}}; font: 700 14px Inter, system-ui, sans-serif; cursor: {{nextCursor}}">{{nextLabel}}</button>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startStep":{"editor":"enum","options":[1,2,3,4,5],"default":1},"dark":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var start = Number(props.startStep ?? 1);
+    this.state = {
+      step: start,
+      lang: 'en',
+      theme: 'system',
+      agreed: start > 2,
+      engine: start > 3 ? 'whatsapp' : null,
+      linked: start > 4,
+      skipped: false,
+      label: 'Personal',
+      color: '#3FB68B'
+    };
+  }
+
+  palette(dark) {
+    if (dark) {
+      return { bg: '#0F1013', surface: '#131418', raised: '#1B1D23', divider: '#22252C', border: '#6B6F7A', text: '#ECEDF0', text2: '#A0A3AD', faint: '#868A95', accent: '#8B9CFF', onAccent: '#0A0B0D', tint: '#262C52', success: '#5ED3B5', warning: '#F2A65A', disabledBg: '#22252C', disabledFg: '#868A95', onAccount: '#0A0B0D' };
+    }
+    return { bg: '#FFFFFF', surface: '#F8F8FA', raised: '#ECEDF0', divider: '#E3E4E9', border: '#6B6F7A', text: '#0F1013', text2: '#585C67', faint: '#6B6F7A', accent: '#4453D6', onAccent: '#FFFFFF', tint: '#E4E8FF', success: '#1A7D5A', warning: '#976209', disabledBg: '#E3E4E9', disabledFg: '#585C67', onAccount: '#FFFFFF' };
+  }
+
+  dict() {
+    return {
+      en: {
+        progress: 'Setup progress',
+        steps: ['Welcome', 'Privacy', 'Connect', 'Link', 'Ready'],
+        welcomeTitle: 'Welcome to Privé',
+        welcomeBody: 'All your conversations in one private place. No account to create, no servers in the middle.',
+        language: 'Language', detected: 'detected from your system', theme: 'Appearance',
+        themes: ['System', 'Light', 'Dark'],
+        getStarted: 'Get started',
+        footer: 'Free and open source · MIT License · v0.1',
+        privacyTitle: 'Before you start',
+        privacyBody: 'Three things worth knowing. It takes 20 seconds.',
+        facts: [
+          ['Everything stays on this computer', 'Your messages and sessions are stored only here. No Privé account, no telemetry, ever.'],
+          ['Unofficial connections', 'Privé connects like a linked device. Networks may limit third-party apps, so you are responsible for your accounts.'],
+          ['For your own conversations', 'No spam, bulk messaging, scraping or monitoring other people. Privé is a personal tool.']
+        ],
+        agree: 'I understand and agree to the Disclaimer and the Acceptable Use Policy.',
+        disclaimer: 'Disclaimer', acceptableUse: 'Acceptable use', privacy: 'Privacy',
+        connectTitle: 'Connect your first account',
+        connectBody: 'Add as many as you like later, even several of the same network.',
+        available: 'Available', soon: 'Coming soon', selected: 'Selected',
+        suggest: 'Missing a network?', suggestLink: 'Suggest or build an engine',
+        linkTitle: 'Link WhatsApp',
+        linkBody: 'Scan the code with the phone that has the account you want to add.',
+        linkStep1: 'Open WhatsApp on your phone',
+        linkStep2: 'Go to Settings → Linked devices',
+        linkStep3: 'Tap Link a device and point your phone at this screen',
+        qrAlt: 'QR code. In this prototype, click to simulate a scan.',
+        qrPlaceholder: '[LIVE QR] · click to simulate',
+        waiting: 'Waiting for scan · the code refreshes automatically',
+        linkedOk: 'Linked. Importing your recent chats…',
+        accountName: 'Account name', accountColor: 'Account color',
+        readyTitle: 'You are all set', readyBody: 'Your chats keep importing in the background. You can start using Privé right away.',
+        readySkipTitle: 'Privé is ready', readySkipBody: 'Connect an account whenever you like with the + button in the sidebar.',
+        importing: 'Importing recent chats',
+        tips: [['⌘ K', 'Search everything'], ['⌘ 1–9', 'Jump to an account'], ['⌘ N', 'Add an account']],
+        openInbox: 'Open my inbox', addAnother: 'Add another account',
+        back: 'Back', next: 'Continue', skip: 'Skip for now', linkCta: 'Continue'
+      },
+      es: {
+        progress: 'Progreso de la configuración',
+        steps: ['Bienvenida', 'Privacidad', 'Conectar', 'Vincular', 'Listo'],
+        welcomeTitle: 'Te damos la bienvenida a Privé',
+        welcomeBody: 'Todas tus conversaciones en un solo lugar privado. Sin crear cuentas, sin servidores de por medio.',
+        language: 'Idioma', detected: 'detectado de tu sistema', theme: 'Apariencia',
+        themes: ['Sistema', 'Claro', 'Oscuro'],
+        getStarted: 'Empezar',
+        footer: 'Libre y de código abierto · Licencia MIT · v0.1',
+        privacyTitle: 'Antes de empezar',
+        privacyBody: 'Tres cosas que conviene saber. Toma 20 segundos.',
+        facts: [
+          ['Todo se queda en este equipo', 'Tus mensajes y sesiones se guardan solo aquí. Sin cuenta de Privé y sin telemetría, nunca.'],
+          ['Conexiones no oficiales', 'Privé se conecta como un dispositivo vinculado. Las redes pueden limitar apps de terceros, así que tus cuentas son tu responsabilidad.'],
+          ['Para tus propias conversaciones', 'Nada de spam, envíos masivos, extracción de datos ni vigilar a otras personas. Privé es una herramienta personal.']
+        ],
+        agree: 'Entiendo y acepto el Aviso legal y la Política de uso aceptable.',
+        disclaimer: 'Aviso legal', acceptableUse: 'Uso aceptable', privacy: 'Privacidad',
+        connectTitle: 'Conecta tu primera cuenta',
+        connectBody: 'Después puedes añadir todas las que quieras, incluso varias de la misma red.',
+        available: 'Disponible', soon: 'Próximamente', selected: 'Seleccionada',
+        suggest: '¿Falta una red?', suggestLink: 'Propón o crea un engine',
+        linkTitle: 'Vincular WhatsApp',
+        linkBody: 'Escanea el código con el teléfono que tiene la cuenta que quieres añadir.',
+        linkStep1: 'Abre WhatsApp en tu teléfono',
+        linkStep2: 'Ve a Ajustes → Dispositivos vinculados',
+        linkStep3: 'Toca Vincular un dispositivo y apunta a esta pantalla',
+        qrAlt: 'Código QR. En este prototipo, haz clic para simular el escaneo.',
+        qrPlaceholder: '[QR EN VIVO] · clic para simular',
+        waiting: 'Esperando el escaneo · el código se renueva solo',
+        linkedOk: 'Vinculada. Importando tus chats recientes…',
+        accountName: 'Nombre de la cuenta', accountColor: 'Color de la cuenta',
+        readyTitle: 'Todo listo', readyBody: 'Tus chats se siguen importando en segundo plano. Ya puedes usar Privé.',
+        readySkipTitle: 'Privé está listo', readySkipBody: 'Conecta una cuenta cuando quieras con el botón + de la barra lateral.',
+        importing: 'Importando chats recientes',
+        tips: [['⌘ K', 'Buscar en todo'], ['⌘ 1–9', 'Ir a una cuenta'], ['⌘ N', 'Añadir cuenta']],
+        openInbox: 'Abrir mi bandeja', addAnother: 'Añadir otra cuenta',
+        back: 'Atrás', next: 'Continuar', skip: 'Omitir por ahora', linkCta: 'Continuar'
+      }
+    };
+  }
+
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var dark = st.theme === 'light' ? false : st.theme === 'dark' ? true : (this.props.dark ?? true);
+    var c = this.palette(dark);
+    var t = this.dict()[st.lang];
+    var go = function (n) { self.setState({ step: n }); };
+
+    var steps = t.steps.map(function (label, i) {
+      var n = i + 1;
+      var done = n < st.step;
+      var cur = n === st.step;
+      return {
+        label: label,
+        mark: done ? '✓' : String(n),
+        current: cur ? 'step' : 'false',
+        dotBg: done ? c.accent : 'transparent',
+        dotFg: done ? c.onAccent : (cur ? c.accent : c.faint),
+        dotBorder: done || cur ? c.accent : c.border,
+        labelColor: cur ? c.text : c.text2,
+        weight: cur ? 700 : 500,
+        notLast: n < 5
+      };
+    });
+
+    var langs = [{ id: 'en', label: 'English' }, { id: 'es', label: 'Español' }].map(function (l) {
+      var sel = st.lang === l.id;
+      return { label: l.label, pressed: sel ? 'true' : 'false', border: sel ? c.accent : c.border, bg: sel ? c.tint : 'transparent', pick: function () { self.setState({ lang: l.id }); } };
+    });
+    var themes = ['system', 'light', 'dark'].map(function (id, i) {
+      var sel = st.theme === id;
+      return { label: t.themes[i], pressed: sel ? 'true' : 'false', border: sel ? c.accent : c.border, bg: sel ? c.tint : 'transparent', pick: function () { self.setState({ theme: id }); } };
+    });
+
+    var facts = t.facts.map(function (f, i) {
+      return { title: f[0], text: f[1], isLock: i === 0, isLink: i === 1, isPerson: i === 2 };
+    });
+
+    var engineDefs = [
+      { id: 'whatsapp', name: 'WhatsApp', short: 'WA', ready: true },
+      { id: 'telegram', name: 'Telegram', short: 'TG' },
+      { id: 'signal', name: 'Signal', short: 'SG' },
+      { id: 'slack', name: 'Slack', short: 'SL' },
+      { id: 'instagram', name: 'Instagram', short: 'IG' },
+      { id: 'messenger', name: 'Messenger', short: 'MS' },
+      { id: 'discord', name: 'Discord', short: 'DC' },
+      { id: 'gmessages', name: 'Google Messages', short: 'GM' },
+      { id: 'linkedin', name: 'LinkedIn', short: 'IN' },
+      { id: 'matrix', name: 'Matrix', short: 'MX' }
+    ];
+    var engines = engineDefs.map(function (e) {
+      var sel = st.engine === e.id;
+      return {
+        name: e.name, short: e.short,
+        disabled: !e.ready,
+        pressed: sel ? 'true' : 'false',
+        border: sel ? c.accent : (e.ready ? c.border : c.divider),
+        bg: sel ? c.tint : (e.ready ? c.surface : 'transparent'),
+        cursor: e.ready ? 'pointer' : 'default',
+        nameColor: e.ready ? c.text : c.text2,
+        shortColor: e.ready ? c.text : c.text2,
+        badge: sel ? t.selected : (e.ready ? t.available : t.soon),
+        badgeBg: e.ready ? c.tint : c.raised,
+        badgeFg: e.ready ? c.accent : c.text2,
+        pick: function () { if (e.ready) self.setState({ engine: e.id }); }
+      };
+    });
+
+    var palette = [
+      { name: 'Green', color: dark ? '#3FB68B' : '#1A7D5A' },
+      { name: 'Amber', color: dark ? '#E0A43A' : '#976209' },
+      { name: 'Rose', color: dark ? '#D46A9A' : '#B4477A' },
+      { name: 'Sky', color: dark ? '#4AA3DF' : '#1F78B4' },
+      { name: 'Violet', color: dark ? '#9C8CFF' : '#6B5AE0' },
+      { name: 'Coral', color: dark ? '#E5765C' : '#C2533A' }
+    ];
+    var colorIdx = Math.max(0, ['#3FB68B', '#E0A43A', '#D46A9A', '#4AA3DF', '#9C8CFF', '#E5765C'].indexOf(st.color));
+    var swatches = palette.map(function (s, i) {
+      var sel = i === colorIdx;
+      var darkHex = ['#3FB68B', '#E0A43A', '#D46A9A', '#4AA3DF', '#9C8CFF', '#E5765C'][i];
+      return { name: s.name, color: s.color, pressed: sel ? 'true' : 'false', ring: sel ? '0 0 0 2px ' + c.bg + ', 0 0 0 4px ' + c.text : 'none', pick: function () { self.setState({ color: darkHex }); } };
+    });
+
+    var step = st.step;
+    var nextDisabled = (step === 2 && !st.agreed) || (step === 3 && !st.engine) || (step === 4 && !st.linked);
+    var nextLabel = t.next;
+
+    return {
+      c: c, t: t, steps: steps, langs: langs, themes: themes, facts: facts, engines: engines, swatches: swatches,
+      is: { welcome: step === 1, privacy: step === 2, connect: step === 3, link: step === 4, ready: step === 5 },
+      showNav: step >= 2 && step <= 4,
+      agreed: st.agreed,
+      agreeBorder: st.agreed ? c.accent : c.border,
+      toggleAgree: function (e) { self.setState({ agreed: e.target.checked }); },
+      linked: st.linked,
+      linkedNot: !st.linked,
+      statusDot: st.linked ? c.success : c.warning,
+      statusText: st.linked ? t.linkedOk : t.waiting,
+      simulateScan: function () { self.setState({ linked: true }); },
+      label: st.label,
+      onLabel: function (e) { self.setState({ label: e.target.value }); },
+      initial: (st.label || '?').charAt(0).toUpperCase(),
+      accountColor: palette[colorIdx].color,
+      hasAccount: !st.skipped,
+      readyTitle: st.skipped ? t.readySkipTitle : t.readyTitle,
+      readyBody: st.skipped ? t.readySkipBody : t.readyBody,
+      tips: t.tips.map(function (p) { return { key: p[0], text: p[1] }; }),
+      nextDisabled: nextDisabled,
+      nextBg: nextDisabled ? c.disabledBg : c.accent,
+      nextFg: nextDisabled ? c.disabledFg : c.onAccent,
+      nextCursor: nextDisabled ? 'not-allowed' : 'pointer',
+      nextLabel: nextLabel,
+      next: function () { if (!nextDisabled) go(Math.min(5, step + 1)); },
+      back: function () { go(Math.max(1, step - 1)); },
+      skip: function () { self.setState({ skipped: true, step: 5 }); },
+      addAnother: function () { self.setState({ step: 3, engine: null, linked: false, skipped: false, label: 'Work', color: '#E0A43A' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

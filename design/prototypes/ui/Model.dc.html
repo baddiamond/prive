@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — unified model</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 860px; box-sizing: border-box; padding: 48px 56px; background: #0F1013; font-family: Inter, system-ui, sans-serif; color: #ECEDF0; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; flex-direction: column; gap: 8px; max-width: 900px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -0.02em">Every network speaks Privé</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.55; color: #A0A3AD">Each engine translates its network's objects into one shared model. The UI only knows that model and each engine's capabilities — so a new network appears with the same look, the same gestures and the same shortcuts.</p>
+  </div>
+
+  <div style="flex: 1; display: flex; align-items: stretch; gap: 0">
+
+    <div style="flex: 0 0 360px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #868A95">1 · Engines (one per network)</span>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #3A3E48; display: flex; flex-direction: column; gap: 8px">
+        <span style="display: flex; align-items: center; justify-content: space-between"><strong style="font-size: 15px">WhatsApp</strong><span style="font-size: 11px; color: #7BE0C3; background: #1F3A33; padding: 2px 8px; border-radius: 8px">whatsmeow</span></span>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7C9D0">types.JID · waE2E.Message<br>events.Receipt · events.HistorySync</code>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px dashed #3A3E48; display: flex; flex-direction: column; gap: 8px">
+        <span style="display: flex; align-items: center; justify-content: space-between"><strong style="font-size: 15px">Telegram</strong><span style="font-size: 11px; color: #A0A3AD; background: #22252C; padding: 2px 8px; border-radius: 8px">planned</span></span>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7C9D0">Peer · tg.Message<br>UpdateNewMessage · ReadHistory</code>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px dashed #3A3E48; display: flex; flex-direction: column; gap: 8px">
+        <span style="display: flex; align-items: center; justify-content: space-between"><strong style="font-size: 15px">Slack</strong><span style="font-size: 11px; color: #A0A3AD; background: #22252C; padding: 2px 8px; border-radius: 8px">planned</span></span>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7C9D0">Channel · ts · thread_ts<br>message.channels · mark</code>
+      </div>
+      <div style="padding: 14px 16px; border-radius: 14px; border: 1px dashed #3A3E48; font-size: 13px; color: #A0A3AD">+ any community engine</div>
+    </div>
+
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 12px">
+      <span style="font-size: 11px; color: #868A95; text-align: center">translate</span>
+      <div style="width: 100%; display: flex; align-items: center">
+        <div style="flex: 1; height: 2px; background: #3A3E48"></div>
+        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M0 0l12 7-12 7z" fill="#3A3E48"></path></svg>
+      </div>
+    </div>
+
+    <div style="flex: 0 0 400px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #868A95">2 · Privé model (internal/core)</span>
+      <div style="padding: 16px; border-radius: 14px; background: #1A1F3D; border: 1px solid #8B9CFF; display: flex; flex-direction: column; gap: 6px">
+        <strong style="font-size: 15px">Account</strong>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7CDFF">id · engineId · remoteId · displayName · color</code>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #1A1F3D; border: 1px solid #8B9CFF; display: flex; flex-direction: column; gap: 6px">
+        <strong style="font-size: 15px">Chat</strong>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7CDFF">accountId · id · kind (direct | group | channel)<br>name · avatar · unread · lastMessage · muted</code>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #1A1F3D; border: 1px solid #8B9CFF; display: flex; flex-direction: column; gap: 6px">
+        <strong style="font-size: 15px">Message</strong>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7CDFF">accountId · chatId · id · sender · timestamp<br>kind · text · status · replyTo</code>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #1A1F3D; border: 1px solid #8B9CFF; display: flex; flex-direction: column; gap: 6px">
+        <strong style="font-size: 15px">Event + Capabilities</strong>
+        <code style="font: 12px/1.6 ui-monospace, Menlo, monospace; color: #C7CDFF">message:new · chat:updated · account:state<br>sendText · media · reactions · edit · replies</code>
+      </div>
+    </div>
+
+    <div style="flex: 1 1 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 0 12px">
+      <span style="font-size: 11px; color: #868A95; text-align: center">render</span>
+      <div style="width: 100%; display: flex; align-items: center">
+        <div style="flex: 1; height: 2px; background: #3A3E48"></div>
+        <svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true"><path d="M0 0l12 7-12 7z" fill="#3A3E48"></path></svg>
+      </div>
+    </div>
+
+    <div style="flex: 0 0 340px; display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #868A95">3 · One UI (frontend)</span>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 4px">
+        <strong style="font-size: 15px">AccountRail</strong>
+        <span style="font-size: 13px; color: #A0A3AD; line-height: 1.5">Account color + small network tag, unread badge</span>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 4px">
+        <strong style="font-size: 15px">ChatList · ChatRow</strong>
+        <span style="font-size: 13px; color: #A0A3AD; line-height: 1.5">One row shape for every network; color dot shows the owning account</span>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 4px">
+        <strong style="font-size: 15px">Conversation · Bubble</strong>
+        <span style="font-size: 13px; color: #A0A3AD; line-height: 1.5">Same bubbles, statuses and day separators everywhere</span>
+      </div>
+      <div style="padding: 16px; border-radius: 14px; background: #131418; border: 1px solid #22252C; display: flex; flex-direction: column; gap: 4px">
+        <strong style="font-size: 15px">Composer</strong>
+        <span style="font-size: 13px; color: #A0A3AD; line-height: 1.5">"Sending as" account; attach, react, edit appear only if capabilities allow</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 24px; font-size: 13px; color: #A0A3AD; border-top: 1px solid #22252C; padding-top: 20px">
+    <span><strong style="color: #ECEDF0">Identity = account, not brand.</strong> Accounts get a user-chosen color; networks only show as a small tag.</span>
+    <span><strong style="color: #ECEDF0">No engine-specific screens.</strong> The UI branches on capabilities, never on engine id.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

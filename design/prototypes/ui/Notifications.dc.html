@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — notifications</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 100%; min-height: 800px; box-sizing: border-box; background: #0F1013; color: #ECEDF0; font-family: Inter, system-ui, sans-serif; display: flex; flex-wrap: wrap; gap: 32px; padding: 40px 48px">
+
+  <section aria-labelledby="n-settings" style="flex: 1 1 520px; min-width: 0; max-width: 640px; display: flex; flex-direction: column; gap: 22px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 id="n-settings" style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">Notifications</h1>
+      <p style="margin: 0; font-size: 14px; color: #A0A3AD">Settings → Notifications. Notifications are shown by your operating system and never leave this computer.</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; border: 1px solid #22252C; border-radius: 14px; overflow: hidden">
+      <sc-for list="{{toggles}}" as="tg" hint-placeholder-count="3">
+        <label style="display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-top: {{tg.divider}}; cursor: pointer">
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 14px; font-weight: 600">{{tg.label}}</span>
+            <span style="font-size: 12px; color: #A0A3AD">{{tg.hint}}</span>
+          </span>
+          <input type="checkbox" role="switch" checked="{{tg.on}}" onChange="{{tg.flip}}" style="width: 20px; height: 20px; accent-color: #8B9CFF">
+        </label>
+      </sc-for>
+    </div>
+
+    <fieldset style="border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px">
+      <legend style="font-size: 15px; font-weight: 600; padding: 0; margin-bottom: 4px">What notifications show</legend>
+      <span style="font-size: 12px; color: #A0A3AD">Anyone near your screen can read notifications. "Sender only" is the default.</span>
+      <sc-for list="{{levels}}" as="lv" hint-placeholder-count="3">
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid {{lv.border}}; background: {{lv.bg}}; cursor: pointer">
+          <input type="radio" name="preview" checked="{{lv.on}}" onChange="{{lv.pick}}" style="width: 18px; height: 18px; accent-color: #8B9CFF">
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+            <span style="font-size: 14px; font-weight: 600">{{lv.label}}</span>
+            <span style="font-size: 12px; color: #A0A3AD">{{lv.hint}}</span>
+          </span>
+        </label>
+      </sc-for>
+    </fieldset>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <h2 style="margin: 0; font-size: 15px; font-weight: 600">Per account</h2>
+      <div style="display: flex; flex-direction: column; border: 1px solid #22252C; border-radius: 14px; overflow: hidden">
+        <sc-for list="{{accounts}}" as="a" hint-placeholder-count="4">
+          <label style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: {{a.divider}}; cursor: pointer">
+            <span style="width: 32px; height: 32px; border-radius: 10px; background: {{a.color}}; color: #0A0B0D; font-weight: 700; display: flex; align-items: center; justify-content: center">{{a.initial}}</span>
+            <span style="flex: 1; font-size: 14px; font-weight: 600">{{a.label}} <span style="font-weight: 500; color: #A0A3AD">· {{a.net}}</span></span>
+            <span style="font-size: 12px; color: #A0A3AD">{{a.state}}</span>
+            <input type="checkbox" role="switch" checked="{{a.on}}" onChange="{{a.flip}}" style="width: 20px; height: 20px; accent-color: #8B9CFF">
+          </label>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="n-preview" style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+    <h2 id="n-preview" style="margin: 0; font-size: 15px; font-weight: 600">Preview</h2>
+    <span style="font-size: 12px; color: #A0A3AD">Drawn by the operating system; Privé only provides the title, the text and the icon.</span>
+    <sc-for list="{{previews}}" as="p" hint-placeholder-count="2">
+      <div style="display: flex; gap: 12px; padding: 14px; border-radius: 18px; background: #1B1D23; border: 1px solid #22252C; box-shadow: 0 12px 32px rgba(0,0,0,0.35); max-width: 380px">
+        <span style="flex: 0 0 40px; width: 40px; height: 40px; border-radius: 10px; background: #131418; border: 1px solid #3A3E48; display: flex; align-items: center; justify-content: center">
+          <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><circle cx="34" cy="36" r="14" fill="none" stroke="#ECEDF0" stroke-width="7"></circle><path d="M20 36v22" stroke="#ECEDF0" stroke-width="7" stroke-linecap="round"></path><path d="M39 12 49 5" stroke="#8B9CFF" stroke-width="6.5" stroke-linecap="round"></path></svg>
+        </span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <span style="display: flex; justify-content: space-between; font-size: 11px; color: #A0A3AD"><span>Privé · {{p.account}}</span><span>now</span></span>
+          <strong style="font-size: 14px">{{p.title}}</strong>
+          <span style="font-size: 13px; line-height: 1.4; color: #C7C9D0">{{p.body}}</span>
+        </span>
+      </div>
+    </sc-for>
+    <div style="margin-top: 8px; padding: 14px; border-radius: 14px; border: 1px dashed #6B6F7A; display: flex; flex-direction: column; gap: 6px; max-width: 380px">
+      <strong style="font-size: 13px">Dock / taskbar badge</strong>
+      <span style="font-size: 12px; line-height: 1.5; color: #A0A3AD">Shows the total unread count of unmuted chats. Muted chats and muted accounts never notify or count.</span>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { enabled: true, sound: true, badge: true, level: 'sender', acc: { a1: true, a2: true, a3: false, a4: true } };
+  }
+
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var flip = function (key) { return function () { var p = {}; p[key] = !self.state[key]; self.setState(p); }; };
+    var toggles = [
+      { key: 'enabled', label: 'Show notifications', hint: 'For new messages in unmuted chats' },
+      { key: 'sound', label: 'Play a sound', hint: 'A short, soft chime' },
+      { key: 'badge', label: 'Unread badge', hint: 'On the Dock or taskbar icon' }
+    ].map(function (t, i) {
+      return { label: t.label, hint: t.hint, on: !!st[t.key], flip: flip(t.key), divider: i === 0 ? 'none' : '1px solid #22252C' };
+    });
+    var levels = [
+      { id: 'full', label: 'Sender and message', hint: 'Lucía Romero — See you at 8 then' },
+      { id: 'sender', label: 'Sender only', hint: 'Lucía Romero — New message' },
+      { id: 'none', label: 'Nothing private', hint: 'Privé — New message' }
+    ].map(function (l) {
+      var on = st.level === l.id;
+      return { label: l.label, hint: l.hint, on: on, border: on ? '#8B9CFF' : '#6B6F7A', bg: on ? '#262C52' : 'transparent', pick: function () { self.setState({ level: l.id }); } };
+    });
+    var accDefs = [
+      { id: 'a1', label: 'Personal', net: 'WhatsApp', color: '#3FB68B' },
+      { id: 'a2', label: 'Work', net: 'WhatsApp', color: '#E0A43A' },
+      { id: 'a3', label: 'Family', net: 'WhatsApp', color: '#D46A9A' },
+      { id: 'a4', label: 'Telegram', net: 'Telegram', color: '#4AA3DF' }
+    ];
+    var accounts = accDefs.map(function (a, i) {
+      var on = !!st.acc[a.id];
+      return {
+        label: a.label, net: a.net, color: a.color, initial: a.label.charAt(0), on: on,
+        state: on ? 'On' : 'Muted',
+        divider: i === 0 ? 'none' : '1px solid #22252C',
+        flip: function () { var next = Object.assign({}, self.state.acc); next[a.id] = !next[a.id]; self.setState({ acc: next }); }
+      };
+    });
+    var samples = [
+      { account: 'Personal', sender: 'Lucía Romero', text: 'See you at 8 then' },
+      { account: 'Work', sender: 'Product team', text: 'Marco: the build is green again' }
+    ];
+    var previews = samples.map(function (s) {
+      if (st.level === 'full') return { account: s.account, title: s.sender, body: s.text };
+      if (st.level === 'sender') return { account: s.account, title: s.sender, body: 'New message' };
+      return { account: 'New message', title: 'Privé', body: 'You have a new message' };
+    });
+    return { toggles: toggles, levels: levels, accounts: accounts, previews: previews };
+  }
+}
+</script>
+</body>
+</html>

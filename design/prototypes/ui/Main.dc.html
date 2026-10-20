@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Privé — unified inbox</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="position: relative; width: 100%; min-height: 800px; height: 800px; display: flex; font-family: Inter, system-ui, sans-serif; color: {{c.text}}; background: {{c.bg}}; overflow: hidden; font-size: 14px">
+
+  <nav aria-label="Accounts" style="width: 76px; flex: 0 0 76px; background: {{c.rail}}; border-right: 1px solid {{c.divider}}; display: flex; flex-direction: column; align-items: center; padding: 16px 0; gap: 12px; box-sizing: border-box">
+    <svg width="30" height="30" viewBox="0 0 64 64" role="img" aria-label="Privé" style="margin-bottom: 4px">
+      <circle cx="34" cy="36" r="14" fill="none" stroke="{{c.text}}" stroke-width="7"></circle>
+      <path d="M20 36v22" stroke="{{c.text}}" stroke-width="7" stroke-linecap="round"></path>
+      <path d="M39 12 49 5" stroke="{{c.accent}}" stroke-width="6.5" stroke-linecap="round"></path>
+    </svg>
+    <div style="width: 36px; height: 1px; background: {{c.divider}}"></div>
+    <sc-for list="{{rail}}" as="a" hint-placeholder-count="5">
+      <button type="button" onClick="{{a.pick}}" aria-label="{{a.aria}}" aria-pressed="{{a.pressed}}" title="{{a.aria}}" style="position: relative; width: 48px; height: 48px; border-radius: 14px; border: none; padding: 0; cursor: pointer; background: {{a.bg}}; color: {{a.fg}}; font: 700 16px Inter, system-ui, sans-serif; box-shadow: {{a.ring}}; display: flex; align-items: center; justify-content: center">
+        <sc-if value="{{a.isAll}}" hint-placeholder-val="{{false}}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2 3h6l2-3h4"></path><path d="M5 5h14l2 7v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-6z"></path></svg>
+        </sc-if>
+        <sc-if value="{{a.isAccount}}" hint-placeholder-val="{{true}}">
+          <span>{{a.initial}}</span>
+        </sc-if>
+        <sc-if value="{{a.isAccount}}" hint-placeholder-val="{{true}}">
+          <span style="position: absolute; right: -4px; bottom: -4px; min-width: 22px; height: 16px; padding: 0 3px; box-sizing: border-box; border-radius: 6px; background: {{c.rail}}; border: 1px solid {{c.borderStrong}}; color: {{c.text2}}; font: 700 9px Inter, system-ui, sans-serif; letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center">{{a.netShort}}</span>
+        </sc-if>
+        <sc-if value="{{a.hasUnread}}" hint-placeholder-val="{{true}}">
+          <span style="position: absolute; top: -5px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; box-sizing: border-box; border-radius: 9px; background: {{c.accent}}; color: {{c.onAccent}}; font: 700 10px Inter, system-ui, sans-serif; display: flex; align-items: center; justify-content: center; border: 2px solid {{c.rail}}">{{a.unread}}</span>
+        </sc-if>
+        <sc-if value="{{a.hasIssue}}" hint-placeholder-val="{{false}}">
+          <span style="position: absolute; left: -5px; bottom: -5px; width: 18px; height: 18px; border-radius: 50%; background: {{a.issueColor}}; color: {{c.rail}}; border: 2px solid {{c.rail}}; box-sizing: border-box; font: 800 11px Inter, system-ui, sans-serif; display: flex; align-items: center; justify-content: center">!</span>
+        </sc-if>
+      </button>
+    </sc-for>
+    <a href="AddAccount.dc.html" aria-label="Add account" title="Add account (⌘N)" style="width: 48px; height: 48px; border-radius: 14px; border: 1.5px dashed {{c.borderStrong}}; color: {{c.text2}}; display: flex; align-items: center; justify-content: center; text-decoration: none; box-sizing: border-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    </a>
+    <div style="flex: 1"></div>
+    <a href="Settings.dc.html" aria-label="Settings" title="Settings (⌘,)" style="width: 44px; height: 44px; border-radius: 12px; color: {{c.text2}}; display: flex; align-items: center; justify-content: center; text-decoration: none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>
+    </a>
+  </nav>
+
+  <section aria-label="Chats" style="width: 340px; flex: 0 0 340px; background: {{c.surface}}; border-right: 1px solid {{c.divider}}; display: flex; flex-direction: column; min-width: 0">
+    <div style="padding: 18px 16px 12px; display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <h1 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em">{{scopeTitle}}</h1>
+        <span style="font-size: 12px; color: {{c.text2}}">{{scopeSubtitle}}</span>
+      </div>
+      <button type="button" onClick="{{openSearch}}" aria-label="Search all accounts" style="display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border-radius: 10px; border: 1.5px solid {{c.borderStrong}}; background: {{c.raised}}; color: {{c.text2}}; font: 400 13px Inter, system-ui, sans-serif; cursor: pointer; text-align: left">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="flex: 1">Search all accounts</span>
+        <kbd style="font: 600 11px ui-monospace, Menlo, monospace; color: {{c.text2}}; border: 1px solid {{c.borderStrong}}; border-radius: 5px; padding: 1px 5px">⌘K</kbd>
+      </button>
+      <div role="group" aria-label="Filter chats" style="display: flex; gap: 6px">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="3">
+          <button type="button" onClick="{{f.pick}}" aria-pressed="{{f.pressed}}" style="height: 30px; padding: 0 12px; border-radius: 15px; border: 1.5px solid {{f.border}}; background: {{f.bg}}; color: {{f.fg}}; font: 600 12px Inter, system-ui, sans-serif; cursor: pointer">{{f.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{banner.show}}" hint-placeholder-val="{{false}}">
+      <div role="status" style="margin: 0 12px 8px; padding: 10px 12px; border-radius: 12px; background: {{banner.bg}}; border: 1px solid {{banner.border}}; display: flex; gap: 10px; align-items: flex-start">
+        <span style="color: {{banner.color}}; flex: 0 0 18px; margin-top: 1px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"></path></svg>
+        </span>
+        <span style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 13px; font-weight: 600">{{banner.title}}</span>
+          <span style="font-size: 12px; line-height: 1.45; color: {{c.text2}}">{{banner.body}}</span>
+          <sc-if value="{{banner.hasAction}}" hint-placeholder-val="{{false}}">
+            <a href="AddAccount.dc.html" style="align-self: flex-start; height: 30px; padding: 0 12px; border-radius: 8px; background: {{c.accent}}; color: {{c.onAccent}}; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center">{{banner.action}}</a>
+          </sc-if>
+        </span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+      <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center">
+        <span style="width: 56px; height: 56px; border-radius: 16px; background: {{c.raised}}; color: {{c.text2}}; display: flex; align-items: center; justify-content: center">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </span>
+        <strong style="font-size: 15px">No chats yet</strong>
+        <span style="font-size: 13px; line-height: 1.5; color: {{c.text2}}; max-width: 240px">Add an account to see your conversations here.</span>
+        <a href="AddAccount.dc.html" style="height: 38px; padding: 0 16px; border-radius: 10px; background: {{c.accent}}; color: {{c.onAccent}}; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center">Add account</a>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasChats}}" hint-placeholder-val="{{true}}">
+      <div style="flex: 1; overflow-y: auto; padding: 0 8px 8px">
+        <sc-for list="{{chats}}" as="ch" hint-placeholder-count="7">
+          <button type="button" onClick="{{ch.pick}}" aria-current="{{ch.current}}" style="width: 100%; display: flex; gap: 12px; align-items: center; padding: 10px; border: none; border-radius: 12px; background: {{ch.bg}}; color: {{c.text}}; text-align: left; cursor: pointer; font-family: Inter, system-ui, sans-serif">
+            <span style="position: relative; flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; background: {{c.avatar}}; color: {{c.text}}; font-weight: 600; font-size: 15px; display: flex; align-items: center; justify-content: center">
+              {{ch.initials}}
+              <span style="position: absolute; right: -1px; bottom: -1px; width: 12px; height: 12px; border-radius: 50%; background: {{ch.accColor}}; border: 2px solid {{c.surface}}"></span>
+            </span>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+              <span style="display: flex; align-items: center; gap: 8px">
+                <span style="flex: 1; min-width: 0; font-weight: {{ch.weight}}; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ch.name}}</span>
+                <span style="font-size: 11px; font-weight: {{ch.timeWeight}}; color: {{ch.timeColor}}">{{ch.time}}</span>
+              </span>
+              <span style="display: flex; align-items: center; gap: 8px">
+                <span style="flex: 1; min-width: 0; font-size: 13px; color: {{ch.previewColor}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ch.preview}}</span>
+                <sc-if value="{{ch.hasUnread}}" hint-placeholder-val="{{false}}">
+                  <span aria-label="{{ch.unreadLabel}}" style="min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: {{c.accent}}; color: {{c.onAccent}}; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{ch.unread}}</span>
+                </sc-if>
+              </span>
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: {{c.faint}}">
+                <span>{{ch.accLabel}}</span><span aria-hidden="true">·</span><span>{{ch.net}}</span>
+              </span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </section>
+
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+    <main style="flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; padding: 24px; text-align: center">
+      <svg width="72" height="72" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="34" cy="36" r="14" fill="none" stroke="{{c.avatar}}" stroke-width="7"></circle>
+        <path d="M20 36v22" stroke="{{c.avatar}}" stroke-width="7" stroke-linecap="round"></path>
+        <path d="M39 12 49 5" stroke="{{c.accent}}" stroke-width="6.5" stroke-linecap="round"></path>
+      </svg>
+      <h2 style="margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.01em">Your conversations, at home.</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.55; color: {{c.text2}}; max-width: 380px">Connect WhatsApp to start. More networks are on the way, and you can add as many accounts as you like.</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center">
+        <sc-for list="{{tips}}" as="tip" hint-placeholder-count="3">
+          <span style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; border: 1px solid {{c.divider}}; font-size: 12px; color: {{c.text2}}">
+            <kbd style="font: 600 11px ui-monospace, Menlo, monospace; padding: 2px 6px; border-radius: 5px; border: 1px solid {{c.borderStrong}}; color: {{c.text}}">{{tip.key}}</kbd>{{tip.text}}
+          </span>
+        </sc-for>
+      </div>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{hasChats}}" hint-placeholder-val="{{true}}">
+    <main style="flex: 999 1 420px; min-width: 0; display: flex; flex-direction: column; background: {{c.bg}}">
+      <header style="height: 64px; flex: 0 0 64px; display: flex; align-items: center; gap: 12px; padding: 0 16px 0 20px; border-bottom: 1px solid {{c.divider}}; box-sizing: border-box">
+        <span style="width: 38px; height: 38px; border-radius: 50%; background: {{c.avatar}}; display: flex; align-items: center; justify-content: center; font-weight: 600">{{active.initials}}</span>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 600">{{active.name}}</h2>
+          <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{active.statusColor}}">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: {{active.accColor}}"></span>
+            {{active.accLabel}} · {{active.net}} · {{active.status}}
+          </span>
+        </div>
+        <button type="button" onClick="{{openSearch}}" aria-label="Search" title="Search (⌘K)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: transparent; color: {{c.text2}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        </button>
+        <button type="button" onClick="{{toggleDetails}}" aria-label="Chat details" aria-pressed="{{detailsPressed}}" title="Chat details (⌘I)" style="width: 36px; height: 36px; border-radius: 10px; border: none; background: {{detailsBtnBg}}; color: {{c.text2}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+        </button>
+      </header>
+
+      <div role="log" aria-label="Messages" style="flex: 1; overflow-y: auto; padding: 20px 28px; display: flex; flex-direction: column; gap: 6px">
+        <div style="align-self: center; font-size: 11px; font-weight: 600; color: {{c.text2}}; background: {{c.raised}}; padding: 4px 10px; border-radius: 10px; margin-bottom: 8px">Today</div>
+        <sc-for list="{{messages}}" as="m" hint-placeholder-count="5">
+          <div style="display: flex; flex-direction: column; align-items: {{m.align}}; margin-top: {{m.gap}}; gap: 6px">
+            <div style="max-width: 62%; padding: 8px 12px 6px; border-radius: {{m.radius}}; background: {{m.bg}}; border: 1.5px solid {{m.border}}; color: {{c.text}}; display: flex; flex-direction: column; gap: 2px">
+              <sc-if value="{{m.showSender}}" hint-placeholder-val="{{false}}">
+                <span style="font-size: 12px; font-weight: 700; color: {{m.senderColor}}">{{m.sender}}</span>
+              </sc-if>
+              <span style="font-size: 14px; line-height: 1.45">{{m.text}}</span>
+              <span style="align-self: flex-end; font-size: 11px; font-weight: 500; color: {{m.metaColor}}">{{m.meta}}</span>
+            </div>
+            <sc-if value="{{m.failed}}" hint-placeholder-val="{{false}}">
+              <span role="alert" style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: {{c.danger}}">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5h.01"></path></svg>
+                Couldn’t send. Check your connection and try again.
+                <button type="button" onClick="{{retry}}" style="height: 26px; padding: 0 10px; border-radius: 8px; border: 1.5px solid {{c.borderStrong}}; background: transparent; color: {{c.text}}; font: 600 12px Inter, system-ui, sans-serif; cursor: pointer">Retry</button>
+              </span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <footer style="padding: 10px 20px 16px; border-top: 1px solid {{c.divider}}; display: flex; flex-direction: column; gap: 8px">
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{composerNoteColor}}">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{active.accColor}}"></span>
+          {{composerNote}}
+        </span>
+        <div style="display: flex; align-items: center; gap: 8px">
+          <button type="button" aria-label="Attach (coming soon)" title="Attachments arrive with media support" disabled="{{true}}" style="width: 40px; height: 40px; border-radius: 12px; border: none; background: transparent; color: {{c.faint}}; display: flex; align-items: center; justify-content: center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"></path></svg>
+          </button>
+          <label for="composer" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Message</label>
+          <input id="composer" type="text" placeholder="Message" value="{{draft}}" onChange="{{onDraft}}" onKeyDown="{{onKey}}" style="flex: 1; min-width: 0; height: 42px; padding: 0 14px; border-radius: 12px; border: 1.5px solid {{c.borderStrong}}; background: {{c.raised}}; color: {{c.text}}; font: 400 14px Inter, system-ui, sans-serif">
+          <button type="button" onClick="{{send}}" aria-label="Send" title="Send (Enter)" style="width: 42px; height: 42px; border-radius: 12px; border: none; background: {{c.accent}}; color: {{c.onAccent}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </button>
+        </div>
+      </footer>
+    </main>
+  </sc-if>
+
+  <sc-if value="{{details}}" hint-placeholder-val="{{false}}">
+    <aside aria-label="Chat details" style="width: 320px; flex: 0 0 320px; border-left: 1px solid {{c.divider}}; background: {{c.surface}}; display: flex; flex-direction: column; overflow-y: auto">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid {{c.divider}}">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600">Details</h2>
+        <button type="button" onClick="{{toggleDetails}}" aria-label="Close details" style="width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent; color: {{c.text2}}; cursor: pointer; display: flex; align-items: center; justify-content: center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        </button>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 16px 16px; text-align: center">
+        <span style="width: 80px; height: 80px; border-radius: 50%; background: {{c.avatar}}; font-size: 28px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{active.initials}}</span>
+        <strong style="font-size: 18px">{{active.name}}</strong>
+        <span style="font-size: 13px; color: {{c.text2}}">{{active.subtitle}}</span>
+        <span style="display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 10px; background: {{c.raised}}; font-size: 12px; font-weight: 600">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: {{active.accColor}}"></span>via {{active.accLabel}} · {{active.net}}
+        </span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 16px 16px">
+        <sc-for list="{{chatActions}}" as="ca" hint-placeholder-count="3">
+          <button type="button" onClick="{{ca.pick}}" aria-pressed="{{ca.pressed}}" style="display: flex; align-items: center; justify-content: center; height: 40px; padding: 0 4px; border-radius: 10px; border: 1.5px solid {{ca.border}}; background: {{ca.bg}}; color: {{c.text}}; font: 600 12px Inter, system-ui, sans-serif; cursor: pointer">
+            {{ca.label}}
+          </button>
+        </sc-for>
+      </div>
+      <div style="padding: 16px; border-top: 1px solid {{c.divider}}; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <strong style="font-size: 13px">Shared media</strong>
+          <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: {{c.raised}}; color: {{c.text2}}">Coming soon</span>
+        </div>
+        <span style="font-size: 12px; line-height: 1.5; color: {{c.text2}}">Photos, files and links appear here once the engine supports media.</span>
+      </div>
+      <div style="padding: 16px; border-top: 1px solid {{c.divider}}; display: flex; flex-direction: column; gap: 10px">
+        <strong style="font-size: 13px">On this computer</strong>
+        <span style="font-size: 12px; line-height: 1.5; color: {{c.text2}}">[N] messages from this chat are stored locally. They never leave this computer except to be sent.</span>
+        <button type="button" style="align-self: flex-start; height: 34px; padding: 0 12px; border-radius: 8px; border: 1.5px solid {{c.danger}}; background: transparent; color: {{c.danger}}; font: 600 12px Inter, system-ui, sans-serif; cursor: pointer">Clear local history</button>
+      </div>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{search}}" hint-placeholder-val="{{false}}">
+    <div style="position: absolute; inset: 0; background: {{c.scrim}}; display: flex; justify-content: center; align-items: flex-start; padding-top: 88px">
+      <div role="dialog" aria-modal="true" aria-label="Search all accounts" style="width: 640px; max-width: calc(100% - 32px); border-radius: 20px; background: {{c.surface}}; border: 1px solid {{c.divider}}; box-shadow: 0 24px 64px rgba(0,0,0,0.35); overflow: hidden; display: flex; flex-direction: column">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 56px; border-bottom: 1px solid {{c.divider}}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{c.text2}}" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <label for="q" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search</label>
+          <input id="q" type="search" placeholder="Search chats and messages in all accounts" value="{{query}}" onChange="{{onQuery}}" onKeyDown="{{onSearchKey}}" style="flex: 1; min-width: 0; height: 40px; border: none; outline: none; background: transparent; color: {{c.text}}; font: 400 16px Inter, system-ui, sans-serif">
+          <kbd style="font: 600 11px ui-monospace, Menlo, monospace; color: {{c.text2}}; border: 1px solid {{c.borderStrong}}; border-radius: 5px; padding: 1px 6px">esc</kbd>
+        </div>
+        <div style="max-height: 380px; overflow-y: auto; padding: 8px">
+          <sc-if value="{{hasChatResults}}" hint-placeholder-val="{{true}}">
+            <span style="display: block; padding: 8px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.faint}}">Chats</span>
+          </sc-if>
+          <sc-for list="{{chatResults}}" as="r" hint-placeholder-count="2">
+            <button type="button" onClick="{{r.open}}" style="width: 100%; display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: none; border-radius: 10px; background: {{r.bg}}; color: {{c.text}}; text-align: left; cursor: pointer; font-family: Inter, system-ui, sans-serif">
+              <span style="width: 32px; height: 32px; border-radius: 50%; background: {{c.avatar}}; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center">{{r.initials}}</span>
+              <span style="flex: 1; font-size: 14px; font-weight: 600">{{r.name}}</span>
+              <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: {{c.text2}}"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{r.accColor}}"></span>{{r.accLabel}}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{hasMessageResults}}" hint-placeholder-val="{{true}}">
+            <span style="display: block; padding: 12px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: {{c.faint}}">Messages</span>
+          </sc-if>
+          <sc-for list="{{messageResults}}" as="r" hint-placeholder-count="3">
+            <button type="button" onClick="{{r.open}}" style="width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; border: none; border-radius: 10px; background: transparent; color: {{c.text}}; text-align: left; cursor: pointer; font-family: Inter, system-ui, sans-serif">
+              <span style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: {{c.text2}}">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: {{r.accColor}}"></span><strong style="color: {{c.text}}">{{r.chat}}</strong> · {{r.accLabel}} · {{r.time}}
+              </span>
+              <span style="font-size: 13px; line-height: 1.45; color: {{c.text2}}">{{r.pre}}<mark style="background: {{c.tint}}; color: {{c.text}}; border-radius: 3px; padding: 0 2px">{{r.match}}</mark>{{r.post}}</span>
+            </button>
+          </sc-for>
+          <sc-if value="{{noResults}}" hint-placeholder-val="{{false}}">
+            <p style="margin: 0; padding: 24px 10px; text-align: center; font-size: 13px; color: {{c.text2}}">No results for “{{query}}”. Search looks in chats and messages stored on this computer.</p>
+          </sc-if>
+        </div>
+        <div style="display: flex; gap: 16px; padding: 10px 16px; border-top: 1px solid {{c.divider}}; font-size: 12px; color: {{c.text2}}">
+          <span><kbd style="font: 600 11px ui-monospace, Menlo, monospace">↑↓</kbd> navigate</span>
+          <span><kbd style="font: 600 11px ui-monospace, Menlo, monospace">↵</kbd> open</span>
+          <span style="flex: 1"></span>
+          <span>Searches only this computer</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":true},"scenario":{"editor":"enum","options":["default","empty","reconnecting","loggedOut","sendError","search","details"],"default":"default"},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    var sc = props.scenario ?? 'default';
+    this.state = {
+      acc: 'all', filter: 'all', chat: 'c2', draft: '', sent: {},
+      search: sc === 'search', query: sc === 'search' ? 'dinner' : '',
+      details: sc === 'details', failed: sc === 'sendError',
+      muted: false, pinned: true, archived: false
+    };
+  }
+
+  palette(dark) {
+    if (dark) {
+      return { bg: '#0F1013', rail: '#0A0B0D', surface: '#131418', raised: '#1B1D23', avatar: '#2A2D35', divider: '#22252C', borderStrong: '#6B6F7A', text: '#ECEDF0', text2: '#A0A3AD', faint: '#868A95', accent: '#8B9CFF', onAccent: '#0A0B0D', tint: '#262C52', selected: '#1B1D23', incoming: '#1B1D23', outgoing: '#262C52', warning: '#F2A65A', danger: '#F2A0A8', warningBg: '#2A2117', dangerBg: '#2A1719', scrim: 'rgba(5,6,8,0.6)', onAccount: '#0A0B0D' };
+    }
+    return { bg: '#FFFFFF', rail: '#F8F8FA', surface: '#F8F8FA', raised: '#ECEDF0', avatar: '#E3E4E9', divider: '#E3E4E9', borderStrong: '#6B6F7A', text: '#0F1013', text2: '#585C67', faint: '#6B6F7A', accent: '#4453D6', onAccent: '#FFFFFF', tint: '#E4E8FF', selected: '#ECEDF0', incoming: '#ECEDF0', outgoing: '#E4E8FF', warning: '#976209', danger: '#B3261E', warningBg: '#FFF4E5', dangerBg: '#FDECEC', scrim: 'rgba(15,16,19,0.35)', onAccount: '#FFFFFF' };
+  }
+
+  data(dark) {
+    var col = function (d, l) { return dark ? d : l; };
+    var accounts = [
+      { id: 'a1', label: 'Personal', net: 'WhatsApp', netShort: 'WA', color: col('#3FB68B', '#1A7D5A'), initial: 'P' },
+      { id: 'a2', label: 'Work', net: 'WhatsApp', netShort: 'WA', color: col('#E0A43A', '#976209'), initial: 'W' },
+      { id: 'a3', label: 'Family', net: 'WhatsApp', netShort: 'WA', color: col('#D46A9A', '#B4477A'), initial: 'F' },
+      { id: 'a4', label: 'Telegram', net: 'Telegram', netShort: 'TG', color: col('#4AA3DF', '#1F78B4'), initial: 'T' }
+    ];
+    var chats = [
+      { id: 'c1', acc: 'a1', name: 'Lucía Romero', preview: 'See you at 8 then', time: '09:41', unread: 2, group: false },
+      { id: 'c2', acc: 'a2', name: 'Product team', preview: 'Marco: the build is green again', time: '09:30', unread: 5, group: true },
+      { id: 'c3', acc: 'a3', name: 'Mom', preview: 'Did you call your aunt?', time: '08:12', unread: 1, group: false },
+      { id: 'c4', acc: 'a4', name: 'Diego Herrera', preview: 'Sent you the slides', time: 'Yesterday', unread: 0, group: false },
+      { id: 'c5', acc: 'a2', name: 'Ana Torres', preview: 'Thanks! Talk on Monday.', time: 'Yesterday', unread: 0, group: false },
+      { id: 'c6', acc: 'a1', name: 'Climbing crew', preview: 'Saturday 10am at the usual wall?', time: 'Mon', unread: 3, group: true },
+      { id: 'c7', acc: 'a4', name: 'Sofía Méndez', preview: 'Perfect, thank you', time: 'Sun', unread: 0, group: false },
+      { id: 'c8', acc: 'a2', name: 'Billing', preview: 'Payment received', time: 'Fri', unread: 0, group: false }
+    ];
+    var messages = {
+      c1: [
+        { out: false, text: 'Are we still on for dinner?', time: '09:35' },
+        { out: true, text: 'Yes! 8pm works for me', time: '09:38', status: 'Read' },
+        { out: false, text: 'Great, I booked a table for dinner at Lola’s', time: '09:40' },
+        { out: false, text: 'See you at 8 then', time: '09:41' }
+      ],
+      c2: [
+        { out: false, sender: 'Marco', senderColor: col('#E0A43A', '#976209'), text: 'Heads up: CI was red after the last merge.', time: '09:02' },
+        { out: false, sender: 'Julia', senderColor: col('#5ED3B5', '#1A7D5A'), text: 'Looking into it now.', time: '09:05' },
+        { out: true, text: 'Thanks — it was the migration test, I pushed a fix.', time: '09:21', status: 'Delivered' },
+        { out: false, sender: 'Marco', senderColor: col('#E0A43A', '#976209'), text: 'The build is green again', time: '09:30' }
+      ],
+      c4: [
+        { out: true, text: 'Could you share the deck from the team dinner talk?', time: 'Yesterday', status: 'Read' },
+        { out: false, text: 'Sent you the slides', time: 'Yesterday' }
+      ]
+    };
+    return { accounts: accounts, chats: chats, messages: messages };
+  }
+
+  renderVals() {
+    var self = this;
+    var dark = this.props.dark ?? true;
+    var sc = this.props.scenario ?? 'default';
+    var c = this.palette(dark);
+    var d = this.data(dark);
+    var st = this.state;
+    var isEmpty = sc === 'empty';
+    var issueAcc = sc === 'reconnecting' ? 'a2' : sc === 'loggedOut' ? 'a2' : null;
+    if (isEmpty) { d.accounts = []; d.chats = []; }
+
+    var accById = {};
+    d.accounts.forEach(function (a) { accById[a.id] = a; });
+
+    var sent = st.sent;
+    var chats = d.chats.map(function (ch) {
+      var extra = sent[ch.id] || [];
+      if (extra.length) {
+        var last = extra[extra.length - 1];
+        return Object.assign({}, ch, { preview: 'You: ' + last.text, time: last.time, unread: 0 });
+      }
+      return ch;
+    });
+
+    var unreadByAcc = {};
+    var total = 0;
+    chats.forEach(function (ch) { unreadByAcc[ch.acc] = (unreadByAcc[ch.acc] || 0) + ch.unread; total += ch.unread; });
+
+    var railItems = [{ id: 'all', isAll: true, isAccount: false, aria: 'All inboxes', unread: total }]
+      .concat(d.accounts.map(function (a) {
+        return { id: a.id, isAll: false, isAccount: true, aria: a.label + ' · ' + a.net, initial: a.initial, netShort: a.netShort, color: a.color, unread: unreadByAcc[a.id] || 0 };
+      }));
+    var rail = railItems.map(function (r) {
+      var sel = st.acc === r.id;
+      var issue = r.id === issueAcc;
+      return Object.assign({}, r, {
+        pressed: sel ? 'true' : 'false',
+        bg: r.isAll ? (sel ? c.raised : 'transparent') : r.color,
+        fg: r.isAll ? c.text : c.onAccount,
+        ring: sel ? '0 0 0 2px ' + c.rail + ', 0 0 0 4px ' + c.accent : 'none',
+        hasUnread: r.unread > 0,
+        unread: r.unread > 99 ? '99+' : String(r.unread),
+        hasIssue: issue,
+        issueColor: sc === 'loggedOut' ? c.danger : c.warning,
+        aria: issue ? r.aria + (sc === 'loggedOut' ? ' · logged out' : ' · reconnecting') : r.aria,
+        pick: function () { self.setState({ acc: r.id }); }
+      });
+    });
+
+    var filters = [{ id: 'all', label: 'All' }, { id: 'unread', label: 'Unread' }, { id: 'groups', label: 'Groups' }].map(function (f) {
+      var sel = st.filter === f.id;
+      return Object.assign({}, f, {
+        pressed: sel ? 'true' : 'false',
+        bg: sel ? c.text : 'transparent', fg: sel ? c.bg : c.text2, border: sel ? c.text : c.borderStrong,
+        pick: function () { self.setState({ filter: f.id }); }
+      });
+    });
+
+    var initialsOf = function (name) { return name.split(' ').map(function (p) { return p[0]; }).join('').slice(0, 2); };
+
+    var visible = chats.filter(function (ch) {
+      if (st.acc !== 'all' && ch.acc !== st.acc) return false;
+      if (st.filter === 'unread' && ch.unread === 0) return false;
+      if (st.filter === 'groups' && !ch.group) return false;
+      return true;
+    }).map(function (ch) {
+      var a = accById[ch.acc];
+      var sel = ch.id === st.chat;
+      return Object.assign({}, ch, {
+        initials: initialsOf(ch.name), accColor: a.color, accLabel: a.label, net: a.net,
+        current: sel ? 'true' : 'false',
+        bg: sel ? c.selected : 'transparent',
+        weight: ch.unread > 0 ? 700 : 500,
+        timeWeight: ch.unread > 0 ? 700 : 500,
+        timeColor: ch.unread > 0 ? c.accent : c.faint,
+        previewColor: ch.unread > 0 ? c.text : c.text2,
+        hasUnread: ch.unread > 0,
+        unreadLabel: ch.unread + ' unread',
+        pick: function () { self.setState({ chat: ch.id }); }
+      });
+    });
+
+    var activeRaw = chats.filter(function (ch) { return ch.id === st.chat; })[0] || chats[0];
+    var active = { name: '', initials: '', accColor: 'transparent', accLabel: '', net: '', status: '', statusColor: c.text2, subtitle: '' };
+    var messages = [];
+    var composerNote = '';
+    var composerNoteColor = c.text2;
+    if (activeRaw) {
+      var activeAcc = accById[activeRaw.acc];
+      var issueHere = activeRaw.acc === issueAcc;
+      active = {
+        name: activeRaw.name, initials: initialsOf(activeRaw.name),
+        accColor: activeAcc.color, accLabel: activeAcc.label, net: activeAcc.net,
+        status: issueHere ? (sc === 'loggedOut' ? 'Logged out' : 'Reconnecting…') : (activeRaw.group ? '6 members' : 'Connected'),
+        statusColor: issueHere ? (sc === 'loggedOut' ? c.danger : c.warning) : c.text2,
+        subtitle: activeRaw.group ? 'Group · 6 members' : '+00 •••• ••47'
+      };
+      composerNote = 'Sending as ' + activeAcc.label + ' · ' + activeAcc.net;
+      if (issueHere && sc === 'reconnecting') { composerNote = 'Messages you send now will go out when ' + activeAcc.label + ' reconnects.'; composerNoteColor = c.warning; }
+      if (issueHere && sc === 'loggedOut') { composerNote = activeAcc.label + ' is logged out. Link it again to send messages.'; composerNoteColor = c.danger; }
+
+      var base = d.messages[activeRaw.id] || [{ out: false, text: activeRaw.preview, time: activeRaw.time }];
+      var all = base.concat(sent[activeRaw.id] || []);
+      if (st.failed && activeRaw.id === 'c2') {
+        all = all.concat([{ out: true, text: 'Great, I’ll deploy after lunch.', time: '09:33', status: 'Not sent', failed: true }]);
+      }
+      messages = all.map(function (m, i) {
+        var prev = all[i - 1];
+        var sameSide = prev && prev.out === m.out;
+        return {
+          text: m.text, sender: m.sender || '', senderColor: m.senderColor || c.accent,
+          showSender: !m.out && !!m.sender && !(prev && prev.sender === m.sender),
+          align: m.out ? 'flex-end' : 'flex-start',
+          bg: m.out ? c.outgoing : c.incoming,
+          border: m.failed ? c.danger : 'transparent',
+          radius: m.out ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+          gap: sameSide ? '0px' : '8px',
+          meta: m.out ? m.time + ' · ' + (m.status || 'Sent') : m.time,
+          metaColor: m.failed ? c.danger : c.text2,
+          failed: !!m.failed
+        };
+      });
+    }
+
+    var banner = { show: false };
+    if (sc === 'reconnecting') {
+      banner = { show: true, bg: c.warningBg, border: c.warning, color: c.warning, title: 'Reconnecting to Work…', body: 'Your phone may be offline. Your messages are safe and will sync when it is back.', hasAction: false };
+    }
+    if (sc === 'loggedOut') {
+      banner = { show: true, bg: c.dangerBg, border: c.danger, color: c.danger, title: 'Work was logged out', body: 'This device was removed from Linked devices on your phone. Your local chats are kept.', hasAction: true, action: 'Link again' };
+    }
+
+    var scopeAcc = accById[st.acc];
+    var sendNow = function () {
+      var text = (self.state.draft || '').trim();
+      if (!text) return;
+      var id = self.state.chat;
+      var next = Object.assign({}, self.state.sent);
+      next[id] = (next[id] || []).concat([{ out: true, text: text, time: '09:42', status: 'Sent' }]);
+      self.setState({ sent: next, draft: '' });
+    };
+
+    var q = (st.query || '').trim().toLowerCase();
+    var chatResults = [];
+    var messageResults = [];
+    if (q) {
+      chatResults = chats.filter(function (ch) { return ch.name.toLowerCase().indexOf(q) >= 0; }).slice(0, 4).map(function (ch, i) {
+        var a = accById[ch.acc];
+        return { name: ch.name, initials: initialsOf(ch.name), accColor: a.color, accLabel: a.label, bg: i === 0 ? c.raised : 'transparent', open: function () { self.setState({ chat: ch.id, acc: 'all', search: false }); } };
+      });
+      Object.keys(d.messages).forEach(function (cid) {
+        var ch = chats.filter(function (x) { return x.id === cid; })[0];
+        if (!ch) return;
+        d.messages[cid].forEach(function (m) {
+          var idx = m.text.toLowerCase().indexOf(q);
+          if (idx < 0 || messageResults.length >= 5) return;
+          var a = accById[ch.acc];
+          messageResults.push({
+            chat: ch.name, accColor: a.color, accLabel: a.label, time: m.time,
+            pre: (idx > 28 ? '…' : '') + m.text.slice(Math.max(0, idx - 28), idx),
+            match: m.text.slice(idx, idx + q.length),
+            post: m.text.slice(idx + q.length),
+            open: function () { self.setState({ chat: cid, acc: 'all', search: false }); }
+          });
+        });
+      });
+    }
+
+    var chatActions = [
+      { id: 'muted', label: st.muted ? 'Muted' : 'Mute', glyph: st.muted ? '🔕' : '🔔' },
+      { id: 'pinned', label: st.pinned ? 'Pinned' : 'Pin', glyph: '📌' },
+      { id: 'archived', label: st.archived ? 'Archived' : 'Archive', glyph: '🗄' }
+    ].map(function (a) {
+      var on = !!st[a.id];
+      return {
+        label: a.label, glyph: '',
+        pressed: on ? 'true' : 'false',
+        border: on ? c.accent : c.borderStrong, bg: on ? c.tint : 'transparent',
+        pick: function () { var p = {}; p[a.id] = !self.state[a.id]; self.setState(p); }
+      };
+    });
+
+    return {
+      c: c, rail: rail, filters: filters, chats: visible, active: active, messages: messages,
+      isEmpty: isEmpty, hasChats: !isEmpty, banner: banner,
+      scopeTitle: scopeAcc ? scopeAcc.label : 'All inboxes',
+      scopeSubtitle: isEmpty ? 'No accounts yet' : (scopeAcc ? scopeAcc.net : d.accounts.length + ' accounts'),
+      tips: [{ key: '⌘N', text: 'Add account' }, { key: '⌘K', text: 'Search' }, { key: '⌘,', text: 'Settings' }],
+      draft: st.draft,
+      onDraft: function (e) { self.setState({ draft: e.target.value }); },
+      onKey: function (e) { if (e.key === 'Enter') sendNow(); },
+      send: sendNow,
+      composerNote: composerNote, composerNoteColor: composerNoteColor,
+      retry: function () { self.setState({ failed: false, sent: Object.assign({}, self.state.sent, { c2: (self.state.sent.c2 || []).concat([{ out: true, text: 'Great, I’ll deploy after lunch.', time: '09:34', status: 'Sent' }]) }) }); },
+      details: st.details && !isEmpty,
+      detailsPressed: st.details ? 'true' : 'false',
+      detailsBtnBg: st.details ? c.raised : 'transparent',
+      toggleDetails: function () { self.setState({ details: !self.state.details }); },
+      chatActions: chatActions,
+      search: st.search,
+      query: st.query,
+      openSearch: function () { self.setState({ search: true }); },
+      onQuery: function (e) { self.setState({ query: e.target.value }); },
+      onSearchKey: function (e) { if (e.key === 'Escape') self.setState({ search: false }); },
+      chatResults: chatResults, messageResults: messageResults,
+      hasChatResults: chatResults.length > 0, hasMessageResults: messageResults.length > 0,
+      noResults: !!q && chatResults.length === 0 && messageResults.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>
