@@ -1,0 +1,151 @@
+# Privé
+
+**One fast, private, local-first desktop app for all your messaging accounts.**
+
+Privé (`prive`) brings WhatsApp — and, over time, Telegram, Slack, Signal, Instagram and more — into a single
+minimal window. Think Beeper, but:
+
+- **Local-first**: your sessions, chats and messages live only on your computer, in a local SQLite database.
+- **No account**: there is no Privé account and no Privé server. Ever.
+- **No telemetry**: the app talks only to the messaging networks you connect.
+- **Fast**: a native Go backend with a lightweight web UI (Wails), built for quick startup and low memory.
+- **Unlimited accounts**: connect as many accounts as you want, including several of the same network.
+- **Multilingual**: English and Spanish from day one; community translations welcome.
+- **Open and extensible**: every network is an *engine* with a small, documented interface.
+
+> **Status:** early design phase. Nothing is usable yet — see the [roadmap](#roadmap).
+> Platforms: macOS first, then Windows and Linux.
+
+## How it works
+
+```
+ ┌──────────────── Privé (one process) ────────────────┐
+ │  React UI  ◀── Wails events / bindings ──▶  Go core │
+ │                                              │      │
+ │                     ┌────────────────────────┤      │
+ │                     ▼            ▼           ▼      │
+ │               WhatsApp engine  Telegram   ...       │
+ │               (whatsmeow)      engine               │
+ │                     │                               │
+ │                SQLite (local)                       │
+ └─────────────────────┼───────────────────────────────┘
+                       ▼
+            The messaging networks themselves
+```
+
+Read more in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Tech stack
+
+| Layer | Choice |
+|---|---|
+| Desktop shell | [Wails v2](https://wails.io) |
+| Backend | Go |
+| Frontend | React + TypeScript + Tailwind CSS, Zustand, react-i18next |
+| Storage | SQLite via `modernc.org/sqlite` (pure Go, no CGO) |
+| WhatsApp | [whatsmeow](https://github.com/tulir/whatsmeow) |
+
+## Installation (development)
+
+> These steps become valid once Phase 0 lands. Prebuilt releases will follow after the MVP.
+
+### Prerequisites (macOS)
+
+```bash
+# Xcode command line tools
+xcode-select --install
+
+# Go (1.23+) and Node.js (20+)
+brew install go node
+
+# Wails CLI
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+# Make sure $(go env GOPATH)/bin is on your PATH, then:
+wails doctor
+```
+
+Windows and Linux prerequisites: see the [Wails installation guide](https://wails.io/docs/gettingstarted/installation).
+
+### Run in development mode
+
+```bash
+git clone https://github.com/baddiamond/prive.git
+cd prive
+wails dev
+```
+
+### Build
+
+```bash
+wails build                          # current platform → build/bin/
+wails build -platform darwin/universal   # macOS Intel + Apple Silicon
+```
+
+### Tests
+
+```bash
+go test ./...
+cd frontend && npm run lint && npm run typecheck
+```
+
+## Where is my data?
+
+| OS | Location |
+|---|---|
+| macOS | `~/Library/Application Support/Prive` |
+| Windows | `%AppData%\Prive` |
+| Linux | `~/.local/share/prive` |
+
+Deleting that folder removes every session, chat and setting. Nothing is stored anywhere else.
+
+## Adding a language
+
+1. Copy `frontend/src/locales/en.json` to `frontend/src/locales/<code>.json` (e.g. `fr.json`).
+2. Translate the values (never the keys).
+3. Register the language in `frontend/src/i18n.ts` and add its native name under `settings.language.options`.
+4. Open a pull request.
+
+Full guide: [`docs/I18N.md`](docs/I18N.md).
+
+## Adding a network (engine)
+
+Each network lives in `internal/engines/<id>/` and implements two interfaces (`Engine` and `Session`).
+Copy the template, implement it, pass the shared conformance tests, add translations and an icon.
+Step by step: [`docs/ADDING_AN_ENGINE.md`](docs/ADDING_AN_ENGINE.md).
+
+## Roadmap
+
+Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+**Phase 1 — MVP (WhatsApp)**
+
+- [ ] **0. Bootstrap** — repo docs, Wails + React + TS + Tailwind skeleton, i18n (en/es), dark mode, CI
+- [ ] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
+- [ ] **2. WhatsApp login** — QR pairing, persisted sessions, auto-reconnect, unlimited accounts
+- [ ] **3. Chat list** — unified inbox + per-account filter, sorted by last message, unread counters
+- [ ] **4. History** — paginated message history cached locally
+- [ ] **5. Real time** — send and receive text messages live, mark as read
+- [ ] **6. Polish** — keyboard shortcuts, startup/memory profiling, macOS/Windows/Linux builds
+
+**Later**
+
+- Media (images, audio, documents), reactions, replies, edits
+- Search across all accounts (local full-text index)
+- Notifications and tray/menu bar icon
+- More engines: Telegram, Signal, Slack, Instagram, Discord, Matrix… (community welcome)
+- Optional encryption at rest for the local database
+- Out-of-process engines (write an engine in any language over stdio)
+
+## Contributing
+
+Contributions from humans and AI-assisted contributors are welcome.
+Start with [`CONTRIBUTING.md`](CONTRIBUTING.md) and the project rules in [`CLAUDE.md`](CLAUDE.md).
+
+## Disclaimer
+
+Privé is an independent project, not affiliated with WhatsApp, Meta or any other network.
+Using unofficial clients may violate a network's terms of service; use at your own risk.
+
+## License
+
+[MIT](LICENSE) © Privé contributors
