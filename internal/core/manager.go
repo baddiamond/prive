@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -30,6 +31,9 @@ type ManagerConfig struct {
 	Now func() time.Time
 	// NewID creates account IDs. Defaults to NewAccountID; tests may override it.
 	NewID func() AccountID
+	// OpenDB opens engine databases (see SessionDeps.OpenDB). The app passes an opener that
+	// encrypts every file with its own derived key. If nil, engines cannot open databases.
+	OpenDB DBOpener
 }
 
 // NewAccount is a request to add an account.
@@ -60,6 +64,7 @@ type Manager struct {
 	emitFn  func(Event)
 	now     func() time.Time
 	newID   func() AccountID
+	openDB  DBOpener
 
 	ctx    context.Context // lives until Close; used for connections and logins
 	cancel context.CancelFunc
@@ -99,6 +104,7 @@ func NewManager(cfg ManagerConfig) *Manager {
 		emitFn:   cfg.Emit,
 		now:      cfg.Now,
 		newID:    cfg.NewID,
+		openDB:   cfg.OpenDB,
 		accounts: map[AccountID]*runningAccount{},
 	}
 	if m.logger == nil {
@@ -379,6 +385,7 @@ func (m *Manager) open(acc Account) *runningAccount {
 	deps := SessionDeps{
 		DataDir: dir,
 		Logger:  m.logger.With("engine", acc.EngineID, "account", acc.ID),
+		OpenDB:  m.engineDBOpener(acc, dir),
 	}
 	sess, err := newSession(eng, acc, deps)
 	if err != nil {
@@ -578,6 +585,21 @@ func (m *Manager) nextPosition() int {
 		ra.mu.Unlock()
 	}
 	return next
+}
+
+// engineDBOpener returns the SessionDeps.OpenDB of one account: names are validated so a
+// database can only be created inside the account's own folder.
+func (m *Manager) engineDBOpener(acc Account, dir string) func(context.Context, string) (*sql.DB, error) {
+	return func(ctx context.Context, name string) (*sql.DB, error) {
+		if !dbNamePattern.MatchString(name) {
+			return nil, fmt.Errorf("engine database name %q must match %s", name, dbNamePattern)
+		}
+		if m.openDB == nil {
+			return nil, ErrNotImplemented
+		}
+		label := "engine/" + acc.EngineID + "/" + string(acc.ID) + "/" + name
+		return m.openDB(ctx, filepath.Join(dir, name+".db"), label)
+	}
 }
 
 func (m *Manager) accountDir(acc Account) string {

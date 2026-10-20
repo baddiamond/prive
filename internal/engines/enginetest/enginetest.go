@@ -11,7 +11,9 @@
 package enginetest
 
 import (
+	"bytes"
 	"context"
+	"database/sql"
 	"errors"
 	"io"
 	"log/slog"
@@ -22,6 +24,7 @@ import (
 	"time"
 
 	"github.com/baddiamond/prive/internal/core"
+	"github.com/baddiamond/prive/internal/store"
 )
 
 // Options tunes the suite for one engine.
@@ -98,10 +101,7 @@ func (h *harness) newAccount(t *testing.T) account {
 // and registers cleanup that closes it and checks the DataDir boundary.
 func (h *harness) open(t *testing.T, a account) core.Session {
 	t.Helper()
-	s, err := h.engine.NewSession(a.account, core.SessionDeps{
-		DataDir: a.dataDir,
-		Logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
-	})
+	s, err := h.engine.NewSession(a.account, h.deps(a))
 	if err != nil {
 		t.Fatalf("NewSession: %v", err)
 	}
@@ -117,6 +117,18 @@ func (h *harness) open(t *testing.T, a account) core.Session {
 		assertOnlyDataDir(t, a)
 	})
 	return s
+}
+
+// deps mirrors what the Manager gives a session, including encrypted databases.
+func (h *harness) deps(a account) core.SessionDeps {
+	key := bytes.Repeat([]byte{0x5a}, store.KeySize)
+	return core.SessionDeps{
+		DataDir: a.dataDir,
+		Logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
+		OpenDB: func(ctx context.Context, name string) (*sql.DB, error) {
+			return store.OpenDB(ctx, filepath.Join(a.dataDir, name+".db"), store.Options{Key: key})
+		},
+	}
 }
 
 func (h *harness) ctx(t *testing.T) context.Context {
@@ -162,10 +174,7 @@ func (h *harness) testUnsupportedLoginMethod(t *testing.T) {
 
 func (h *harness) testEventChannelLifecycle(t *testing.T) {
 	a := h.newAccount(t)
-	s, err := h.engine.NewSession(a.account, core.SessionDeps{
-		DataDir: a.dataDir,
-		Logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
-	})
+	s, err := h.engine.NewSession(a.account, h.deps(a))
 	if err != nil {
 		t.Fatal(err)
 	}

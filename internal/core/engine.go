@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"regexp"
@@ -120,7 +121,17 @@ type SessionDeps struct {
 	// Logger is already tagged with the engine and account. Never log message
 	// content, phone numbers, tokens or keys.
 	Logger *slog.Logger
+	// OpenDB opens (or creates) a private SQLite database named name ("store", "cache"…)
+	// inside DataDir, with the app's driver and encryption (ADR 0007). Engines must use it
+	// for every database instead of opening files themselves, and close it in Close.
+	OpenDB func(ctx context.Context, name string) (*sql.DB, error)
 }
+
+var dbNamePattern = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,31}$`)
+
+// DBOpener opens one engine database: path is the file inside the account's DataDir and
+// label identifies it for key derivation ("engine/<engineId>/<accountId>/<name>").
+type DBOpener func(ctx context.Context, path, label string) (*sql.DB, error)
 
 // EngineSource looks up registered engines. internal/engines provides the implementation.
 type EngineSource interface {

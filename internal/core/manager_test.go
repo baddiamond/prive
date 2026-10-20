@@ -1,7 +1,9 @@
 package core_test
 
 import (
+	"bytes"
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -15,6 +17,7 @@ import (
 	"github.com/baddiamond/prive/internal/core"
 	"github.com/baddiamond/prive/internal/engines"
 	"github.com/baddiamond/prive/internal/engines/fake"
+	"github.com/baddiamond/prive/internal/keys"
 	"github.com/baddiamond/prive/internal/store"
 )
 
@@ -27,6 +30,7 @@ type env struct {
 	store    *store.Store
 	registry *engines.Registry
 	fake     *fake.Engine
+	keys     *keys.Keys
 	events   *recorder
 	manager  *core.Manager
 }
@@ -34,7 +38,11 @@ type env struct {
 func newEnv(t *testing.T, extra ...core.Engine) *env {
 	t.Helper()
 	dir := t.TempDir()
-	st, err := store.Open(context.Background(), filepath.Join(dir, store.FileName))
+	k, _, err := keys.Unlock(dir, keys.NewMemoryKeychain())
+	if err != nil {
+		t.Fatal(err)
+	}
+	st, err := store.Open(context.Background(), filepath.Join(dir, store.FileName), store.Options{Key: k.Derive("prive.db")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,7 +55,7 @@ func newEnv(t *testing.T, extra ...core.Engine) *env {
 			t.Fatal(err)
 		}
 	}
-	e := &env{t: t, dataDir: dir, store: st, registry: reg, fake: fk}
+	e := &env{t: t, dataDir: dir, store: st, registry: reg, fake: fk, keys: k}
 	e.restart()
 	return e
 }
@@ -68,6 +76,9 @@ func (e *env) restart() {
 		DataDir: e.dataDir,
 		Logger:  slog.New(slog.NewTextHandler(io.Discard, nil)),
 		Emit:    e.events.add,
+		OpenDB: func(ctx context.Context, path, label string) (*sql.DB, error) {
+			return store.OpenDB(ctx, path, store.Options{Key: e.keys.Derive(label)})
+		},
 	})
 	m := e.manager
 	e.t.Cleanup(func() { _ = m.Close() })
@@ -414,5 +425,38 @@ func TestInputValidation(t *testing.T) {
 	}
 	if _, err := e.manager.AddAccount(ctx, core.NewAccount{EngineID: fake.EngineID}); !errors.Is(err, core.ErrShuttingDown) {
 		t.Errorf("AddAccount after Close = %v, want ErrShuttingDown", err)
+	}
+}
+
+func TestEngineDatabasesAreEncryptedAndConfined(t *testing.T) {
+	e := newEnv(t)
+	ctx := context.Background()
+	a := e.addLoggedIn("A")
+	deps := e.fake.Session(a.ID).Deps()
+
+	db, err := deps.OpenDB(ctx, "store")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.ExecContext(ctx, `CREATE TABLE t (v TEXT); INSERT INTO t VALUES ('engine-secret')`); err != nil {
+		t.Fatal(err)
+	}
+	if err := db.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	raw, err := os.ReadFile(filepath.Join(deps.DataDir, "store.db"))
+	if err != nil {
+		t.Fatalf("engine database not created inside DataDir: %v", err)
+	}
+	if bytes.HasPrefix(raw, []byte("SQLite format 3")) || bytes.Contains(raw, []byte("engine-secret")) {
+		t.Error("engine database is not encrypted")
+	}
+
+	for _, bad := range []string{"../escape", "a/b", "", "UPPER", "store.db"} {
+		if db, err := deps.OpenDB(ctx, bad); err == nil {
+			_ = db.Close()
+			t.Errorf("OpenDB(%q) accepted", bad)
+		}
 	}
 }

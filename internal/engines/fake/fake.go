@@ -54,6 +54,7 @@ func (e *Engine) NewSession(account core.Account, deps core.SessionDeps) (core.S
 	defer e.mu.Unlock()
 	s := &Session{
 		account:    account,
+		deps:       deps,
 		dataDir:    deps.DataDir,
 		events:     core.NewEventQueue(),
 		chats:      map[core.ChatID]*core.Chat{},
@@ -81,6 +82,7 @@ func (e *Engine) Session(id core.AccountID) *Session {
 // Session is one fake account. It implements core.Session.
 type Session struct {
 	account    core.Account
+	deps       core.SessionDeps
 	dataDir    string
 	events     *core.EventQueue
 	connectErr error
@@ -233,6 +235,9 @@ func (s *Session) Receive(chatID core.ChatID, chatName, text string) core.Messag
 
 // Emit pushes an arbitrary event, for tests of the Manager's event handling.
 func (s *Session) Emit(e core.Event) { s.events.Push(e) }
+
+// Deps returns the dependencies the core gave this session.
+func (s *Session) Deps() core.SessionDeps { return s.deps }
 
 // Closed reports whether Close was called.
 func (s *Session) Closed() bool {
