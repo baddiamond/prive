@@ -1,6 +1,6 @@
 # 0002 — Pure-Go SQLite
 
-- **Status:** accepted
+- **Status:** superseded by [0006](0006-sqlite-driver-ncruces.md)
 - **Date:** 2026-10-20
 
 ## Context

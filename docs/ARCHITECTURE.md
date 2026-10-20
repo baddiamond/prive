@@ -38,7 +38,7 @@
 │  session A   session B     session C                                   │
 │  (whatsmeow) (whatsmeow)                                               │
 │                                                                        │
-│  internal/store (SQLite, modernc.org/sqlite)                           │
+│  internal/store (SQLite; ncruces/go-sqlite3 per ADR 0006)              │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -279,7 +279,13 @@ See [`I18N.md`](I18N.md).
 Recorded as ADRs in [`docs/adr/`](adr/):
 
 - [0001 — Wails v2 for the desktop shell](adr/0001-wails-desktop-shell.md)
-- [0002 — Pure-Go SQLite](adr/0002-pure-go-sqlite.md)
+- [0002 — Pure-Go SQLite](adr/0002-pure-go-sqlite.md) (superseded by 0006)
 - [0003 — Engines compiled into the binary](adr/0003-compiled-engines.md)
 - [0004 — Backend returns codes, not text](adr/0004-backend-returns-codes.md)
 - [0005 — whatsmeow called directly, no HTTP/gRPC layer](adr/0005-direct-whatsmeow.md)
+- [0006 — SQLite driver: ncruces/go-sqlite3](adr/0006-sqlite-driver-ncruces.md) (supersedes 0002)
+- [0007 — Encryption at rest and recovery phrase](adr/0007-encryption-at-rest.md)
+- [0008 — On-device voice note transcription](adr/0008-local-voice-transcription.md)
+- [0009 — Hybrid local search](adr/0009-hybrid-local-search.md)
+- [0010 — Per-chat and per-account privacy](adr/0010-chat-and-account-privacy.md)
+- [0011 — Dependency and model licensing policy](adr/0011-licensing-policy.md)

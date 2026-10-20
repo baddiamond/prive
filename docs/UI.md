@@ -198,7 +198,19 @@ Namespaces: `rail.*`, `chatList.*`, `conversation.*`, `composer.*`, `details.*`,
 | `messages` | Messages per chat (paged), send queue, failures | `GetMessages()`, `message:new`, `message:status` |
 | `ui` | Scope (all/account), details open, search open, theme, language | Local |
 
-## 8. Prototypes
+## 8. Planned additions
+
+Not designed yet; the decisions are in ADRs and the spec will be extended before each feature is built.
+
+| Feature | Touches | ADR |
+|---|---|---|
+| Recovery phrase banner, unlock screen, Privacy rows (encryption status, recovery phrase, app password) | ChatList banner, Settings → Privacy, new unlock screen | [0007](adr/0007-encryption-at-rest.md) |
+| Transcribe action and transcript under voice bubbles; "On this computer" Settings section (models, download) | Conversation, Settings | [0008](adr/0008-local-voice-transcription.md) |
+| "Voice notes" result group, "Similar meaning" label, search filters, one-time semantic search offer | SearchPalette | [0009](adr/0009-hybrid-local-search.md) |
+| Lock / hide / exclude from search; "Locked chats" row; secret code in ⌘K | DetailsPanel, ChatList, AccountRail, Settings → Privacy | [0010](adr/0010-chat-and-account-privacy.md) |
+| Third-party notices | Settings → About | [0011](adr/0011-licensing-policy.md) |
+
+## 9. Prototypes
 
 The interactive prototypes were built on a design canvas. Their sources are in
 [`design/prototypes/`](../design/prototypes/) as reference (copy, layout values, states and sample data);

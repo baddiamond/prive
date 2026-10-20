@@ -47,7 +47,7 @@ Read more in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Desktop shell | [Wails v2](https://wails.io) |
 | Backend | Go |
 | Frontend | React + TypeScript + Tailwind CSS, Zustand, react-i18next |
-| Storage | SQLite via `modernc.org/sqlite` (pure Go, no CGO) |
+| Storage | SQLite via `modernc.org/sqlite` (pure Go, no CGO); moving to `ncruces/go-sqlite3` for encryption, FTS5 and vectors ([ADR 0006](docs/adr/0006-sqlite-driver-ncruces.md)) |
 | WhatsApp | [whatsmeow](https://github.com/tulir/whatsmeow) |
 
 ## Installation (development)
@@ -137,19 +137,22 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - [ ] **5. Real time** — send and receive text messages live, mark as read
 - [ ] **6. Polish** — keyboard shortcuts, startup/memory profiling, macOS/Windows/Linux builds
 
-**Later**
+**Future features** ([details](docs/ROADMAP.md#future-features))
 
+- Encryption at rest on by default, with a recovery phrase
+- Lock and hide chats or whole accounts, exclude them from search
+- Search across all accounts: full-text, plus opt-in semantic search — all on this computer
+- Opt-in voice note transcription on this computer
 - Media (images, audio, documents), reactions, replies, edits
-- Search across all accounts (local full-text index)
 - Notifications and tray/menu bar icon
 - More engines: Telegram, Signal, Slack, Instagram, Discord, Matrix… (community welcome)
-- Optional encryption at rest for the local database
 - Out-of-process engines (write an engine in any language over stdio)
 
 ## Design
 
 - [UI specification](docs/UI.md) — app shell, components, states, keyboard, accessibility
 - [First run](docs/ONBOARDING.md) — onboarding flow
+- [System requirements](docs/REQUIREMENTS.md) — device tiers and feature defaults
 - [Design sources](design/) — interactive prototype sources
 
 ## Brand
