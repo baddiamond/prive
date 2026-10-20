@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title">
+  <title id="title">Privé app icon</title>
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="#1B1D23"/>
+  <rect x="102" y="102" width="820" height="820" rx="183" fill="none" stroke="#3A3E48" stroke-width="4"/>
+  <g transform="translate(218.08 241.6) scale(8.55)">
+    <circle cx="34" cy="36" r="14" fill="none" stroke="#ECEDF0" stroke-width="7"/>
+    <path d="M20 36V58" fill="none" stroke="#ECEDF0" stroke-width="7" stroke-linecap="round"/>
+    <path d="M39 12L49 5" fill="none" stroke="#8B9CFF" stroke-width="6.5" stroke-linecap="round"/>
+  </g>
+</svg>

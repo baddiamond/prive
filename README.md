@@ -1,3 +1,8 @@
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="assets/brand/social/prive-banner-light.svg">
+  <img alt="Privé — Your conversations, at home." src="assets/brand/social/prive-banner-dark.svg" width="100%">
+</picture>
+
 # Privé
 
 **One fast, private, local-first desktop app for all your messaging accounts.**
@@ -135,6 +140,11 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 - More engines: Telegram, Signal, Slack, Instagram, Discord, Matrix… (community welcome)
 - Optional encryption at rest for the local database
 - Out-of-process engines (write an engine in any language over stdio)
+
+## Brand
+
+Logo, icons, colors, typography, voice and accessibility rules live in the
+[brand guide](docs/brand/BRAND.md). All assets are in [`assets/brand/`](assets/brand/) and are generated from code.
 
 ## Contributing
 

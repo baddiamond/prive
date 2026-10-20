@@ -10,9 +10,10 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 ### 🟨 0. Bootstrap
 
 - `LICENSE`, `.gitignore`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, docs and ADRs ✅ (proposal)
+- Brand identity: guide, logo, app/tray icons, banners, design tokens and generator ✅
 - Wails v2 project with React + TypeScript + Tailwind + Zustand
 - react-i18next with `en.json` / `es.json`, OS language detection, language selector persisted locally
-- Light/dark theme (follows the OS, overridable in Settings)
+- Light/dark theme from the brand tokens (follows the OS, overridable in Settings)
 - GitHub issue/PR templates; CI running `go vet`, `go test`, frontend lint and typecheck
 
 **Test on macOS:** `wails dev` opens an empty window; switching language and theme works and survives a restart.

@@ -62,3 +62,8 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 *.swp
+
+# ---------------------------------------------------------------------------
+# Tool caches (e.g. fonts downloaded by scripts/brand/generate.py)
+# ---------------------------------------------------------------------------
+.cache/

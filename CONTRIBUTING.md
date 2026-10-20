@@ -59,12 +59,15 @@ Scopes: `core`, `store`, `engines`, `<engine id>`, `ui`, `i18n`, `build`, `docs`
 
 **TypeScript / React**
 - Function components and hooks, strict TypeScript, no `any`.
-- Styling with Tailwind utility classes; support both light and dark themes.
+- Styling with Tailwind utilities from the brand preset (`bg-surface`, `text-text-secondary`…);
+  no hardcoded colors. Support both light and dark themes.
+- Follow the accessibility rules in [`docs/brand/BRAND.md`](docs/brand/BRAND.md#8-accessibility).
 - All strings via `useTranslation()`.
 
 ## Ways to help
 
 - 🌍 Translate Privé into your language — [`docs/I18N.md`](docs/I18N.md)
+- 🎨 Improve the brand assets or accessibility — [`docs/brand/BRAND.md`](docs/brand/BRAND.md)
 - 🔌 Build a new engine — [`docs/ADDING_AN_ENGINE.md`](docs/ADDING_AN_ENGINE.md)
 - 🐛 Report bugs or propose features with the issue templates
 - 📖 Improve docs
