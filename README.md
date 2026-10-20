@@ -117,6 +117,17 @@ Deleting that folder removes every session, chat and setting. Nothing is stored 
 
 Full guide: [`docs/I18N.md`](docs/I18N.md).
 
+### Developer tool
+
+`cmd/prive-dev` drives the backend from the terminal, with the same encrypted data as the app.
+Quit Privé first: two processes must not run the same sessions.
+
+```bash
+go run ./cmd/prive-dev link Personal green   # shows a QR code to scan with WhatsApp
+go run ./cmd/prive-dev accounts              # lists accounts and their connection state
+go run ./cmd/prive-dev remove <id-prefix>    # logs out and deletes an account
+```
+
 ## Adding a network (engine)
 
 Each network lives in `internal/engines/<id>/` and implements two interfaces (`Engine` and `Session`).
@@ -130,7 +141,7 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 **Phase 1 — MVP (WhatsApp)**
 
 - [x] **0. Bootstrap** — repo docs, Wails + React + TS + Tailwind skeleton, i18n (en/es), dark mode, CI
-- [ ] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
+- [x] **1. Core & store** — engine interfaces, registry, multi-account manager, SQLite, conformance suite
 - [ ] **2. WhatsApp login** — QR pairing, persisted sessions, auto-reconnect, unlimited accounts
 - [ ] **3. Chat list** — unified inbox + per-account filter, sorted by last message, unread counters
 - [ ] **4. History** — paginated message history cached locally

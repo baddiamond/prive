@@ -64,8 +64,10 @@ prive/
 │   │   ├── enginetest/         # Conformance suite every engine must pass
 │   │   ├── _template/          # Skeleton for new engines (ignored by the Go toolchain; CI tests a copy)
 │   │   ├── fake/               # In-memory engine for tests (never registered in the app)
-│   │   └── whatsapp/           # whatsmeow-based engine (phase 2)
+│   │   └── whatsapp/           # whatsmeow-based engine
 │   ├── store/                  # SQLite access + embedded migrations
+│   ├── keys/                   # Data encryption key and keychain slot
+│   ├── bootstrap/              # Opens local data for the app and cmd/prive-dev
 │   └── platform/               # Data directory per OS, system locale detection
 ├── frontend/
 │   └── src/
@@ -120,6 +122,7 @@ type Engine interface {
 type Manifest struct {
     ID           string       // stable, lowercase: "whatsapp"
     Name         string       // brand name, not translated: "WhatsApp"
+    ShortName    string       // 2-3 letter tag for the rail: "WA"
     LoginMethods []LoginMethod // e.g. LoginQR, LoginPhoneCode, LoginToken
     Capabilities Capabilities
 }
@@ -181,6 +184,7 @@ to the UI as Wails events.
 | Wails event | Payload (JSON) | When |
 |---|---|---|
 | `account:state` | `{accountId, state, code?}` | disconnected / connecting / connected / reconnecting / loggedOut / error |
+| `account:updated` | `{accountId, account}` | label, color or remote identity changed (emitted by the Manager only) |
 | `account:removed` | `{accountId}` | account deleted (emitted by the Manager only) |
 | `login:qr` | `{accountId, code, expiresAt}` | new QR to display |
 | `login:success` | `{accountId, remoteId, displayName}` | pairing completed |

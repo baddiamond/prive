@@ -40,14 +40,26 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 
 **Test:** `go test ./...` (includes multi-account scenarios with the fake engine).
 
-### ⬜ 2. WhatsApp login
+### 🟨 2. WhatsApp login
 
-- WhatsApp engine on whatsmeow
+**2a — backend**
+
+- WhatsApp engine on whatsmeow, store encrypted through `SessionDeps.OpenDB`; passes the conformance suite ✅
+- Session persisted per account; automatic `Connect` on startup; reconnection with backoff (whatsmeow) ✅
+- Logout / remove account (unlinks on the phone when online) ✅
+- Unlimited accounts ✅
+- API for the UI: `ListEngines`, `ListAccounts`, `AddAccount`, `UpdateAccount`, `Login`, `CancelLogin`,
+  `RemoveAccount`; events `login:*`, `account:state`, `account:updated`, `account:removed` ✅
+- Developer tool `cmd/prive-dev` to link and list accounts from the terminal ✅
+
+**Test 2a on macOS:** quit Privé, run `go run ./cmd/prive-dev link Personal green` and scan the QR code, repeat
+with a second number, then run `go run ./cmd/prive-dev accounts` again later: both show `connected` without scanning.
+
+**2b — interface**
+
 - First-run onboarding ([`docs/ONBOARDING.md`](ONBOARDING.md)): welcome, responsible-use agreement, connect, link, ready
 - Add-account flow with QR code in the app
-- Session persisted per account; automatic `Connect` on startup; reconnection with backoff
-- Logout / remove account
-- Unlimited accounts
+- Accounts in the rail; Settings → Accounts (rename, log out)
 
 **Test on macOS:** link two WhatsApp numbers, quit the app, reopen it — both reconnect without scanning again.
 

@@ -31,6 +31,7 @@ func (e *Engine) Manifest() core.Manifest {
     return core.Manifest{
         ID:           "telegram",
         Name:         "Telegram",
+        ShortName:    "TG", // 2-3 letter tag shown on account items in the rail
         LoginMethods: []core.LoginMethod{core.LoginQR, core.LoginPhoneCode},
         Capabilities: core.Capabilities{SendText: true, ReadReceipts: true, Typing: true},
     }
@@ -54,7 +55,8 @@ Only declare capabilities you actually implement — the UI trusts them.
 Rules:
 
 - **Many sessions of your engine will run at once** (multi-account). No package-level mutable state.
-- Store private data **only** under `deps.DataDir`.
+- Store private data **only** under `deps.DataDir`. Open every SQLite database with `deps.OpenDB(ctx, "name")`:
+  it is created inside `DataDir` and encrypted with its own key. Never open database files directly.
 - Log with `deps.Logger`. Never log message text, phone numbers, tokens or keys.
 - Errors that a user may see are `core.CodedError` with a key under `errors.<id>.*`.
 - Reconnect on your own with backoff and emit `AccountStateEvent` on every change.
