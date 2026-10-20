@@ -1,0 +1,2 @@
+# Keeps frontend/dist non-empty so `//go:embed all:frontend/dist` in main.go compiles
+# before the first frontend build. Vite copies this file from frontend/public on every build.

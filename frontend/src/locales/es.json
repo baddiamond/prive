@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "Privé",
+    "loading": "Cargando…"
+  },
+  "nav": {
+    "label": "Navegación principal",
+    "inbox": "Todos los chats",
+    "settings": "Ajustes"
+  },
+  "inbox": {
+    "empty": {
+      "title": "Te damos la bienvenida a Privé",
+      "body": "Aquí aparecerán las conversaciones de todas tus cuentas, guardadas solo en este ordenador. La conexión de cuentas llegará en una próxima versión."
+    }
+  },
+  "settings": {
+    "title": "Ajustes",
+    "language": {
+      "title": "Idioma",
+      "description": "Elige el idioma de Privé.",
+      "system": "Predeterminado del sistema ({{language}})",
+      "options": {
+        "en": "English",
+        "es": "Español"
+      }
+    },
+    "theme": {
+      "title": "Apariencia",
+      "description": "Sigue al sistema o elige un tema fijo.",
+      "options": {
+        "system": "Sistema",
+        "light": "Claro",
+        "dark": "Oscuro"
+      }
+    }
+  },
+  "errors": {
+    "unknown": "Algo salió mal. Inténtalo de nuevo.",
+    "settings": {
+      "invalidValue": "Ese valor no es válido.",
+      "loadFailed": "No se pudieron cargar tus ajustes.",
+      "saveFailed": "No se pudieron guardar tus ajustes."
+    }
+  }
+}

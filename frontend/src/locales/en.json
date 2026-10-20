@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "Privé",
+    "loading": "Loading…"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "inbox": "All chats",
+    "settings": "Settings"
+  },
+  "inbox": {
+    "empty": {
+      "title": "Welcome to Privé",
+      "body": "Your conversations from every account will appear here, stored only on this computer. Connecting accounts arrives in an upcoming version."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language",
+      "description": "Choose the language Privé uses.",
+      "system": "System default ({{language}})",
+      "options": {
+        "en": "English",
+        "es": "Español"
+      }
+    },
+    "theme": {
+      "title": "Appearance",
+      "description": "Follow your system or pick a fixed theme.",
+      "options": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      }
+    }
+  },
+  "errors": {
+    "unknown": "Something went wrong. Please try again.",
+    "settings": {
+      "invalidValue": "That value is not valid.",
+      "loadFailed": "Your settings could not be loaded.",
+      "saveFailed": "Your settings could not be saved."
+    }
+  }
+}

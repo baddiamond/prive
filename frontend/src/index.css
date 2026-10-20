@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-white font-sans text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+    /* Desktop app: no rubber-band scrolling or accidental text selection in chrome. */
+    overscroll-behavior: none;
+    user-select: none;
+  }
+}
