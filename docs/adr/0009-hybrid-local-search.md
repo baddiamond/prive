@@ -19,7 +19,8 @@ merged with **Reciprocal Rank Fusion (RRF)**:
 - **FTS5** with BM25 ranking and the `unicode61 remove_diacritics 2` tokenizer
   ("cancion" finds "canción").
 - Indexes message text, captions, file names and transcripts ([ADR 0008](0008-local-voice-transcription.md)).
-- Created from the first store migration, so it never needs a rebuild later.
+- Created before the first release (store migration `0003`), so it never needs a rebuild later. It is a
+  contentless FTS5 table keyed by `messages.rowid` and kept in sync by triggers.
 
 ### 2. Semantic (opt-in)
 
@@ -28,7 +29,8 @@ merged with **Reciprocal Rank Fusion (RRF)**:
   time. We write a small Go loader (tokenizer + table lookup); the weights are memory-mapped, so RAM use stays low.
 - **Conversation windows**, not single messages: consecutive messages of one chat, split on long silences
   or a size limit. Each window points back to its messages, and a hit opens the best message in context.
-- Vectors stored with **`sqlite-vec`**, quantized to int8 (binary quantization if a dataset needs it).
+- Vectors stored with **`vec1`**, SQLite's vector extension shipped with our driver
+  ([ADR 0006](0006-sqlite-driver-ncruces.md)), quantized to int8 (binary quantization if a dataset needs it).
 - Off by default. ⌘K offers it once, when a search returns few results; it is also in Settings.
   It needs one model download under the same rules as ADR 0008 (explicit action, pinned SHA-256, import from file).
 - Possible later upgrade (opt-in): `multilingual-e5-small` (MIT) on ONNX Runtime for higher quality.

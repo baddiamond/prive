@@ -19,12 +19,13 @@ every installation.
 ## Decision
 
 Use **[`github.com/ncruces/go-sqlite3`](https://github.com/ncruces/go-sqlite3)** through its `database/sql` driver.
-It runs the real SQLite C code compiled to WebAssembly on the [wazero](https://wazero.io) runtime, so it stays
+It runs the real SQLite C code, translated to Go (`ncruces/go-sqlite3-wasm`, produced with `wasm2go`), so it stays
 CGO-free. We use:
 
 - its **`adiantum` VFS** for encryption at rest (details in ADR 0007);
-- the **`sqlite-vec`** build from `github.com/asg017/sqlite-vec-go-bindings/ncruces` for vector search;
-- **FTS5** for full-text search.
+- **FTS5** for full-text search, registered on every connection (`ext/fts5`);
+- **`vec1`**, SQLite's own vector extension, for vector search (`ext/vec1`), registered when semantic search
+  ships.
 
 WAL mode stays on. Migrations remain plain `.sql` files embedded in the binary.
 The same driver opens every SQLite file Privé owns, including each engine's private store
@@ -33,12 +34,19 @@ The same driver opens every SQLite file Privé owns, including each engine's pri
 ## Consequences
 
 - One driver gives encryption, full-text and vector search; no CGO for storage.
-- WebAssembly execution is somewhat slower than native SQLite. For a messaging client's workload
+- Translated code is somewhat slower than native SQLite. For a messaging client's workload
   (small writes, indexed reads) this is not noticeable; we verify it in the phase 6 profiling.
-- First open compiles the Wasm module (a one-time cost per process, tens of milliseconds); measured at startup.
-- **Do the switch before the first release** (tracked in the roadmap, phase 1).
-- **To verify during the switch:** FTS5 availability in the exact build we embed together with
-  `sqlite-vec`, and that whatsmeow's `sqlstore` works unchanged on this driver (it uses `database/sql`).
+- Extensions are not built in: FTS5 (and later `vec1`) must be registered on each connection. `store.OpenDB`
+  does this for every database Privé opens.
+- **Switch done in phase 1, before any release.**
+
+### Verification (2026-10-20, ncruces v0.35.6)
+
+A spike opened one database through the `adiantum` VFS in WAL mode and checked: FTS5 with
+`unicode61 remove_diacritics 2` ("cancion" finds "canción"), `vec1` loaded on the same connection, whatsmeow's
+`sqlstore` created and upgraded its schema on that database unchanged, the file on disk has no plaintext, and a
+wrong key is rejected. The `asg017/sqlite-vec-go-bindings` package mentioned in the first draft of this ADR is not
+usable: its last release (Nov 2024) targets ncruces v0.17 and the older Wasm runtime.
 
 ## Alternatives considered
 

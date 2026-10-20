@@ -18,8 +18,16 @@ Everything is stored **locally, on your computer**, in your user's data folder:
 | Chats, contacts' display names, messages (cache) | To open instantly and work offline |
 | Settings (language, theme, account names and colors) | To remember your preferences |
 
-The local database is **not encrypted by Privé yet** (planned: optional encryption at rest).
-Use your operating system's disk encryption.
+Privé **encrypts its databases** (settings, chats, messages, search index and each account's session keys)
+with a random key created on your computer. That key is kept in your system's keychain (macOS Keychain,
+Windows Credential Manager or the Linux Secret Service), so Privé opens without asking for a password.
+
+What this protects against: a lost or stolen computer, backups and disk copies, other users of the same computer,
+someone copying the data folder. What it does not protect against: malicious software running as you while Privé
+is open. The encryption hides contents but does not detect tampering.
+
+A recovery phrase, to move your data to another computer or recover it if the keychain entry is lost, is coming.
+Until then, if the keychain entry is lost, the local data cannot be read; your accounts can be linked again.
 
 ## What Privé sends, and to whom
 
@@ -37,10 +45,11 @@ The networks you connect have their own privacy policies, which still apply to y
 
 - **One account:** Settings → Accounts → Log out. This unlinks the device and deletes that account's
   local data.
-- **Everything:** quit Privé and delete the data folder listed above.
+- **Everything:** quit Privé and delete the data folder listed above. Its key stays in your system keychain under
+  `io.github.baddiamond.prive` and is useless without the folder; you can delete that entry too.
 
 ## Changes
 
 Any change to this page is made in public, in this repository, with its history visible in git.
 
-_Last updated: 2026-10-20 · Version 1_
+_Last updated: 2026-10-20 · Version 2_

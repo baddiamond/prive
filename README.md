@@ -47,7 +47,7 @@ Read more in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 | Desktop shell | [Wails v2](https://wails.io) |
 | Backend | Go |
 | Frontend | React + TypeScript + Tailwind CSS, Zustand, react-i18next |
-| Storage | SQLite via `modernc.org/sqlite` (pure Go, no CGO); moving to `ncruces/go-sqlite3` for encryption, FTS5 and vectors ([ADR 0006](docs/adr/0006-sqlite-driver-ncruces.md)) |
+| Storage | SQLite via `ncruces/go-sqlite3` (pure Go, no CGO), encrypted at rest, with FTS5 ([ADR 0006](docs/adr/0006-sqlite-driver-ncruces.md), [ADR 0007](docs/adr/0007-encryption-at-rest.md)) |
 | WhatsApp | [whatsmeow](https://github.com/tulir/whatsmeow) |
 
 ## Installation (development)
@@ -139,7 +139,7 @@ Detailed version: [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 **Future features** ([details](docs/ROADMAP.md#future-features))
 
-- Encryption at rest on by default, with a recovery phrase
+- Recovery phrase and optional app password for the encrypted database (encryption itself is already on)
 - Lock and hide chats or whole accounts, exclude them from search
 - Search across all accounts: full-text, plus opt-in semantic search — all on this computer
 - Opt-in voice note transcription on this computer
@@ -176,4 +176,7 @@ It is a **personal** client: spam, bulk messaging, scraping and surveillance are
 
 ## License
 
-[MIT](LICENSE) © Privé contributors
+The source code is [MIT](LICENSE) © Privé contributors.
+
+Release builds include the WhatsApp engine, which depends on a GPL-3.0 library (`go.mau.fi/libsignal`), so those
+**binaries are distributed under the GPL-3.0** ([ADR 0012](docs/adr/0012-gpl-binaries-with-whatsapp.md)).

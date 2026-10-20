@@ -38,7 +38,7 @@
 │  session A   session B     session C                                   │
 │  (whatsmeow) (whatsmeow)                                               │
 │                                                                        │
-│  internal/store (SQLite; ncruces/go-sqlite3 per ADR 0006)              │
+│  internal/store (SQLite via ncruces/go-sqlite3, encrypted; ADR 0006/7) │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -139,6 +139,9 @@ type Capabilities struct {
 type SessionDeps struct {
     DataDir string       // private folder for this account's engine data
     Logger  *slog.Logger // already tagged with engine and account
+    // OpenDB opens a private SQLite database ("store", "cache"…) inside DataDir with the app's
+    // driver and encryption. Engines never open database files themselves.
+    OpenDB func(ctx context.Context, name string) (*sql.DB, error)
 }
 ```
 
@@ -210,18 +213,33 @@ The frontend renders `t(code, params)`. Unknown codes fall back to `errors.unkno
 
 ## Storage
 
-One SQLite database per installation at `<DataDir>/prive.db` (see the README for OS paths):
+SQLite through [`ncruces/go-sqlite3`](https://github.com/ncruces/go-sqlite3) (pure Go, no CGO; [ADR 0006](adr/0006-sqlite-driver-ncruces.md)).
+Every database file is **encrypted at rest** with the `adiantum` VFS ([ADR 0007](adr/0007-encryption-at-rest.md)):
+
+- `internal/keys` creates a random 256-bit data key (DEK) on first run, wraps it into `<DataDir>/keys.json` and keeps
+  the wrapping key in the OS keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service), so the app
+  opens without a prompt. The recovery phrase and app password slots come later.
+- Each database gets its own key, derived from the DEK with HKDF and a label: `prive.db` for the app database,
+  `engine/<engineId>/<accountId>/<name>` for engine databases.
+- `temp_store=MEMORY` keeps temporary data off the disk. A database left in clear by a development build is
+  encrypted in place on first open.
+- If the keychain cannot be reached or no longer has the key, the window still opens and shows a translated
+  explanation (`errors.encryption.*`) instead of quitting.
+
+One app database per installation at `<DataDir>/prive.db` (see the README for OS paths):
 
 | Table | Purpose |
 |---|---|
 | `accounts` | One row per account (`id`, `engine_id`, `remote_id`, `display_name`, `color`, `position`, `created_at`) |
 | `chats` | `(account_id, id)` primary key; name, kind (direct/group), unread count, last message preview and time, muted, archived |
 | `messages` | `(account_id, chat_id, id)` primary key; sender, timestamp, kind, text, status, reply-to |
+| `messages_fts` | FTS5 full-text index over message text and `search_extra` (captions, transcripts); contentless, kept in sync by triggers, skips chats and accounts with `search_excluded = 1` ([ADR 0009](adr/0009-hybrid-local-search.md), [ADR 0010](adr/0010-chat-and-account-privacy.md)) |
 | `settings` | Key/value: `language`, `theme`, window size… |
 | `schema_migrations` | Applied migration versions |
 
 Engine-private data (e.g. whatsmeow's device keys and session store) lives in
-`<DataDir>/engines/<engineId>/<accountId>/`, given to the session as `SessionDeps.DataDir`.
+`<DataDir>/engines/<engineId>/<accountId>/`, given to the session as `SessionDeps.DataDir`; its databases are opened
+through `SessionDeps.OpenDB`, so they are encrypted with their own derived key.
 Removing an account deletes its rows and that folder.
 
 Indexes: `chats(account_id, last_message_at DESC)` and `chats(last_message_at DESC)` for the per-account and unified
@@ -289,3 +307,4 @@ Recorded as ADRs in [`docs/adr/`](adr/):
 - [0009 — Hybrid local search](adr/0009-hybrid-local-search.md)
 - [0010 — Per-chat and per-account privacy](adr/0010-chat-and-account-privacy.md)
 - [0011 — Dependency and model licensing policy](adr/0011-licensing-policy.md)
+- [0012 — Binaries with the WhatsApp engine are distributed under GPL-3.0](adr/0012-gpl-binaries-with-whatsapp.md)

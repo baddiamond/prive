@@ -1,6 +1,7 @@
 # 0007 — Encryption at rest and recovery phrase
 
-- **Status:** accepted (planned — see [roadmap](../ROADMAP.md#future-features))
+- **Status:** accepted — partly implemented: DEK, keychain slot, per-database derived keys and encrypted
+  databases (phase 1). Recovery phrase, app password and media encryption are still planned.
 - **Date:** 2026-10-20
 
 ## Context

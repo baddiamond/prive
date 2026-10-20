@@ -33,8 +33,10 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - `store`: accounts/chats/messages tables (SQLite, migrations and settings already exist since phase 0) ✅
 - A fake in-memory engine used by tests ✅
 - Bound methods reject with `{code, params}`; backend codes are checked against `en.json` in tests ✅
-- ⬜ Switch the store to `ncruces/go-sqlite3` and add the FTS5 table, before the first release
-  ([ADR 0006](adr/0006-sqlite-driver-ncruces.md))
+- Store on `ncruces/go-sqlite3` with the FTS5 table and search-exclusion flags
+  ([ADR 0006](adr/0006-sqlite-driver-ncruces.md), [ADR 0009](adr/0009-hybrid-local-search.md)) ✅
+- Encryption at rest, invisible: data key in the OS keychain, every database encrypted with its own derived key,
+  engines open databases only through `SessionDeps.OpenDB` ([ADR 0007](adr/0007-encryption-at-rest.md)) ✅
 
 **Test:** `go test ./...` (includes multi-account scenarios with the fake engine).
 
@@ -54,6 +56,7 @@ Legend: ⬜ not started · 🟨 in progress · ✅ done
 - Initial history sync into SQLite
 - Unified inbox and per-account filter, sorted by last message
 - Unread counters per chat, per account and in total
+- Recovery phrase banner after the first account finishes its initial sync ([ADR 0007](adr/0007-encryption-at-rest.md))
 
 **Test:** your real chats appear in the right order with correct unread counts.
 
@@ -87,9 +90,9 @@ Decisions are recorded in the linked ADRs; system requirements and defaults are 
 
 ### Privacy and security
 
-- ⬜ **Encryption at rest, on by default** — random data key in the OS keychain, 12-word recovery phrase
-  with Privé's own word lists, optional app password ([ADR 0007](adr/0007-encryption-at-rest.md)).
-  Depends on the SQLite driver of [ADR 0006](adr/0006-sqlite-driver-ncruces.md), adopted in phase 1.
+- 🟨 **Encryption at rest, on by default** — data key in the OS keychain and encrypted databases are done
+  (phase 1). Still to do: 12-word recovery phrase with Privé's own word lists (shown after the first sync, phase 3),
+  optional app password, media encryption ([ADR 0007](adr/0007-encryption-at-rest.md)).
 - ⬜ **Exclude from search and lock** chats and accounts, unlocked with Touch ID / Windows Hello
   ([ADR 0010](adr/0010-chat-and-account-privacy.md), step 1).
 - ⬜ **Hidden chats and accounts** in an encrypted vault, revealed with a secret code

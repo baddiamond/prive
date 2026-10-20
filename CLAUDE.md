@@ -44,7 +44,8 @@ These rules apply to every session. Read them before changing anything.
 
 - Desktop app: **Wails v2** (Go backend + web frontend). Targets macOS, Windows and Linux.
 - Frontend: React + TypeScript + Tailwind, state in Zustand.
-- Storage: SQLite, pure Go, no CGO. Currently `modernc.org/sqlite`; moving to `ncruces/go-sqlite3` (ADR 0006).
+- Storage: SQLite via `ncruces/go-sqlite3` (pure Go, no CGO; ADR 0006), encrypted at rest (ADR 0007).
+  Every SQLite file goes through `store.OpenDB`; engines get theirs from `SessionDeps.OpenDB`, never open files directly.
 - Every messaging network is an **engine** in `internal/engines/<id>/`:
   - `core.Engine` = factory for one network; declares a `Manifest` (id, name, login method, capabilities).
   - `core.Session` = one running account: `Connect`, `Login`, `Logout`, `ListChats`, `GetMessages`,
