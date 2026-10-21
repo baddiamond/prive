@@ -46,14 +46,14 @@ export default function Conversation() {
       </header>
 
       <MessageLog
-        key={selected}
+        key={`log-${selected}`}
         chat={chat}
         chatName={name}
         canAsk={canAsk}
         showStatus={account?.manifest.capabilities.readReceipts ?? false}
       />
 
-      {account && <Composer key={selected} account={account} chatId={chat.id} />}
+      {account && <Composer key={`composer-${selected}`} account={account} chatId={chat.id} />}
     </main>
   );
 }

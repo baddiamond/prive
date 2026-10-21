@@ -9,6 +9,26 @@
     @apply h-full;
   }
 
+  /*
+   * The window never scrolls: every region scrolls on its own. Scroll regions are also
+   * position: relative, so absolutely positioned content (e.g. sr-only labels) cannot
+   * escape them and stretch the page; e2e/regression.mjs checks both.
+   */
+  html,
+  body {
+    overflow: hidden;
+  }
+}
+
+@layer utilities {
+  /* A scroll region without a visible scrollbar, for narrow strips like the account rail. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   body {
     @apply bg-bg font-sans text-body text-text antialiased;
     /* Desktop app: no rubber-band scrolling or accidental text selection in chrome. */

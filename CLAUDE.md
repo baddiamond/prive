@@ -94,7 +94,8 @@ docs/                    Architecture, guides, brand guide and ADRs
 
 - Work one roadmap phase at a time (`docs/ROADMAP.md`). Do not start the next phase without the maintainer's approval.
 - At the end of each phase, explain how to test it on macOS.
-- Before committing: `go vet ./...`, `go test ./...`, and in `frontend/`: `npm run lint`, `npm run typecheck`.
+- Before committing: `go vet ./...`, `go test ./...`, and in `frontend/`: `npm run lint`, `npm run typecheck`,
+  and `npm run test:ui` when the UI changes (then look at the screenshots in `frontend/e2e/screenshots/`).
 - Commit messages: Conventional Commits in English (`feat(whatsapp): add QR login`, `docs: ...`, `fix(store): ...`).
 - Significant design decisions get an ADR in `docs/adr/`.
 - Never commit databases, session files, QR codes, phone numbers or message content (including in tests and fixtures).

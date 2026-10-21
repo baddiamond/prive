@@ -28,13 +28,20 @@ export default function Composer({ account, chatId }: { account: AccountStatus; 
   const online = account.state === "connected";
   const canSend = caps.sendText && online && text.trim() !== "";
 
-  // Grow with the text up to maxLines.
+  // Grow with the text up to maxLines; only then may the field scroll. The height includes
+  // the borders (box-sizing: border-box), or a scrollbar would show on an empty field.
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    const style = getComputedStyle(el);
+    const borders = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+    const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+    const line = parseFloat(style.lineHeight) || 20;
+    const max = line * maxLines + padding + borders;
     el.style.height = "auto";
-    const line = parseFloat(getComputedStyle(el).lineHeight) || 20;
-    el.style.height = `${Math.min(el.scrollHeight, line * maxLines + 20)}px`;
+    const needed = el.scrollHeight + borders;
+    el.style.height = `${Math.min(needed, max)}px`;
+    el.style.overflowY = needed > max ? "auto" : "hidden";
   }, [text]);
 
   const change = (value: string) => {

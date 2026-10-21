@@ -33,7 +33,7 @@ export default function MessageBubble(props: MessageBubbleProps) {
     : `bg-raised ${lastOfRun ? "rounded-bubble rounded-bl-tag" : "rounded-bubble"}`;
 
   return (
-    <div className={`flex max-w-[62%] flex-col gap-1.5 ${m.fromMe ? "items-end self-end" : "items-start self-start"} ${firstOfRun ? "mt-2" : ""}`}>
+    <div className={`relative flex max-w-[62%] flex-col gap-1.5 ${m.fromMe ? "items-end self-end" : "items-start self-start"} ${firstOfRun ? "mt-2" : ""}`}>
       <div
         className={`flex min-w-0 max-w-full flex-col gap-0.5 border-[1.5px] px-3 pb-1.5 pt-2 ${shape} ${failed ? "border-status-danger" : "border-transparent"}`}
       >

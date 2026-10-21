@@ -50,7 +50,7 @@ export default function SettingsScreen() {
         })}
       </nav>
 
-      <main className="min-w-0 flex-1 overflow-y-auto bg-bg">
+      <main className="relative min-w-0 flex-1 overflow-y-auto overscroll-contain bg-bg">
         <div className="flex max-w-[880px] flex-col gap-7 px-10 py-8">
           <h1 className="text-title font-semibold tracking-[-0.01em]">{t(`settings.nav.${section}`)}</h1>
           {errorCode && (

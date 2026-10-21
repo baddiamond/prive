@@ -34,7 +34,7 @@ export default function UnlockScreen() {
   };
 
   return (
-    <main className="flex h-full items-center justify-center overflow-y-auto p-8">
+    <main className="relative flex h-full items-center justify-center overflow-y-auto p-8">
       <form onSubmit={(e) => void onSubmit(e)} className="flex w-full max-w-[520px] flex-col gap-5">
         <LogoMark width={48} height={48} />
         <h1 className="text-title font-semibold tracking-[-0.01em]">{t("unlock.title")}</h1>

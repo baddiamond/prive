@@ -78,7 +78,7 @@ export default function MessageLog({ chat, chatName, canAsk, showStatus }: Messa
       aria-label={t("conversation.messages")}
       aria-busy={state?.loading || state?.loadingOlder || state?.older === "asking"}
       tabIndex={0}
-      className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-7 py-5 [&>*]:shrink-0"
+      className="relative flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain px-7 py-5 [&>*]:shrink-0"
     >
       <OlderStatus state={state} onLoad={older} />
       {items.map((item) =>

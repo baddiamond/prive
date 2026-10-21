@@ -116,7 +116,7 @@ export default function ChatList() {
       <RecoveryBanner />
 
       {visible.length > 0 ? (
-        <div role="list" aria-label={t("chatList.label")} className="flex-1 overflow-y-auto px-2 pb-2">
+        <div role="list" aria-label={t("chatList.label")} className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2">
           {visible.map((c) => (
             <div role="listitem" key={`${c.accountId}\u0000${c.id}`}>
               <ChatRow

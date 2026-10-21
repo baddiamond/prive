@@ -194,6 +194,18 @@ for every affected account (stacked, max 2, then "+N more").
 
 Ctrl replaces ⌘ on Windows and Linux.
 
+## 4b. Layout invariants
+
+Checked on every push by `frontend/e2e/regression.mjs` (`npm run test:ui`):
+
+- The window never scrolls. Every region scrolls on its own (rail accounts, chat list, message log, settings,
+  dialogs); `html` and `body` hide overflow, and the check still measures the real document size.
+- Scroll regions are `position: relative`, so absolutely positioned content (e.g. `sr-only` labels) cannot escape
+  them and stretch the page.
+- No scroll region inside another, and nothing scrolls sideways; long words and links wrap inside bubbles.
+- A text field that fits its text shows no scrollbar (macOS can be set to always show scrollbars).
+- Fixed controls stay reachable at the minimum window size: Settings at the bottom of the rail, the composer.
+
 ## 5. Accessibility checklist (per component)
 
 - Real elements: `button`, `a`, `input` + `label`, `fieldset` + `legend`; no clickable `div`s.

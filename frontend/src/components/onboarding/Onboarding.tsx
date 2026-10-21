@@ -65,7 +65,7 @@ function Flow() {
   const canContinue = (step === 2 && agreed) || (step === 3 && engineId !== null) || (step === 4 && linkFlow?.phase === "linked");
 
   return (
-    <div className="flex h-full flex-col items-center overflow-y-auto bg-bg px-4 py-8">
+    <div className="relative flex h-full flex-col items-center overflow-y-auto bg-bg px-4 py-8">
       <Stepper current={step} />
       <main className="flex w-full max-w-[760px] flex-1 flex-col">
         {step === 1 && <WelcomeStep headingRef={headingRef} onStart={() => goTo(2)} />}
@@ -402,7 +402,7 @@ function ReAccept() {
   useEffect(() => headingRef.current?.focus(), []);
 
   return (
-    <div className="flex h-full flex-col items-center overflow-y-auto bg-bg px-4 py-12">
+    <div className="relative flex h-full flex-col items-center overflow-y-auto bg-bg px-4 py-12">
       <main className="flex w-full max-w-[760px] flex-col">
         <PrivacyStep headingRef={headingRef} agreed={agreed} onAgree={setAgreed} />
         {error && (

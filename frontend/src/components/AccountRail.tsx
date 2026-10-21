@@ -29,7 +29,7 @@ export default function AccountRail() {
   return (
     <nav
       aria-label={t("rail.label")}
-      className="flex w-[76px] shrink-0 flex-col items-center gap-3 overflow-y-auto border-r border-divider bg-rail py-4"
+      className="flex w-[76px] shrink-0 flex-col items-center gap-3 border-r border-divider bg-rail py-4"
     >
       <LogoMark width={30} height={30} className="mb-1 shrink-0" />
       <div className="h-px w-9 shrink-0 bg-divider" />
@@ -48,28 +48,30 @@ export default function AccountRail() {
         <UnreadBadge count={unread.total} />
       </button>
 
-      {accounts.map((s, i) => (
-        <RailAccount
-          key={s.account.id}
-          status={s}
-          index={i}
-          unread={unread.perAccount[s.account.id] ?? 0}
-          selected={inbox && scope === s.account.id}
-          onSelect={() => setScope(s.account.id)}
-        />
-      ))}
+      {/* Only the accounts scroll, so Settings stays reachable with any number of them. The
+          rail is too narrow for a scrollbar; wheel, trackpad and keyboard focus still scroll. */}
+      <div className="scrollbar-none relative -mx-1 flex min-h-0 w-full flex-1 flex-col items-center gap-3 overflow-y-auto overscroll-contain px-1 py-1.5">
+        {accounts.map((s, i) => (
+          <RailAccount
+            key={s.account.id}
+            status={s}
+            index={i}
+            unread={unread.perAccount[s.account.id] ?? 0}
+            selected={inbox && scope === s.account.id}
+            onSelect={() => setScope(s.account.id)}
+          />
+        ))}
 
-      <button
-        type="button"
-        aria-label={t("rail.addAccount")}
-        title={`${t("rail.addAccount")} (${shortcutLabel("N")})`}
-        onClick={() => openAddAccount()}
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card border-[1.5px] border-dashed border-border text-text-secondary hover:bg-raised hover:text-text"
-      >
-        <PlusIcon />
-      </button>
-
-      <div className="flex-1" />
+        <button
+          type="button"
+          aria-label={t("rail.addAccount")}
+          title={`${t("rail.addAccount")} (${shortcutLabel("N")})`}
+          onClick={() => openAddAccount()}
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-card border-[1.5px] border-dashed border-border text-text-secondary hover:bg-raised hover:text-text"
+        >
+          <PlusIcon />
+        </button>
+      </div>
 
       <button
         type="button"

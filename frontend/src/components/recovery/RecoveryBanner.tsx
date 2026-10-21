@@ -1,11 +1,14 @@
 import { useTranslation } from "react-i18next";
+import { linkedAccounts, useAccounts } from "../../state/accounts";
 import { useChats } from "../../state/chats";
+import { hasIssue } from "../accounts/accountLabel";
 import { useRecovery } from "../../state/recovery";
 import { LockIcon } from "../icons";
 
 /**
  * Calm, non-blocking offer to save the recovery phrase (ADR 0007). It appears once there is
- * data to lose: chats exist and no account is still importing. "Later" hides it until the
+ * data to lose: chats exist and no account is still importing. It waits while an account
+ * needs attention, so it never pushes those banners and the chats out of view. "Later" hides it until the
  * next start; it stops for good once the phrase is confirmed.
  */
 export default function RecoveryBanner() {
@@ -13,7 +16,9 @@ export default function RecoveryBanner() {
   const { loaded, confirmed, postponed, postpone, openDialog } = useRecovery();
   const hasChats = useChats((s) => s.chats.length > 0);
   const importing = useChats((s) => Object.keys(s.syncProgress).length > 0);
-  if (!loaded || confirmed || postponed || !hasChats || importing) return null;
+  // Accounts that need attention come first; the phrase can wait until they are fine.
+  const issues = useAccounts((s) => linkedAccounts(s.accounts).some(hasIssue));
+  if (!loaded || confirmed || postponed || !hasChats || importing || issues) return null;
 
   return (
     <div role="status" className="mx-3 mb-2 flex items-start gap-2.5 rounded-control border border-accent px-3 py-2.5">

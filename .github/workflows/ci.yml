@@ -88,3 +88,21 @@ jobs:
       - name: Frontend build
         working-directory: frontend
         run: npm run build
+
+      # The real frontend in Chromium against an in-memory backend (frontend/e2e): checks that
+      # the window never scrolls, scroll regions are not nested and messages stay in place.
+      - name: Install Chromium for the UI regression
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: UI regression
+        working-directory: frontend
+        run: npm run test:ui
+
+      - name: Upload UI screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-screenshots
+          path: frontend/e2e/screenshots/
+          retention-days: 7
